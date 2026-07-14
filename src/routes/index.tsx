@@ -382,7 +382,7 @@ function ExploreDestinationsBento() {
       alt: "Mysore Palace (Amba Vilas), Karnataka",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-2",
-      minH: "min-h-[420px] md:min-h-[560px]",
+      minH: "min-h-[420px] md:min-h-[720px]",
       position: "center 30%",
     },
     {
@@ -391,7 +391,7 @@ function ExploreDestinationsBento() {
       alt: "Brihadeeswarar Temple, Thanjavur, Tamil Nadu",
       to: "/tour-packages" as const,
       area: "md:col-span-2 md:row-span-1",
-      minH: "min-h-[220px] md:min-h-[275px]",
+      minH: "min-h-[240px] md:min-h-[350px]",
       position: "center 55%",
     },
     {
@@ -400,7 +400,7 @@ function ExploreDestinationsBento() {
       alt: "Houseboat on the Alleppey backwaters, Kerala",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
-      minH: "min-h-[220px] md:min-h-[275px]",
+      minH: "min-h-[240px] md:min-h-[350px]",
       position: "center center",
     },
     {
@@ -409,7 +409,7 @@ function ExploreDestinationsBento() {
       alt: "Tirumala Venkateswara Temple, Tirupati, Andhra Pradesh",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
-      minH: "min-h-[220px] md:min-h-[275px]",
+      minH: "min-h-[240px] md:min-h-[350px]",
       position: "center 40%",
     },
     {
@@ -418,7 +418,7 @@ function ExploreDestinationsBento() {
       alt: "French Quarter heritage street, Pondicherry",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
-      minH: "min-h-[220px] md:min-h-[275px]",
+      minH: "min-h-[240px] md:min-h-[350px]",
       position: "center center",
     },
     {
@@ -427,14 +427,14 @@ function ExploreDestinationsBento() {
       alt: "Kerala backwater houseboat — a signature South India experience",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
-      minH: "min-h-[220px] md:min-h-[275px]",
+      minH: "min-h-[240px] md:min-h-[350px]",
       position: "center center",
     },
   ];
 
   return (
     <section className="py-16 md:py-24">
-      <div className="container-fortune">
+      <div className="mx-auto w-[calc(100%-24px)] max-w-[1880px] md:w-[calc(100%-32px)]">
         <Reveal variant="up">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--color-emerald)]">
@@ -450,7 +450,7 @@ function ExploreDestinationsBento() {
           </div>
         </Reveal>
 
-        <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 md:mt-14 md:grid-cols-4 md:grid-rows-2">
+        <div className="destination-gallery-grid mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 md:mt-14 md:grid-cols-4 md:grid-rows-2 md:gap-4">
           {tiles.map((t, idx) => (
             <Reveal
               key={t.name}
@@ -460,7 +460,7 @@ function ExploreDestinationsBento() {
             >
               <Link
                 to={t.to}
-                className={`group relative block h-full w-full overflow-hidden rounded-md ${t.minH}`}
+                className={`group relative block h-full w-full overflow-hidden rounded-2xl bg-[#e9e5dc] ${t.minH}`}
                 aria-label={t.name}
               >
                 <img
