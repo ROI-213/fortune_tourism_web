@@ -351,3 +351,33 @@
     to   { transform: scale(1.06); }
   }
 }
+
+/* Home hero: fit within first viewport on desktops */
+:root {
+  --desktop-header-height: 84px;
+  --hero-top-gap: 20px;
+  --hero-bottom-safe-space: 40px;
+}
+
+.home-hero {
+  height: calc(100svh - var(--desktop-header-height) - var(--hero-top-gap) - var(--hero-bottom-safe-space));
+  min-height: 480px;
+  max-height: 720px;
+}
+@supports not (height: 100svh) {
+  .home-hero {
+    height: calc(100vh - var(--desktop-header-height) - var(--hero-top-gap) - var(--hero-bottom-safe-space));
+  }
+}
+@media (min-width: 1440px) {
+  .home-hero { max-height: 720px; }
+}
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .home-hero { min-height: 460px; max-height: 640px; }
+}
+@media (max-width: 1023px) {
+  .home-hero {
+    height: clamp(420px, 68svh, 600px);
+    max-height: none;
+  }
+}
