@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Menu, Phone, X } from "lucide-react";
 import { NAV } from "@/data/site";
 import { CONTACT, buildWhatsAppUrl } from "@/lib/contact";
+import logoAsset from "@/assets/fortune-tourism-logo.png.asset.json";
 
 const WhatsAppIcon = ({ className = "" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
@@ -29,18 +30,12 @@ export function Header() {
         >
           {/* Brand */}
           <Link to="/" className="flex items-center gap-2.5 md:gap-3 shrink-0">
-            <span
-              className="grid shrink-0 place-items-center rounded-2xl text-[color:var(--color-gold)] shadow-[inset_0_-2px_0_rgba(0,0,0,0.15)] h-11 w-11 md:h-[52px] md:w-[52px]"
-              style={{
-                background: "linear-gradient(145deg,#064933,#013b2a)",
-                fontFamily: 'Georgia,"Times New Roman",serif',
-                fontSize: "clamp(24px,2.2vw,32px)",
-                fontWeight: 500,
-                lineHeight: 1,
-              }}
-              aria-hidden="true"
-            >
-              F
+            <span className="grid shrink-0 place-items-center overflow-hidden rounded-2xl bg-white h-11 w-11 md:h-[56px] md:w-[56px]">
+              <img
+                src={logoAsset.url}
+                alt="Fortune Tourism logo"
+                className="h-full w-full object-contain"
+              />
             </span>
             <span
               className="whitespace-nowrap font-heading"

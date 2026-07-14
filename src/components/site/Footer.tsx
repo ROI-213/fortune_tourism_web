@@ -4,6 +4,7 @@ import { CONTACT, buildWhatsAppUrl } from "@/lib/contact";
 import { NAV } from "@/data/site";
 import { destinations } from "@/data/destinations";
 import { WhatsAppIcon } from "./Header";
+import logoAsset from "@/assets/fortune-tourism-logo.png.asset.json";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -11,8 +12,10 @@ export function Footer() {
     <footer className="mt-20 bg-[color:var(--color-navy)] text-[color:var(--color-cream)]">
       <div className="container-fortune grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-[color:var(--color-gold)] font-heading text-lg font-bold text-[color:var(--color-navy)]">F</span>
+          <div className="flex items-center gap-3">
+            <span className="grid h-14 w-14 place-items-center overflow-hidden rounded-xl bg-white">
+              <img src={logoAsset.url} alt="Fortune Tourism logo" className="h-full w-full object-contain" />
+            </span>
             <span className="font-heading text-lg">Fortune Tourism</span>
           </div>
           <p className="mt-4 max-w-xs text-sm opacity-80">
