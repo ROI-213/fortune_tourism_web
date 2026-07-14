@@ -357,7 +357,7 @@ function FleetCard({
       </div>
 
       {/* Info */}
-      <div className="flex w-full flex-col justify-between gap-4 bg-[#fffdf8] p-6 md:w-[32%] md:p-8">
+      <div className="flex w-full flex-col justify-start gap-5 bg-[#fffdf8] p-6 md:w-[32%] md:p-8">
         <div>
           <h3
             className="font-[Playfair_Display,serif] font-bold text-[#12213b]"
@@ -401,7 +401,7 @@ function FleetCard({
           )}
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="mt-auto flex flex-col gap-2 pt-4">
           <Link
             to="/contact"
             hash="enquiry"
