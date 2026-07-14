@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Reveal } from "@/components/site/Reveal";
+import { useParallax } from "@/hooks/useParallax";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { StateTourPackages } from "@/components/home/StateTourPackages";
 import karnatakaHero from "@/assets/karnataka-hero.png";
@@ -95,6 +96,7 @@ function KarnatakaHero() {
   }, [paused, n]);
 
   const touch = { x: 0 };
+  const parallaxRef = useParallax<HTMLDivElement>(0.12);
   return (
     <section className="relative w-full bg-[#f7f1e7] pt-3 pb-6 md:pt-5 md:pb-10" aria-roledescription="carousel">
       <div
@@ -107,24 +109,29 @@ function KarnatakaHero() {
           if (Math.abs(dx) > 40) setI((v) => (v + (dx < 0 ? 1 : -1) + n) % n);
         }}
       >
-        <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
+        <div ref={parallaxRef} className="parallax relative w-full" style={{ aspectRatio: "16 / 9" }}>
           {slides.map((s, idx) => (
-            <img
+            <div
               key={idx}
-              src={s.src}
-              alt={s.alt}
-              loading="eager"
-              fetchPriority={idx === 0 ? "high" : "auto"}
-              decoding="async"
-              className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "opacity-0"}`}
+              className={`absolute inset-0 overflow-hidden transition-opacity duration-1000 ease-out ${idx === i ? "opacity-100" : "opacity-0"}`}
               aria-hidden={idx === i ? "false" : "true"}
-            />
+            >
+              <img
+                src={s.src}
+                alt={s.alt}
+                loading="eager"
+                fetchPriority={idx === 0 ? "high" : "auto"}
+                decoding="async"
+                className={`h-full w-full object-cover object-center ${idx === i ? "hero-kenburns" : ""}`}
+              />
+              <div className="pointer-events-none absolute inset-0 luxe-overlay opacity-40" />
+            </div>
           ))}
           <button
             type="button"
             aria-label="Previous slide"
             onClick={() => setI((v) => (v - 1 + n) % n)}
-            className="absolute left-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-black shadow hover:bg-white md:flex"
+            className="glass absolute left-3 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-black shadow-lg transition hover:scale-105 hover:bg-white md:flex"
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
@@ -132,18 +139,18 @@ function KarnatakaHero() {
             type="button"
             aria-label="Next slide"
             onClick={() => setI((v) => (v + 1) % n)}
-            className="absolute right-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-black shadow hover:bg-white md:flex"
+            className="glass absolute right-3 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-black shadow-lg transition hover:scale-105 hover:bg-white md:flex"
           >
             <ChevronRight className="h-6 w-6" />
           </button>
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+          <div className="absolute bottom-4 left-0 right-0 z-10 flex justify-center gap-2">
             {slides.map((_, idx) => (
               <button
                 key={idx}
                 type="button"
                 aria-label={`Go to slide ${idx + 1}`}
                 onClick={() => setI(idx)}
-                className={`h-2.5 rounded-full transition-all ${idx === i ? "w-6 bg-white" : "w-2.5 bg-white/60"}`}
+                className={`h-2.5 rounded-full backdrop-blur transition-all duration-500 ${idx === i ? "w-8 bg-white shadow-lg" : "w-2.5 bg-white/60 hover:bg-white/80"}`}
               />
             ))}
           </div>
@@ -291,8 +298,8 @@ function ServicesGrid() {
         <SectionHeader eyebrow="Our Services" title="Everything you need to travel South India" />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((s, idx) => (
-            <Reveal key={s.title} delay={idx * 60}>
-              <Link to={s.href} className="group block h-full rounded-2xl border border-border bg-card p-6 transition hover:-translate-y-1 hover:border-[color:var(--color-navy)]/40 hover:shadow-lg">
+            <Reveal key={s.title} delay={idx * 90} variant="up">
+              <Link to={s.href} className="card-lift shine group block h-full rounded-2xl border border-border bg-card p-6 hover:border-[color:var(--color-navy)]/40">
                 <div className="grid h-12 w-12 place-items-center rounded-xl bg-[color:var(--color-navy)]/5 text-[color:var(--color-navy)]">
                   <s.icon className="h-6 w-6" />
                 </div>
@@ -326,17 +333,18 @@ function ExploreSouthIndia() {
               "md:col-span-6",
             ];
             return (
-              <Reveal key={d.slug} delay={idx * 80} className={spans[idx]}>
-                <Link to="/tour-packages" className="group relative block h-full min-h-[220px] overflow-hidden rounded-2xl">
+              <Reveal key={d.slug} delay={idx * 100} variant="scale" className={spans[idx]}>
+                <Link to="/tour-packages" className="card-lift group relative block h-full min-h-[220px] overflow-hidden rounded-2xl shadow-md">
                   <img
                     src={d.image}
                     alt={d.state}
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-105"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-110"
                     loading="lazy"
                     width={1600}
                     height={1000}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[color:var(--color-navy)]/20 via-transparent to-[color:var(--color-gold)]/10 opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
                   <div className="relative flex h-full flex-col justify-end p-6 text-[color:var(--color-cream)]">
                     <p className="text-xs uppercase tracking-[0.25em] text-[color:var(--color-gold)]">{d.packageCount} packages</p>
                     <h3 className="mt-2 font-heading text-2xl md:text-3xl">{d.state}</h3>
@@ -363,11 +371,12 @@ function FeaturedPackages() {
         <SectionHeader eyebrow="Featured" title="Tour packages built from Bengaluru" />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {packages.map((p, idx) => (
-            <Reveal key={p.slug} delay={idx * 60}>
-              <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card">
+            <Reveal key={p.slug} delay={idx * 90} variant="up">
+              <article className="card-lift group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card">
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img src={p.image} alt={p.title} loading="lazy" width={1200} height={900} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-[color:var(--color-navy)]">{p.duration}</span>
+                  <img src={p.image} alt={p.title} loading="lazy" width={1200} height={900} className="h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
+                  <span className="glass absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-medium text-[color:var(--color-navy)]">{p.duration}</span>
                 </div>
                 <div className="flex flex-1 flex-col p-5">
                   <h3 className="font-heading text-xl">{p.title}</h3>
@@ -419,8 +428,8 @@ function FleetPreview() {
         <SectionHeader eyebrow="Our Fleet" title="Vehicles for every kind of trip" />
         <div className="mt-12 -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 lg:grid-cols-4">
           {vehicles.map((v, idx) => (
-            <Reveal key={v.slug} delay={idx * 40} className="min-w-[260px] snap-start md:min-w-0">
-              <article className="flex h-full flex-col rounded-2xl border border-border bg-card p-5">
+            <Reveal key={v.slug} delay={idx * 70} variant="up" className="min-w-[260px] snap-start md:min-w-0">
+              <article className="card-lift flex h-full flex-col rounded-2xl border border-border bg-card p-5">
                 <div className="flex h-32 items-center justify-center rounded-xl bg-gradient-to-br from-[color:var(--color-navy)]/5 to-[color:var(--color-emerald)]/10">
                   <VehicleIllustration category={v.category} />
                 </div>
