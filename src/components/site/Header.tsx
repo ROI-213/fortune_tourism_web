@@ -90,7 +90,7 @@ export function Header() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 md:gap-5">
+          <div className="flex items-center justify-self-end gap-3 md:gap-5 ml-auto">
             <span
               aria-hidden="true"
               className="hidden lg:block"
