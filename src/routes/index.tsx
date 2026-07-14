@@ -96,58 +96,58 @@ function KarnatakaHero() {
 
   const touch = { x: 0 };
   return (
-    <section
-      className="relative w-full overflow-hidden bg-[#f7f1e7]"
-      style={{ height: "calc(100svh - var(--fortune-header, 4rem))" }}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onTouchStart={(e) => { touch.x = e.touches[0].clientX; setPaused(true); }}
-      onTouchEnd={(e) => {
-        const dx = e.changedTouches[0].clientX - touch.x;
-        if (Math.abs(dx) > 40) setI((v) => (v + (dx < 0 ? 1 : -1) + n) % n);
-      }}
-      aria-roledescription="carousel"
-    >
-      <div className="relative w-full h-full">
-        {slides.map((s, idx) => (
-          <img
-            key={idx}
-            src={s.src}
-            alt={s.alt}
-            loading={idx === 0 ? "eager" : "eager"}
-            fetchPriority={idx === 0 ? "high" : "auto"}
-            decoding="async"
-            className={`absolute inset-0 block w-full h-full max-w-full max-h-full object-contain object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "opacity-0"}`}
-            aria-hidden={idx === i ? "false" : "true"}
-          />
-        ))}
-      </div>
-      <button
-        type="button"
-        aria-label="Previous slide"
-        onClick={() => setI((v) => (v - 1 + n) % n)}
-        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 items-center justify-center rounded-full bg-white/80 hover:bg-white text-black shadow"
+    <section className="relative w-full bg-[#f7f1e7] pt-3 pb-6 md:pt-5 md:pb-10" aria-roledescription="carousel">
+      <div
+        className="relative mx-auto w-[calc(100%-16px)] max-w-[1440px] overflow-hidden rounded-[24px] bg-[#f7f1e7] shadow-[0_20px_50px_rgba(68,45,15,0.12)] md:w-[calc(100%-32px)] md:rounded-[32px]"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onTouchStart={(e) => { touch.x = e.touches[0].clientX; setPaused(true); }}
+        onTouchEnd={(e) => {
+          const dx = e.changedTouches[0].clientX - touch.x;
+          if (Math.abs(dx) > 40) setI((v) => (v + (dx < 0 ? 1 : -1) + n) % n);
+        }}
       >
-        <ChevronLeft className="h-6 w-6" />
-      </button>
-      <button
-        type="button"
-        aria-label="Next slide"
-        onClick={() => setI((v) => (v + 1) % n)}
-        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 items-center justify-center rounded-full bg-white/80 hover:bg-white text-black shadow"
-      >
-        <ChevronRight className="h-6 w-6" />
-      </button>
-      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
-        {slides.map((_, idx) => (
+        <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
+          {slides.map((s, idx) => (
+            <img
+              key={idx}
+              src={s.src}
+              alt={s.alt}
+              loading="eager"
+              fetchPriority={idx === 0 ? "high" : "auto"}
+              decoding="async"
+              className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "opacity-0"}`}
+              aria-hidden={idx === i ? "false" : "true"}
+            />
+          ))}
           <button
-            key={idx}
             type="button"
-            aria-label={`Go to slide ${idx + 1}`}
-            onClick={() => setI(idx)}
-            className={`h-2.5 rounded-full transition-all ${idx === i ? "w-6 bg-white" : "w-2.5 bg-white/60"}`}
-          />
-        ))}
+            aria-label="Previous slide"
+            onClick={() => setI((v) => (v - 1 + n) % n)}
+            className="absolute left-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-black shadow hover:bg-white md:flex"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <button
+            type="button"
+            aria-label="Next slide"
+            onClick={() => setI((v) => (v + 1) % n)}
+            className="absolute right-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-black shadow hover:bg-white md:flex"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </button>
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+            {slides.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                aria-label={`Go to slide ${idx + 1}`}
+                onClick={() => setI(idx)}
+                className={`h-2.5 rounded-full transition-all ${idx === i ? "w-6 bg-white" : "w-2.5 bg-white/60"}`}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
