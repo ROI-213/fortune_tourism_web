@@ -4,78 +4,155 @@ import fleetBanner from "@/assets/fleet-banner.jpg";
 
 export function FleetBanner() {
   return (
-    <section className="bg-[color:var(--background)] py-14 md:py-20">
-      <div className="mx-auto w-[calc(100%-24px)] max-w-[1880px] md:w-[calc(100%-40px)]">
-        <div className="relative overflow-hidden rounded-[28px] bg-[#f4efe6] shadow-[0_30px_80px_-40px_rgba(11,31,58,0.35)] ring-1 ring-black/5">
-          <div className="grid gap-0 md:grid-cols-[1.35fr_1fr]">
-            {/* Image side */}
-            <div className="relative min-h-[320px] md:min-h-[520px]">
-              <img
-                src={fleetBanner}
-                alt="Fortune Travels fleet of clean tourism cars parked on a Bengaluru street with a yellow Fortune Travels signboard"
-                width={1920}
-                height={912}
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              {/* Soft right fade so overlay content stays readable on md+ */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-y-0 right-0 hidden w-1/3 md:block"
-                style={{
-                  background:
-                    "linear-gradient(to right, rgba(244,239,230,0) 0%, rgba(244,239,230,0.85) 60%, #f4efe6 100%)",
-                }}
-              />
+    <section className="bg-[color:var(--background)] py-12 md:py-16">
+      <div className="mx-auto w-[min(96%,1800px)]">
+        {/* Desktop / tablet: integrated banner with curved white panel */}
+        <div
+          className="relative hidden overflow-hidden rounded-[30px] bg-[#f5f0e8] shadow-[0_16px_40px_rgba(25,35,30,0.08)] md:block"
+          style={{ height: "clamp(520px, 43vw, 760px)" }}
+        >
+          {/* Fleet image full-bleed */}
+          <img
+            src={fleetBanner}
+            alt="Fortune Travels fleet of clean tourism cars parked in a row on a Bengaluru street with a yellow Fortune Travels signboard"
+            width={1920}
+            height={832}
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+
+          {/* Soft blend from image into panel */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent 48%, rgba(255,252,246,0.14) 58%, rgba(255,252,246,0.75) 72%, #fffdf8 82%)",
+            }}
+          />
+
+          {/* Curved white panel (SVG shape for organic curve) */}
+          <svg
+            aria-hidden
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="absolute inset-y-0 right-0 h-full"
+            style={{ width: "58%" }}
+          >
+            <path
+              d="M 30 100 C 12 82, 4 60, 14 32 C 22 12, 40 2, 62 0 L 100 0 L 100 100 Z"
+              fill="#fffdf8"
+            />
+          </svg>
+
+          {/* Panel content */}
+          <div className="absolute inset-y-0 right-0 flex w-[46%] flex-col justify-center px-8 lg:px-14 xl:px-16">
+            <h2
+              className="font-[Playfair_Display,serif] font-bold uppercase text-[#12213b]"
+              style={{
+                fontSize: "clamp(38px, 3.6vw, 68px)",
+                lineHeight: 0.98,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              Travel with
+              <br />
+              <span className="text-[#0E6B50]">Comfort, Style</span>
+              <br />
+              &amp; Trust.
+            </h2>
+
+            <p className="mt-6 max-w-[440px] text-[15px] leading-relaxed text-[#4a5260] lg:text-base">
+              Local trips, airport transfers, tour packages and outstation
+              rides across Bengaluru and South India.
+            </p>
+
+            <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0E6B50] lg:text-xs">
+              Well-maintained vehicles • Professional drivers • Comfortable journeys
+            </p>
+
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <Link
+                to="/car-rentals"
+                className="inline-flex items-center gap-2 rounded-full bg-[#0E6B50] px-7 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#0b5741] hover:shadow-lg"
+              >
+                View Our Fleet <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/contact"
+                className="inline-flex items-center gap-2 rounded-full border border-[#0E6B50]/40 bg-white px-7 py-3.5 text-sm font-semibold text-[#12213b] transition hover:border-[#0E6B50]"
+              >
+                Book Your Ride
+              </Link>
             </div>
+          </div>
 
-            {/* Text side */}
-            <div className="relative flex flex-col justify-center gap-5 px-6 py-8 md:px-10 md:py-12 lg:px-14">
-              {/* Badge */}
-              <div className="absolute right-6 top-6 hidden md:block">
-                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[#0E6B50] text-center text-[10px] font-semibold uppercase leading-tight tracking-wide text-white shadow-lg lg:h-28 lg:w-28 lg:text-[11px]">
-                  <span className="px-2">
-                    Trusted
-                    <br />
-                    Bengaluru
-                    <br />
-                    Travel
-                  </span>
-                </div>
-              </div>
-
-              <span className="inline-flex w-fit items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--primary)] ring-1 ring-black/5">
-                <ShieldCheck className="h-3.5 w-3.5" /> Our Fleet
+          {/* Trust badge overlapping panel top-right */}
+          <div className="absolute right-8 top-8 lg:right-12 lg:top-10">
+            <div className="relative flex items-center justify-center rounded-full bg-[#0E6B50] text-center text-white shadow-[0_12px_30px_rgba(14,107,80,0.35)]"
+                 style={{ width: "clamp(115px, 9.5vw, 155px)", height: "clamp(115px, 9.5vw, 155px)" }}
+            >
+              <span
+                aria-hidden
+                className="absolute inset-2 rounded-full border border-dashed border-white/60"
+              />
+              <span className="relative px-3 text-[10px] font-bold uppercase leading-[1.25] tracking-[0.08em] lg:text-[12px]">
+                Trusted
+                <br />
+                Bengaluru
+                <br />
+                Travel
               </span>
+            </div>
+          </div>
+        </div>
 
-              <h2 className="font-[Playfair_Display,serif] text-3xl font-bold leading-[1.05] text-[#0B1F3A] md:text-4xl lg:text-5xl xl:text-[52px]">
-                TRAVEL WITH{" "}
-                <span className="text-[#0E6B50]">COMFORT, STYLE</span> &amp; TRUST
-              </h2>
-
-              <p className="max-w-xl text-sm leading-relaxed text-[#3a4049] md:text-base">
-                Local trips, airport transfers, tour packages and outstation
-                rides across Bengaluru and South India.
-              </p>
-
-              <p className="text-xs font-medium uppercase tracking-wider text-[#0E6B50] md:text-sm">
-                Well-maintained vehicles • Professional drivers • Comfortable journeys
-              </p>
-
-              <div className="mt-2 flex flex-wrap items-center gap-3">
-                <Link
-                  to="/car-rentals"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#0E6B50] px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#0b5741] hover:shadow-lg"
-                >
-                  View Our Fleet <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center gap-2 rounded-full border border-[#0B1F3A]/20 bg-white px-6 py-3 text-sm font-semibold text-[#0B1F3A] transition hover:border-[#0B1F3A]/40"
-                >
-                  Book Your Ride
-                </Link>
+        {/* Mobile: stacked */}
+        <div className="overflow-hidden rounded-3xl bg-[#fffdf8] shadow-[0_16px_40px_rgba(25,35,30,0.08)] md:hidden">
+          <div className="relative h-[240px] w-full">
+            <img
+              src={fleetBanner}
+              alt="Fortune Travels fleet on a Bengaluru street"
+              width={1920}
+              height={832}
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute -bottom-8 right-5">
+              <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#0E6B50] text-center text-white shadow-lg">
+                <span aria-hidden className="absolute inset-1.5 rounded-full border border-dashed border-white/60" />
+                <span className="relative px-2 text-[9px] font-bold uppercase leading-[1.2] tracking-wide">
+                  Trusted<br />Bengaluru<br />Travel
+                </span>
               </div>
+            </div>
+          </div>
+          <div className="px-6 pb-8 pt-10">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f0ede4] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#0E6B50]">
+              <ShieldCheck className="h-3 w-3" /> Our Fleet
+            </span>
+            <h2 className="mt-3 font-[Playfair_Display,serif] text-3xl font-bold uppercase leading-[1.02] text-[#12213b]">
+              Travel with <span className="text-[#0E6B50]">Comfort, Style</span> &amp; Trust.
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-[#4a5260]">
+              Local trips, airport transfers, tour packages and outstation rides across Bengaluru and South India.
+            </p>
+            <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0E6B50]">
+              Well-maintained vehicles • Professional drivers • Comfortable journeys
+            </p>
+            <div className="mt-5 flex flex-col gap-3">
+              <Link
+                to="/car-rentals"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0E6B50] px-6 py-3 text-sm font-semibold text-white shadow-md"
+              >
+                View Our Fleet <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center rounded-full border border-[#0E6B50]/40 bg-white px-6 py-3 text-sm font-semibold text-[#12213b]"
+              >
+                Book Your Ride
+              </Link>
             </div>
           </div>
         </div>
