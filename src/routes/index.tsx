@@ -138,13 +138,6 @@ function AndhraHeroOverlay() {
     notes: "Enquiry from Andhra Pradesh hero banner",
   });
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
-  const features = [
-    "Spiritual Journeys",
-    "Scenic Landscapes",
-    "Rich Culture",
-    "Warm Hospitality",
-    "Unforgettable Experiences",
-  ];
   return (
     <div
       className="pointer-events-none absolute inset-0 z-[2] flex items-end justify-center px-4 pb-10 text-center md:pb-16"
