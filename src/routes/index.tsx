@@ -477,7 +477,7 @@ function ExploreDestinationsBento() {
   const tiles = [
     {
       name: "Karnataka",
-      image: destKarnataka.url,
+      image: destKarnataka,
       alt: "Mysore Palace illuminated during evening in Karnataka",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-2",
@@ -486,7 +486,7 @@ function ExploreDestinationsBento() {
     },
     {
       name: "Tamil Nadu",
-      image: destTamilNadu.url,
+      image: destTamilNadu,
       alt: "Meenakshi Amman Temple towers in Tamil Nadu",
       to: "/tour-packages" as const,
       area: "md:col-span-2 md:row-span-1",
@@ -495,7 +495,7 @@ function ExploreDestinationsBento() {
     },
     {
       name: "Kerala",
-      image: destKerala.url,
+      image: destKerala,
       alt: "Luxury houseboat travelling through Kerala backwaters",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
@@ -504,7 +504,7 @@ function ExploreDestinationsBento() {
     },
     {
       name: "Andhra Pradesh",
-      image: destAndhra.url,
+      image: destAndhra,
       alt: "Gandikota Canyon landscape in Andhra Pradesh",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
@@ -513,7 +513,7 @@ function ExploreDestinationsBento() {
     },
     {
       name: "Pondicherry",
-      image: destPondicherry.url,
+      image: destPondicherry,
       alt: "French colonial street in Pondicherry White Town",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
@@ -522,7 +522,7 @@ function ExploreDestinationsBento() {
     },
     {
       name: "South India Special Tours",
-      image: destSouthIndia.url,
+      image: destSouthIndia,
       alt: "Scenic South India travel destination landscape",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
