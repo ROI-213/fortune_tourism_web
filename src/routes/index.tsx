@@ -101,7 +101,7 @@ function KarnatakaHero() {
   const touch = { x: 0 };
   const parallaxRef = useParallax<HTMLDivElement>(0.12);
   return (
-    <section className="relative w-full bg-[#f7f1e7] pt-3 pb-6 md:pt-5 md:pb-10" aria-roledescription="carousel">
+    <section className="relative w-full bg-[#f7f1e7] pt-3 pb-6 md:pt-5 md:pb-8" aria-roledescription="carousel">
       <div
         className="relative mx-auto w-[calc(100%-16px)] max-w-[1440px] overflow-hidden rounded-[24px] bg-[#f7f1e7] shadow-[0_20px_50px_rgba(68,45,15,0.12)] md:w-[calc(100%-32px)] md:rounded-[32px]"
         onMouseEnter={() => setPaused(true)}
@@ -112,7 +112,7 @@ function KarnatakaHero() {
           if (Math.abs(dx) > 40) setI((v) => (v + (dx < 0 ? 1 : -1) + n) % n);
         }}
       >
-        <div ref={parallaxRef} className="parallax relative w-full" style={{ aspectRatio: "16 / 9" }}>
+        <div ref={parallaxRef} className="parallax home-hero relative w-full">
           {slides.map((s, idx) => (
             <div
               key={idx}
@@ -122,10 +122,12 @@ function KarnatakaHero() {
               <img
                 src={s.src}
                 alt={s.alt}
-                loading="eager"
+                width={1920}
+                height={850}
+                loading={idx === 0 ? "eager" : "lazy"}
                 fetchPriority={idx === 0 ? "high" : "auto"}
                 decoding="async"
-                className={`h-full w-full object-cover object-center ${idx === i ? "hero-kenburns" : ""}`}
+                className={`h-full w-full object-cover [object-position:center_top] ${idx === i ? "hero-kenburns" : ""}`}
               />
               <div className="pointer-events-none absolute inset-0 luxe-overlay opacity-40" />
             </div>
