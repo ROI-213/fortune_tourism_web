@@ -4,7 +4,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { findVehicle, vehicles, type Vehicle } from "@/data/vehicles";
 import { testimonials, faqs } from "@/data/site";
-import { buildWhatsAppUrl, PHONE } from "@/lib/contact";
+import { buildWhatsAppUrl, CONTACT } from "@/lib/contact";
 import {
   CheckCircle2,
   Users,
