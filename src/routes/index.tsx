@@ -364,6 +364,108 @@ function ExploreSouthIndia() {
   );
 }
 
+/* --- Explore Destinations Bento (reference layout: 4 cols × 2 rows) --- */
+function ExploreDestinationsBento() {
+  const tiles = [
+    {
+      name: "Karnataka",
+      image: karnatakaHero,
+      to: "/tour-packages" as const,
+      area: "md:col-span-1 md:row-span-2",
+      minH: "min-h-[420px] md:min-h-[560px]",
+    },
+    {
+      name: "Tamil Nadu",
+      image: tamilnaduHero,
+      to: "/tour-packages" as const,
+      area: "md:col-span-2 md:row-span-1",
+      minH: "min-h-[220px] md:min-h-[275px]",
+    },
+    {
+      name: "Kerala",
+      image: keralaHero,
+      to: "/tour-packages" as const,
+      area: "md:col-span-1 md:row-span-1",
+      minH: "min-h-[220px] md:min-h-[275px]",
+    },
+    {
+      name: "Andhra Pradesh",
+      image: andhraHero,
+      to: "/tour-packages" as const,
+      area: "md:col-span-1 md:row-span-1",
+      minH: "min-h-[220px] md:min-h-[275px]",
+    },
+    {
+      name: "Pondicherry",
+      image: pondicherryHero,
+      to: "/tour-packages" as const,
+      area: "md:col-span-1 md:row-span-1",
+      minH: "min-h-[220px] md:min-h-[275px]",
+    },
+    {
+      name: "South India Special Tours",
+      image: southIndiaSpecial,
+      to: "/tour-packages" as const,
+      area: "md:col-span-1 md:row-span-1",
+      minH: "min-h-[220px] md:min-h-[275px]",
+    },
+  ];
+
+  return (
+    <section className="py-16 md:py-24">
+      <div className="container-fortune">
+        <Reveal variant="up">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--color-emerald)]">
+              Explore
+            </p>
+            <h2 className="mt-3 font-heading text-3xl md:text-4xl">
+              Explore South India Tour Destinations
+            </h2>
+            <p className="mt-4 text-sm text-muted-foreground md:text-base">
+              Discover the most beautiful places across Karnataka, Tamil Nadu,
+              Kerala, Andhra Pradesh and Pondicherry.
+            </p>
+          </div>
+        </Reveal>
+
+        <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 md:mt-14 md:grid-cols-4 md:grid-rows-2">
+          {tiles.map((t, idx) => (
+            <Reveal
+              key={t.name}
+              delay={idx * 80}
+              variant="scale"
+              className={`${t.area}`}
+            >
+              <Link
+                to={t.to}
+                className={`group relative block h-full w-full overflow-hidden rounded-md ${t.minH}`}
+                aria-label={t.name}
+              >
+                <img
+                  src={t.image}
+                  alt={t.name}
+                  loading="lazy"
+                  width={1600}
+                  height={1000}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.08]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[color:var(--color-navy)]/10 via-transparent to-[color:var(--color-gold)]/15 opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
+                <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
+                  <h3 className="font-heading text-xl font-semibold text-white drop-shadow-md md:text-2xl">
+                    {t.name}
+                  </h3>
+                </div>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* --- Featured packages --- */
 function FeaturedPackages() {
   return (
