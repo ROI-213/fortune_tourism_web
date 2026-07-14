@@ -13,7 +13,7 @@ export function SiteLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <main>{children}</main>
+      <main className="pb-[calc(72px+env(safe-area-inset-bottom))] md:pb-0">{children}</main>
       <Footer />
       <FloatingContact />
     </div>
