@@ -405,7 +405,6 @@ function FleetCard({
           <Link
             to="/contact"
             hash="enquiry"
-            search={{ vehicle: fleet.name, category: fleet.category, service: "Fleet Booking" } as never}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0E6B50] px-5 py-3 text-[13px] font-semibold text-white shadow-md transition hover:bg-[#0b5741] hover:shadow-lg"
           >
             Enquire Now <ArrowRight className="h-4 w-4" />
