@@ -317,7 +317,7 @@ function FleetCard({
     <article
       data-fleet-card
       className={
-        "fleet-showcase-card group relative flex shrink-0 flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_16px_44px_rgba(23,36,31,0.08)] transition-all duration-500 md:h-[min(620px,calc(100vh-220px))] md:flex-row " +
+        "fleet-showcase-card group relative flex shrink-0 flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_16px_44px_rgba(23,36,31,0.08)] transition-all duration-500 md:h-[min(560px,calc(100vh-320px))] md:flex-row " +
         (active ? "opacity-100" : "opacity-90")
       }
       style={{
