@@ -21,6 +21,14 @@ import pkgChikmagalurAsset from "@/assets/pkg-chikmagalur-real.jpg.asset.json";
 import pkgHampiAsset from "@/assets/pkg-hampi-real.jpg.asset.json";
 import pkgGokarnaAsset from "@/assets/pkg-gokarna-om-beach.jpg.asset.json";
 import pkgKabini from "@/assets/pkg-kabini.jpg";
+import pkgTirupatiAsset from "@/assets/pkg-tirupati-real.jpg.asset.json";
+import pkgArakuAsset from "@/assets/pkg-araku-real.jpg.asset.json";
+import pkgGandikotaAsset from "@/assets/pkg-gandikota-real.jpg.asset.json";
+import pkgSrisailamAsset from "@/assets/pkg-srisailam-real.jpg.asset.json";
+const pkgTirupati = pkgTirupatiAsset.url;
+const pkgAraku = pkgArakuAsset.url;
+const pkgGandikota = pkgGandikotaAsset.url;
+const pkgSrisailam = pkgSrisailamAsset.url;
 const pkgMysuruHeritage = pkgMysuruAsset.url;
 const pkgChikmagalur = pkgChikmagalurAsset.url;
 const pkgHampi = pkgHampiAsset.url;
@@ -99,7 +107,7 @@ export const packages: TourPackage[] = [
     destinations: ["Tirumala", "Tirupati Temple", "Kanipakam (optional)"],
     vehicles: ["Sedan", "Innova", "Tempo Traveller"],
     startingPrice: 6500,
-    image: "/images/state-andhra.jpg",
+    image: pkgTirupati,
     summary: "Same-day return darshan trip with early pickup and comfortable seating.",
     heroImage: "/images/packages/hero-tirupati.jpg",
     highlights: ["Early morning pickup", "Darshan assistance", "Comfortable AC vehicle", "Same-day return"],
@@ -220,7 +228,7 @@ export const packages: TourPackage[] = [
     destinations: ["Vizag", "Borra Caves", "Araku Valley", "Tribal Museum"],
     vehicles: ["SUV", "Innova"],
     startingPrice: 18500,
-    image: "/images/state-andhra.jpg",
+    image: pkgAraku,
     summary: "Beaches, coffee valleys and the scenic Araku train ride.",
     itinerary: [
       { day: 1, title: "Vizag arrival", details: "RK Beach, Kailasagiri." },
@@ -240,7 +248,7 @@ export const packages: TourPackage[] = [
     destinations: ["Gandikota Fort", "Penna Gorge", "Belum Caves"],
     vehicles: ["SUV", "Innova"],
     startingPrice: 13500,
-    image: "/images/state-andhra.jpg",
+    image: pkgGandikota,
     summary: "India's Grand Canyon and the country's longest cave system.",
     itinerary: [
       { day: 1, title: "Bengaluru → Gandikota", details: "Sunset at the gorge." },
@@ -259,7 +267,7 @@ export const packages: TourPackage[] = [
     destinations: ["Srisailam Temple", "Srisailam Dam", "Nallamala forest"],
     vehicles: ["Sedan", "Innova"],
     startingPrice: 9500,
-    image: "/images/state-andhra.jpg",
+    image: pkgSrisailam,
     summary: "Jyotirlinga darshan and forest drives along the Krishna river.",
     itinerary: [
       { day: 1, title: "Drive & darshan", details: "Arrive, evening aarti." },
