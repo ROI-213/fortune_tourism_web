@@ -32,7 +32,7 @@ export function Header() {
           <Link to="/" className="flex items-center gap-2.5 md:gap-3 shrink-0">
             <span className="grid shrink-0 place-items-center overflow-hidden rounded-2xl bg-white h-11 w-11 md:h-[56px] md:w-[56px]">
               <img
-                src={logoAsset.url}
+                src={logoAsset}
                 alt="Fortune Tourism logo"
                 className="h-full w-full object-contain"
               />

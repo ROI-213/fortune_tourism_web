@@ -14,7 +14,7 @@ export function Footer() {
         <div>
           <div className="flex items-center gap-3">
             <span className="grid h-14 w-14 place-items-center overflow-hidden rounded-xl bg-white">
-              <img src={logoAsset.url} alt="Fortune Tourism logo" className="h-full w-full object-contain" />
+              <img src={logoAsset} alt="Fortune Tourism logo" className="h-full w-full object-contain" />
             </span>
             <span className="font-heading text-lg">Fortune Tourism</span>
           </div>
