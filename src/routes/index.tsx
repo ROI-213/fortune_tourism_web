@@ -94,7 +94,7 @@ function KarnatakaHero() {
   return (
     <section
       className="relative w-full overflow-hidden bg-[#f7f1e7]"
-      style={{ height: "calc(100svh - 4rem)" }}
+      style={{ height: "calc(100svh - var(--fortune-header, 4rem))" }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={(e) => { touch.x = e.touches[0].clientX; setPaused(true); }}
@@ -104,7 +104,7 @@ function KarnatakaHero() {
       }}
       aria-roledescription="carousel"
     >
-      <div className="relative w-full h-full md:[height:calc(100svh-5rem)]">
+      <div className="relative w-full h-full">
         {slides.map((s, idx) => (
           <img
             key={idx}
