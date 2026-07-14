@@ -31,7 +31,6 @@ import { destinations } from "@/data/destinations";
 import { packages } from "@/data/packages";
 import { vehicles } from "@/data/vehicles";
 import {
-  services,
   trustPoints,
   bookingSteps,
   testimonials,
@@ -297,33 +296,6 @@ function QuickEnquiry() {
           </div>
           <EnquiryForm />
         </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* --- Services --- */
-function ServicesGrid() {
-  return (
-    <section className="py-20 md:py-28">
-      <div className="container-fortune">
-        <SectionHeader eyebrow="Our Services" title="Everything you need to travel South India" />
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((s, idx) => (
-            <Reveal key={s.title} delay={idx * 90} variant="up">
-              <Link to={s.href} className="card-lift shine group block h-full rounded-2xl border border-border bg-card p-6 hover:border-[color:var(--color-navy)]/40">
-                <div className="grid h-12 w-12 place-items-center rounded-xl bg-[color:var(--color-navy)]/5 text-[color:var(--color-navy)]">
-                  <s.icon className="h-6 w-6" />
-                </div>
-                <h3 className="mt-5 font-heading text-xl">{s.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{s.blurb}</p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[color:var(--color-emerald)] group-hover:gap-2 transition-all">
-                  Learn more <ArrowRight className="h-4 w-4" />
-                </span>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
       </div>
     </section>
   );
