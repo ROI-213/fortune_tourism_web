@@ -3,7 +3,6 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { PageHero } from "@/components/site/PageHero";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { findVehicle, vehicles } from "@/data/vehicles";
-import { VehicleIllustration } from "./index";
 import { CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/car-rentals/$vehicleId")({
@@ -45,14 +44,23 @@ function VehicleDetail() {
       <section className="py-16">
         <div className="container-fortune grid gap-10 lg:grid-cols-[1.2fr_1fr]">
           <div>
-            <div className="flex h-64 items-center justify-center rounded-3xl bg-gradient-to-br from-[color:var(--color-navy)]/5 to-[color:var(--color-emerald)]/10">
-              <VehicleIllustration category={vehicle.category} />
+            <div className="overflow-hidden rounded-3xl border border-border bg-white">
+              <img
+                src={vehicle.image}
+                alt={`${vehicle.name} rental car in Bengaluru`}
+                width={1200}
+                height={900}
+                className="h-auto w-full object-cover"
+              />
             </div>
             <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
               <Stat label="Seats" value={String(vehicle.seats)} />
               <Stat label="Luggage" value={vehicle.luggage} />
               <Stat label="Category" value={vehicle.category} />
             </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Example vehicles: {vehicle.examples.join(", ")}
+            </p>
             <h2 className="mt-10 font-heading text-2xl">Features</h2>
             <ul className="mt-4 grid gap-2 md:grid-cols-2">
               {vehicle.features.map((f: string) => (
