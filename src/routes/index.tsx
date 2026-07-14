@@ -90,6 +90,7 @@ function HomePage() {
       <HowItWorks />
       <Testimonials />
       <FAQSection />
+      <FinalCTA />
     </SiteLayout>
   );
 }
