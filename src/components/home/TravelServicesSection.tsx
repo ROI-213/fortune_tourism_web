@@ -323,28 +323,28 @@ function TravelServiceCard({
         )}
       </div>
 
-      <div className="relative -mt-9 grid h-[72px] w-[72px] place-items-center self-center rounded-full border-[5px] border-white bg-[color:var(--color-emerald)] text-white shadow-[0_10px_22px_-8px_rgba(14,107,80,0.5)]">
-        <Icon className="h-7 w-7" />
+      <div className="relative -mt-8 grid h-[62px] w-[62px] place-items-center self-center rounded-full border-[5px] border-white bg-[color:var(--color-emerald)] text-white shadow-[0_10px_22px_-8px_rgba(14,107,80,0.5)]">
+        <Icon className="h-6 w-6" />
       </div>
 
-      <div className="flex flex-1 flex-col px-6 pb-7 pt-4 text-center md:px-7">
-        <h3 className="font-heading text-[24px] font-semibold text-foreground md:text-[28px]">
+      <div className="flex flex-1 flex-col px-5 pb-6 pt-3 text-center md:px-6">
+        <h3 className="font-heading text-[22px] font-semibold text-foreground md:text-[24px]">
           {service.title}
         </h3>
-        <div className="mx-auto mt-2 flex items-center gap-2 text-[color:var(--color-emerald)]/60" aria-hidden="true">
+        <div className="mx-auto mt-1.5 flex items-center gap-2 text-[color:var(--color-emerald)]/60" aria-hidden="true">
           <span className="h-px w-6 bg-current" />
           <span className="text-[10px]">◆</span>
           <span className="h-px w-6 bg-current" />
         </div>
-        <p className="mx-auto mt-3 max-w-[36ch] text-[15px] leading-relaxed text-muted-foreground md:text-base">
+        <p className="mx-auto mt-3 max-w-[34ch] text-[14px] leading-relaxed text-muted-foreground">
           {service.description}
         </p>
 
-        <ul className="mt-5 flex flex-wrap justify-center gap-2">
+        <ul className="mt-4 flex flex-wrap justify-center gap-2">
           {service.tags.map((tag) => (
             <li
               key={tag}
-              className="rounded-full bg-[color:var(--color-emerald)]/8 px-3 py-1 text-xs font-medium text-[color:var(--color-navy)]"
+              className="rounded-full px-3 py-1 text-[11px] font-medium text-[color:var(--color-navy)]"
               style={{ backgroundColor: "rgba(14,107,80,0.08)" }}
             >
               {tag}
@@ -352,12 +352,12 @@ function TravelServiceCard({
           ))}
         </ul>
 
-        <div className="mt-auto pt-7">
+        <div className="mt-auto pt-6">
           <Link
             to={service.href}
             aria-label={service.buttonLabel}
             className={
-              "group/btn flex h-[54px] w-full items-center justify-center gap-2 rounded-full px-6 text-sm font-bold uppercase tracking-wide transition-all duration-300 active:translate-y-px " +
+              "group/btn flex h-[46px] w-full items-center justify-center gap-2 rounded-full px-5 text-[12px] font-bold uppercase tracking-[0.12em] transition-all duration-300 active:translate-y-px " +
               (isActive
                 ? "bg-[color:var(--color-emerald)] text-white shadow-[0_12px_26px_-12px_rgba(14,107,80,0.6)] hover:brightness-95"
                 : "border-[1.5px] border-[color:var(--color-emerald)] bg-white text-[color:var(--color-emerald)] hover:bg-[color:var(--color-emerald)] hover:text-white")
@@ -462,8 +462,8 @@ function ServiceImageSlideshow({
       className={
         "relative w-full overflow-hidden bg-muted " +
         (featured
-          ? "h-[240px] md:h-[280px] lg:h-[300px]"
-          : "h-[220px] md:h-[250px] lg:h-[270px]")
+          ? "h-[190px] md:h-[210px] lg:h-[220px]"
+          : "h-[180px] md:h-[200px] lg:h-[210px]")
       }
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
