@@ -123,26 +123,26 @@ export function TravelServicesSection() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-[#f6efe0] py-16 md:py-24">
+    <section className="relative overflow-hidden bg-[#F9F5EC] py-20 md:py-28">
       <TravelDecor />
-      <div className="relative mx-auto w-full max-w-[1240px] px-4 md:px-8">
-        <h2 className="text-center font-heading text-[26px] font-bold leading-[1.15] tracking-tight text-foreground md:text-[38px] lg:text-[44px]">
+      <div className="relative mx-auto w-full max-w-[1400px] px-4 md:px-8">
+        <h2 className="text-center font-heading font-bold leading-[1.1] tracking-tight text-[#1D1D1D] text-[34px] md:text-[52px] lg:text-[64px]">
           Travel smarter with our{" "}
           <span className="text-[color:var(--color-emerald)]">Tour Packages</span>
         </h2>
 
-        <div className="mx-auto mt-3 flex items-center justify-center gap-3 text-[color:var(--color-emerald)]/70" aria-hidden="true">
-          <span className="h-px w-10 bg-current opacity-50" />
-          <span className="text-xs">✦</span>
-          <span className="h-px w-10 bg-current opacity-50" />
+        <div className="mx-auto mt-5 flex items-center justify-center gap-4 text-[#C9A84C]" aria-hidden="true">
+          <span className="h-px w-24 bg-current opacity-70 md:w-40" />
+          <span className="text-sm">✦</span>
+          <span className="h-px w-24 bg-current opacity-70 md:w-40" />
         </div>
 
-        <p className="mx-auto mt-4 max-w-[720px] text-center text-[15px] leading-relaxed text-muted-foreground md:text-base">
+        <p className="mx-auto mt-5 max-w-[720px] text-center text-[17px] leading-relaxed text-[#666666] md:text-[20px]">
           Comfortable, reliable and carefully planned travel solutions for every
           journey.
         </p>
 
-        <div className="relative mt-10 md:mt-12">
+        <div className="relative mt-14 md:mt-16">
           <button
             type="button"
             aria-label="Previous service"
@@ -160,7 +160,7 @@ export function TravelServicesSection() {
             <ChevronRight className="h-5 w-5" />
           </button>
 
-          <div className="grid grid-cols-1 items-stretch gap-5 md:gap-6 lg:grid-cols-3">
+          <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 md:gap-7 lg:grid-cols-3 lg:gap-7">
             {travelServices.map((s, idx) => (
               <TravelServiceCard
                 key={s.id}
