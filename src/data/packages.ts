@@ -8,6 +8,8 @@ export interface TourPackage {
   vehicles: string[];
   startingPrice?: number;
   image: string;
+  heroImage?: string;
+  highlights?: string[];
   summary: string;
   itinerary: { day: number; title: string; details: string }[];
   inclusions: string[];
