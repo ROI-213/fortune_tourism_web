@@ -170,23 +170,46 @@ function HeroSlideOverlay({
 
 function KarnatakaHero() {
   const slides = [
-    { src: karnatakaHero, alt: "Karnataka — One State. Infinite Wonders. Mysore Palace, Hampi, Jog Falls, Gokarna, Coorg.", overlay: false as const },
+    {
+      src: karnatakaHero,
+      alt: "Karnataka — Mysore Palace, Vidhana Soudha, Hampi chariot, Jog Falls and Coorg tea gardens.",
+      state: "Karnataka",
+      title: "KARNATAKA",
+      subtitle: "One State. Endless Experiences.",
+      quote: "From royal palaces to whispering waterfalls — every road here tells a story.",
+    },
     {
       src: andhraHero,
-      alt: "Andhra Pradesh tourism collage featuring Charminar, Araku Valley train, Tirupati Temple, Borra Caves and Coastal Andhra sunset.",
-      overlay: "andhra" as const,
+      alt: "Andhra Pradesh — Tirupati temple, Charminar, Araku Valley train, Borra Caves and coastal sunsets.",
+      state: "Andhra Pradesh",
+      title: "ANDHRA PRADESH",
+      subtitle: "Spiritual. Scenic. Unforgettable.",
+      quote: "Temple bells, hill trains and golden shores — the soul of the south awaits.",
     },
     {
       src: tamilnaduHero,
-      alt: "Tamil Nadu tourism collage featuring Meenakshi Amman Temple, Brihadeeswarar Temple, Marina Beach, Ooty Mountain Railway and Vivekananda Rock Memorial.",
-      overlay: "tamilnadu" as const,
+      alt: "Tamil Nadu — Meenakshi Amman Temple, Brihadeeswarar Temple, Marina Beach, Nilgiri Railway and Vivekananda Rock.",
+      state: "Tamil Nadu",
+      title: "TAMIL NADU",
+      subtitle: "Land of Heritage, Nature & Spirituality.",
+      quote: "Temples, coastlines and cool hill escapes — a journey of culture in every direction.",
     },
     {
       src: pondicherryHero,
-      alt: "Explore Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach, Basilica of the Sacred Heart.",
-      overlay: "pondicherry" as const,
+      alt: "Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach and the Basilica.",
+      state: "Pondicherry",
+      title: "PONDICHERRY",
+      subtitle: "A French Soul by the Sea.",
+      quote: "Cobbled lanes, café mornings and turquoise waters — a little Europe on Indian shores.",
     },
-    { src: keralaHero, alt: "Kerala — Kathakali artist, tea plantations, backwaters and houseboats, Chinese fishing nets, temple architecture.", overlay: false as const },
+    {
+      src: keralaHero,
+      alt: "Kerala — Kathakali artist, Munnar tea hills, Alleppey backwaters, Chinese fishing nets and temple architecture.",
+      state: "Kerala",
+      title: "KERALA",
+      subtitle: "God's Own Country.",
+      quote: "Backwaters, misty hills and coconut coasts — where nature slows time down.",
+    },
   ];
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -217,29 +240,24 @@ function KarnatakaHero() {
               key={idx}
               className={`absolute inset-0 overflow-hidden transition-opacity duration-1000 ease-out ${idx === i ? "opacity-100" : "pointer-events-none opacity-0"}`}
               aria-hidden={idx === i ? "false" : "true"}
-              aria-label={
-                s.overlay === "tamilnadu"
-                  ? "Explore Tamil Nadu tour packages"
-                  : s.overlay === "andhra"
-                  ? "Explore Andhra Pradesh tour packages"
-                  : s.overlay === "pondicherry"
-                  ? "Explore Pondicherry tour packages"
-                  : undefined
-              }
+              aria-label={`Explore ${s.state} tour packages`}
             >
               <img
                 src={s.src}
                 alt={s.alt}
                 width={1920}
-                height={850}
+                height={1080}
                 loading={idx === 0 ? "eager" : "lazy"}
-                fetchPriority={idx === 0 || idx === 1 || idx === 2 ? "high" : "auto"}
+                fetchPriority={idx === 0 ? "high" : "auto"}
                 decoding="async"
                 className="h-full w-full object-cover [object-position:center_center]"
               />
-              {s.overlay === "tamilnadu" && <TamilNaduHeroOverlay />}
-              {s.overlay === "andhra" && <AndhraHeroOverlay />}
-              {s.overlay === "pondicherry" && <PondicherryHeroOverlay />}
+              <HeroSlideOverlay
+                state={s.state}
+                title={s.title}
+                subtitle={s.subtitle}
+                quote={s.quote}
+              />
             </div>
           ))}
           <button
