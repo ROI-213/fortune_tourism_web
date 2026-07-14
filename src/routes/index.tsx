@@ -381,25 +381,25 @@ function ExploreDestinationsBento() {
     {
       name: "Karnataka",
       image: destKarnataka.url,
-      alt: "Mysore Palace (Amba Vilas), Karnataka",
+      alt: "Mysore Palace illuminated during evening in Karnataka",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-2",
       minH: "min-h-[420px] md:min-h-[720px]",
-      position: "center 30%",
+      position: "center 60%",
     },
     {
       name: "Tamil Nadu",
       image: destTamilNadu.url,
-      alt: "Brihadeeswarar Temple, Thanjavur, Tamil Nadu",
+      alt: "Meenakshi Amman Temple towers in Tamil Nadu",
       to: "/tour-packages" as const,
       area: "md:col-span-2 md:row-span-1",
       minH: "min-h-[240px] md:min-h-[350px]",
-      position: "center 55%",
+      position: "center 40%",
     },
     {
       name: "Kerala",
       image: destKerala.url,
-      alt: "Houseboat on the Alleppey backwaters, Kerala",
+      alt: "Luxury houseboat travelling through Kerala backwaters",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
       minH: "min-h-[240px] md:min-h-[350px]",
@@ -408,16 +408,16 @@ function ExploreDestinationsBento() {
     {
       name: "Andhra Pradesh",
       image: destAndhra.url,
-      alt: "Tirumala Venkateswara Temple, Tirupati, Andhra Pradesh",
+      alt: "Gandikota Canyon landscape in Andhra Pradesh",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
       minH: "min-h-[240px] md:min-h-[350px]",
-      position: "center 40%",
+      position: "center 55%",
     },
     {
       name: "Pondicherry",
       image: destPondicherry.url,
-      alt: "French Quarter heritage street, Pondicherry",
+      alt: "French colonial street in Pondicherry White Town",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
       minH: "min-h-[240px] md:min-h-[350px]",
@@ -426,7 +426,7 @@ function ExploreDestinationsBento() {
     {
       name: "South India Special Tours",
       image: destSouthIndia.url,
-      alt: "Kerala backwater houseboat — a signature South India experience",
+      alt: "Scenic South India travel destination landscape",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
       minH: "min-h-[240px] md:min-h-[350px]",
@@ -475,7 +475,13 @@ function ExploreDestinationsBento() {
                   style={{ objectPosition: t.position }}
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.03]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.18) 45%, rgba(0,0,0,0) 70%)",
+                  }}
+                />
                 <div className="absolute inset-0 bg-gradient-to-br from-[color:var(--color-navy)]/10 via-transparent to-[color:var(--color-gold)]/15 opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
                 <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
                   <h3 className="font-heading text-xl font-semibold text-white drop-shadow-md md:text-2xl">
