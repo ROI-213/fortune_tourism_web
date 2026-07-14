@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TourPackagesRouteImport } from './routes/tour-packages'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -19,6 +20,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TourPackagesPackageIdRouteImport } from './routes/tour-packages.$packageId'
 import { Route as CarRentalsVehicleIdRouteImport } from './routes/car-rentals.$vehicleId'
 
+const TourPackagesRoute = TourPackagesRouteImport.update({
+  id: '/tour-packages',
+  path: '/tour-packages',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -55,9 +61,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const TourPackagesPackageIdRoute = TourPackagesPackageIdRouteImport.update({
-  id: '/tour-packages/$packageId',
-  path: '/tour-packages/$packageId',
-  getParentRoute: () => rootRouteImport,
+  id: '/$packageId',
+  path: '/$packageId',
+  getParentRoute: () => TourPackagesRoute,
 } as any)
 const CarRentalsVehicleIdRoute = CarRentalsVehicleIdRouteImport.update({
   id: '/$vehicleId',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tour-packages': typeof TourPackagesRouteWithChildren
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
   '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tour-packages': typeof TourPackagesRouteWithChildren
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
   '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tour-packages': typeof TourPackagesRouteWithChildren
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
   '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/services'
     | '/sitemap.xml'
+    | '/tour-packages'
     | '/car-rentals/$vehicleId'
     | '/tour-packages/$packageId'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/services'
     | '/sitemap.xml'
+    | '/tour-packages'
     | '/car-rentals/$vehicleId'
     | '/tour-packages/$packageId'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/services'
     | '/sitemap.xml'
+    | '/tour-packages'
     | '/car-rentals/$vehicleId'
     | '/tour-packages/$packageId'
   fileRoutesById: FileRoutesById
@@ -143,11 +155,18 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  TourPackagesPackageIdRoute: typeof TourPackagesPackageIdRoute
+  TourPackagesRoute: typeof TourPackagesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tour-packages': {
+      id: '/tour-packages'
+      path: '/tour-packages'
+      fullPath: '/tour-packages'
+      preLoaderRoute: typeof TourPackagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -199,10 +218,10 @@ declare module '@tanstack/react-router' {
     }
     '/tour-packages/$packageId': {
       id: '/tour-packages/$packageId'
-      path: '/tour-packages/$packageId'
+      path: '/$packageId'
       fullPath: '/tour-packages/$packageId'
       preLoaderRoute: typeof TourPackagesPackageIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof TourPackagesRoute
     }
     '/car-rentals/$vehicleId': {
       id: '/car-rentals/$vehicleId'
@@ -226,6 +245,18 @@ const CarRentalsRouteWithChildren = CarRentalsRoute._addFileChildren(
   CarRentalsRouteChildren,
 )
 
+interface TourPackagesRouteChildren {
+  TourPackagesPackageIdRoute: typeof TourPackagesPackageIdRoute
+}
+
+const TourPackagesRouteChildren: TourPackagesRouteChildren = {
+  TourPackagesPackageIdRoute: TourPackagesPackageIdRoute,
+}
+
+const TourPackagesRouteWithChildren = TourPackagesRoute._addFileChildren(
+  TourPackagesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
@@ -234,7 +265,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  TourPackagesPackageIdRoute: TourPackagesPackageIdRoute,
+  TourPackagesRoute: TourPackagesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
