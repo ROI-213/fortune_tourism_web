@@ -98,37 +98,11 @@ function TamilNaduHeroOverlay() {
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center px-4"
+      className="pointer-events-none absolute inset-0 z-[2] flex items-end justify-center px-4 pb-10 md:pb-16"
       onMouseEnter={stop as unknown as React.MouseEventHandler}
     >
       <div className="pointer-events-auto flex w-full max-w-[560px] flex-col items-center text-center">
-        <p
-          className="font-heading italic text-[color:var(--color-navy)]"
-          style={{ fontSize: "clamp(18px, 2.4vw, 30px)" }}
-        >
-          — Explore —
-        </p>
-        <h2
-          className="mt-1 font-heading font-black tracking-[0.02em] text-[color:var(--color-navy)] drop-shadow-[0_2px_6px_rgba(255,240,210,0.6)]"
-          style={{ fontSize: "clamp(32px, 6vw, 72px)", lineHeight: 1 }}
-        >
-          TAMIL NADU
-        </h2>
-        <p
-          className="mt-3 font-heading text-[color:var(--color-navy)]/90"
-          style={{ fontSize: "clamp(12px, 1.4vw, 18px)" }}
-        >
-          ✦ Land of Heritage, Nature & Spirituality ✦
-        </p>
-        <blockquote
-          className="mt-3 font-heading italic text-[color:var(--color-navy)]/85"
-          style={{ fontSize: "clamp(11px, 1.15vw, 15px)", lineHeight: 1.5 }}
-        >
-          "Temples, coastlines and cool hill escapes—
-          <br />
-          Tamil Nadu is a journey of culture in every direction."
-        </blockquote>
-        <div className="mt-4 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
+        <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
           <a
             href={waHref}
             target="_blank"
