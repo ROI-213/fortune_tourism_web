@@ -12,6 +12,7 @@ import { Reveal } from "@/components/site/Reveal";
 import { useParallax } from "@/hooks/useParallax";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { StateTourPackages } from "@/components/home/StateTourPackages";
+import { TravelServicesSection } from "@/components/home/TravelServicesSection";
 import karnatakaHero from "@/assets/karnataka-hero.png";
 import andhraHero from "@/assets/andhra-hero.png";
 import tamilnaduHero from "@/assets/tamilnadu-hero.png";
@@ -63,6 +64,7 @@ function HomePage() {
       <KarnatakaHero />
       <QuickEnquiry />
       <TrustStatistics />
+      <TravelServicesSection />
       <ExploreDestinationsBento />
       <ServicesGrid />
       <StateTourPackages />
