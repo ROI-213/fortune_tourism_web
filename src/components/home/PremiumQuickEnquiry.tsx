@@ -18,10 +18,10 @@ import {
 import { buildWhatsAppUrl } from "@/lib/contact";
 import { WhatsAppIcon } from "@/components/site/Header";
 import bgAsset from "@/assets/quick-enquiry/southindia-bg.jpg";
-import thumbMysuru from "@/assets/pkg-mysuru-palace.jpg.asset.json";
-import thumbOoty from "@/assets/pkg-ooty-real.jpg.asset.json";
-import thumbAlleppey from "@/assets/pkg-alleppey-backwaters.jpg.asset.json";
-import thumbPondi from "@/assets/pkg-pondi-whitetown.jpg.asset.json";
+import thumbMysuru from "@/assets/pkg-mysuru-palace.jpg";
+import thumbOoty from "@/assets/pkg-ooty-real.jpg";
+import thumbAlleppey from "@/assets/pkg-alleppey-backwaters.jpg";
+import thumbPondi from "@/assets/pkg-pondi-whitetown.jpg";
 
 const SERVICES = [
   "Car Rental",

@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Car, Luggage, Plane, type LucideIcon } from "lucide-react";
 
-import bgImg from "@/assets/services-hero/bg.jpg.asset.json";
-import cardCar from "@/assets/services-hero/card-car.jpg.asset.json";
-import cardTour from "@/assets/services-hero/card-tour.jpg.asset.json";
-import cardAirport from "@/assets/services-hero/card-airport.jpg.asset.json";
+import bgImg from "@/assets/services-hero/bg.jpg";
+import cardCar from "@/assets/services-hero/card-car.jpg";
+import cardTour from "@/assets/services-hero/card-tour.jpg";
+import cardAirport from "@/assets/services-hero/card-airport.jpg";
 
 type ServiceHref = "/car-rentals" | "/tour-packages" | "/airport-transfer";
 
