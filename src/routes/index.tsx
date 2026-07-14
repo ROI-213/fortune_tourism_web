@@ -10,6 +10,7 @@ import {
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Reveal } from "@/components/site/Reveal";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
+import karnatakaHero from "@/assets/karnataka-hero.png";
 import { destinations } from "@/data/destinations";
 import { packages } from "@/data/packages";
 import { vehicles } from "@/data/vehicles";
@@ -50,8 +51,8 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   return (
-    <SiteLayout transparentHeader>
-      <HeroCarousel />
+    <SiteLayout>
+      <KarnatakaHero />
       <QuickEnquiry />
       <ServicesGrid />
       <ExploreSouthIndia />
@@ -68,6 +69,22 @@ function HomePage() {
 }
 
 /* --- Hero Carousel --- */
+function KarnatakaHero() {
+  return (
+    <section className="w-full">
+      <img
+        src={karnatakaHero}
+        alt="Karnataka — One State. Infinite Wonders. Discover Mysore Palace, Hampi, Jog Falls, Gokarna and Coorg."
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
+        className="block w-full h-auto"
+        style={{ aspectRatio: "3 / 2", objectFit: "contain", objectPosition: "center" }}
+      />
+    </section>
+  );
+}
+
 function HeroCarousel() {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
