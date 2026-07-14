@@ -78,12 +78,12 @@ function HomePage() {
       <PremiumQuickEnquiry />
       <TrustStatistics />
       <TravelServicesSection />
+      <FleetBanner />
+      <FleetShowcase />
       <ExploreDestinationsBento />
       {/* ServicesGrid removed per request */}
       <StateTourPackages />
 
-      <FleetBanner />
-      <FleetShowcase />
       {/* FleetPreview removed */}
       <RouteMap />
       <WhyChooseUs />
