@@ -13,7 +13,12 @@ export function SiteLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <main className={transparentHeader ? "" : "pt-16 md:pt-20"}>{children}</main>
+      <main
+        className={transparentHeader ? "" : ""}
+        style={transparentHeader ? undefined : { paddingTop: "var(--fortune-header, 4rem)" }}
+      >
+        {children}
+      </main>
       <Footer />
       <FloatingContact />
     </div>
