@@ -11,6 +11,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { Reveal } from "@/components/site/Reveal";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import karnatakaHero from "@/assets/karnataka-hero.png";
+import andhraHero from "@/assets/andhra-hero.png";
 import { destinations } from "@/data/destinations";
 import { packages } from "@/data/packages";
 import { vehicles } from "@/data/vehicles";
@@ -70,17 +71,73 @@ function HomePage() {
 
 /* --- Hero Carousel --- */
 function KarnatakaHero() {
+  const slides = [
+    { src: karnatakaHero, alt: "Karnataka — One State. Infinite Wonders. Mysore Palace, Hampi, Jog Falls, Gokarna, Coorg." },
+    { src: andhraHero, alt: "Andhra Pradesh — Charminar, Tirupati, Araku Valley, Borra Caves, Konaseema Backwaters." },
+  ];
+  const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const n = slides.length;
+  useEffect(() => {
+    if (paused) return;
+    const id = window.setInterval(() => setI((v) => (v + 1) % n), 6000);
+    return () => window.clearInterval(id);
+  }, [paused, n]);
+
+  const touch = { x: 0 };
   return (
-    <section className="w-full">
-      <img
-        src={karnatakaHero}
-        alt="Karnataka — One State. Infinite Wonders. Discover Mysore Palace, Hampi, Jog Falls, Gokarna and Coorg."
-        loading="eager"
-        fetchPriority="high"
-        decoding="async"
-        className="block w-full h-auto"
-        style={{ aspectRatio: "3 / 2", objectFit: "contain", objectPosition: "center" }}
-      />
+    <section
+      className="relative w-full overflow-hidden bg-black"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onTouchStart={(e) => { touch.x = e.touches[0].clientX; setPaused(true); }}
+      onTouchEnd={(e) => {
+        const dx = e.changedTouches[0].clientX - touch.x;
+        if (Math.abs(dx) > 40) setI((v) => (v + (dx < 0 ? 1 : -1) + n) % n);
+      }}
+      aria-roledescription="carousel"
+    >
+      <div className="relative w-full" style={{ aspectRatio: "3 / 2" }}>
+        {slides.map((s, idx) => (
+          <img
+            key={idx}
+            src={s.src}
+            alt={s.alt}
+            loading={idx === 0 ? "eager" : "eager"}
+            fetchPriority={idx === 0 ? "high" : "auto"}
+            decoding="async"
+            className={`absolute inset-0 w-full h-full object-contain object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "opacity-0"}`}
+            aria-hidden={idx === i ? "false" : "true"}
+          />
+        ))}
+      </div>
+      <button
+        type="button"
+        aria-label="Previous slide"
+        onClick={() => setI((v) => (v - 1 + n) % n)}
+        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 items-center justify-center rounded-full bg-white/80 hover:bg-white text-black shadow"
+      >
+        <ChevronLeft className="h-6 w-6" />
+      </button>
+      <button
+        type="button"
+        aria-label="Next slide"
+        onClick={() => setI((v) => (v + 1) % n)}
+        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 items-center justify-center rounded-full bg-white/80 hover:bg-white text-black shadow"
+      >
+        <ChevronRight className="h-6 w-6" />
+      </button>
+      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+        {slides.map((_, idx) => (
+          <button
+            key={idx}
+            type="button"
+            aria-label={`Go to slide ${idx + 1}`}
+            onClick={() => setI(idx)}
+            className={`h-2.5 rounded-full transition-all ${idx === i ? "w-6 bg-white" : "w-2.5 bg-white/60"}`}
+          />
+        ))}
+      </div>
     </section>
   );
 }
