@@ -168,7 +168,7 @@ function KarnatakaHero() {
           {slides.map((s, idx) => (
             <div
               key={idx}
-              className={`absolute inset-0 overflow-hidden transition-opacity duration-1000 ease-out ${idx === i ? "opacity-100" : "opacity-0"}`}
+              className={`absolute inset-0 overflow-hidden transition-opacity duration-1000 ease-out ${idx === i ? "opacity-100" : "pointer-events-none opacity-0"}`}
               aria-hidden={idx === i ? "false" : "true"}
               aria-label={s.overlay ? "Explore Tamil Nadu tour packages" : undefined}
             >
