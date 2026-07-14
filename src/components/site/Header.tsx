@@ -21,22 +21,20 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#f7f1e7]">
-      <div className="mx-auto w-[calc(100%-24px)] max-w-[1440px] px-0 pt-3 pb-2 md:w-[calc(100%-56px)] md:pt-5">
+      <div className="mx-auto w-[calc(100%-24px)] max-w-[1440px] px-0 py-2 md:w-[calc(100%-32px)] md:py-3">
         <nav
-          className="grid items-center rounded-[28px] border border-white/80 bg-[rgba(255,253,248,0.98)] px-4 py-2.5 shadow-[0_18px_40px_rgba(68,45,15,0.10),0_4px_12px_rgba(68,45,15,0.06)] md:rounded-[40px] md:px-8 md:py-4"
-          style={{ gridTemplateColumns: "auto 1fr auto", columnGap: "clamp(16px,3vw,48px)" }}
+          className="flex items-center flex-nowrap gap-4 rounded-[28px] border border-white/80 bg-[rgba(255,253,248,0.98)] px-4 py-2 shadow-[0_18px_40px_rgba(68,45,15,0.10),0_4px_12px_rgba(68,45,15,0.06)] md:px-7 md:py-2.5"
+          style={{ minHeight: 64 }}
           aria-label="Primary"
         >
           {/* Brand */}
-          <Link to="/" className="flex items-center gap-3 md:gap-5">
+          <Link to="/" className="flex items-center gap-2.5 md:gap-3 shrink-0">
             <span
-              className="grid shrink-0 place-items-center rounded-2xl text-[color:var(--color-gold)] shadow-[inset_0_-2px_0_rgba(0,0,0,0.15)]"
+              className="grid shrink-0 place-items-center rounded-2xl text-[color:var(--color-gold)] shadow-[inset_0_-2px_0_rgba(0,0,0,0.15)] h-11 w-11 md:h-[52px] md:w-[52px]"
               style={{
-                width: "clamp(44px,4.5vw,80px)",
-                height: "clamp(44px,4.5vw,80px)",
                 background: "linear-gradient(145deg,#064933,#013b2a)",
                 fontFamily: 'Georgia,"Times New Roman",serif',
-                fontSize: "clamp(28px,3vw,52px)",
+                fontSize: "clamp(24px,2.2vw,32px)",
                 fontWeight: 500,
                 lineHeight: 1,
               }}
@@ -46,7 +44,7 @@ export function Header() {
             </span>
             <span
               className="whitespace-nowrap font-heading"
-              style={{ fontSize: "clamp(18px,2vw,34px)", fontWeight: 600, lineHeight: 1 }}
+              style={{ fontSize: "clamp(17px,1.4vw,24px)", fontWeight: 600, lineHeight: 1 }}
             >
               <span style={{ color: "#063f2d" }}>Fortune</span>{" "}
               <span style={{ color: "#d79a17" }}>Tourism</span>
@@ -55,8 +53,8 @@ export function Header() {
 
           {/* Center menu */}
           <div
-            className="hidden min-w-0 items-center justify-center whitespace-nowrap lg:flex"
-            style={{ gap: "clamp(18px,2.4vw,44px)" }}
+            className="hidden min-w-0 flex-1 items-center justify-center whitespace-nowrap lg:flex"
+            style={{ gap: "clamp(14px,1.8vw,28px)" }}
           >
             {NAV.map((item) => {
               const active = pathname === item.to;
@@ -64,7 +62,7 @@ export function Header() {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="relative text-[15px] font-medium text-[#191919] transition-colors hover:text-[#c98d12] xl:text-[17px]"
+                  className="relative text-[14px] font-medium text-[#191919] transition-colors hover:text-[#c98d12] xl:text-[15px]"
                   style={
                     active
                       ? { color: "#d28f00", fontWeight: 600 }
@@ -77,9 +75,9 @@ export function Header() {
                       aria-hidden="true"
                       className="absolute left-1/2 -translate-x-1/2 rounded-full"
                       style={{
-                        bottom: -10,
-                        width: 40,
-                        height: 3,
+                        bottom: -8,
+                        width: 32,
+                        height: 2.5,
                         background: "#d59a0a",
                       }}
                     />
@@ -90,27 +88,22 @@ export function Header() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-self-end gap-3 md:gap-5 ml-auto">
-            <span
-              aria-hidden="true"
-              className="hidden lg:block"
-              style={{ width: 1, height: 40, background: "rgba(20,20,20,0.20)" }}
-            />
+          <div className="flex items-center gap-2 md:gap-3 shrink-0 ml-auto">
             <a
               href={CONTACT.phoneHref}
-              className="hidden items-center gap-2 whitespace-nowrap text-[15px] font-medium text-[#151515] hover:text-[#063f2d] md:inline-flex xl:text-[17px]"
+              className="hidden items-center gap-1.5 whitespace-nowrap text-[14px] font-medium text-[#151515] hover:text-[#063f2d] md:inline-flex"
             >
-              <Phone className="h-5 w-5" style={{ color: "#063f2d" }} />
+              <Phone className="h-4 w-4" style={{ color: "#063f2d" }} />
               <span className="hidden xl:inline">Call Now</span>
             </a>
             <a
               href={wa}
               target="_blank"
               rel="noreferrer noopener"
-              className="hidden items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-[15px] font-medium text-white shadow-[0_8px_18px_rgba(4,83,55,0.16)] transition-transform hover:-translate-y-0.5 md:inline-flex md:px-5 md:py-2.5 xl:text-[17px]"
+              className="hidden items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-[14px] font-medium text-white shadow-[0_8px_18px_rgba(4,83,55,0.16)] transition-transform hover:-translate-y-0.5 md:inline-flex"
               style={{ background: "linear-gradient(135deg,#086a46,#07583d)" }}
             >
-              <WhatsAppIcon className="h-5 w-5" />
+              <WhatsAppIcon className="h-4 w-4" />
               WhatsApp
             </a>
 
@@ -120,17 +113,17 @@ export function Header() {
               target="_blank"
               rel="noreferrer noopener"
               aria-label="WhatsApp"
-              className="grid h-11 w-11 place-items-center rounded-full text-white md:hidden"
+              className="grid h-10 w-10 place-items-center rounded-full text-white md:hidden"
               style={{ background: "linear-gradient(135deg,#086a46,#07583d)" }}
             >
-              <WhatsAppIcon className="h-5 w-5" />
+              <WhatsAppIcon className="h-4 w-4" />
             </a>
             <button
               onClick={() => setOpen(true)}
               aria-label="Open menu"
-              className="grid h-11 w-11 place-items-center rounded-full border border-[color:rgba(6,63,45,0.2)] text-[#063f2d] lg:hidden"
+              className="grid h-10 w-10 place-items-center rounded-full border border-[color:rgba(6,63,45,0.2)] text-[#063f2d] lg:hidden"
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-4 w-4" />
             </button>
           </div>
         </nav>
