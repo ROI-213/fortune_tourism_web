@@ -15,6 +15,7 @@ import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CarRentalsRouteImport } from './routes/car-rentals'
 import { Route as AirportTransferRouteImport } from './routes/airport-transfer'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TourPackagesPackageIdRouteImport } from './routes/tour-packages.$packageId'
 import { Route as CarRentalsVehicleIdRouteImport } from './routes/car-rentals.$vehicleId'
@@ -49,6 +50,11 @@ const AirportTransferRoute = AirportTransferRouteImport.update({
   path: '/airport-transfer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -67,6 +73,7 @@ const CarRentalsVehicleIdRoute = CarRentalsVehicleIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/airport-transfer': typeof AirportTransferRoute
   '/car-rentals': typeof CarRentalsRouteWithChildren
   '/contact': typeof ContactRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/airport-transfer': typeof AirportTransferRoute
   '/car-rentals': typeof CarRentalsRouteWithChildren
   '/contact': typeof ContactRoute
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/airport-transfer': typeof AirportTransferRoute
   '/car-rentals': typeof CarRentalsRouteWithChildren
   '/contact': typeof ContactRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/airport-transfer'
     | '/car-rentals'
     | '/contact'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/airport-transfer'
     | '/car-rentals'
     | '/contact'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/airport-transfer'
     | '/car-rentals'
     | '/contact'
@@ -137,6 +149,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   AirportTransferRoute: typeof AirportTransferRoute
   CarRentalsRoute: typeof CarRentalsRouteWithChildren
   ContactRoute: typeof ContactRoute
@@ -189,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AirportTransferRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -239,6 +259,7 @@ const TourPackagesRouteWithChildren = TourPackagesRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   AirportTransferRoute: AirportTransferRoute,
   CarRentalsRoute: CarRentalsRouteWithChildren,
   ContactRoute: ContactRoute,
