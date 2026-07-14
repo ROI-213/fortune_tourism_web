@@ -27,9 +27,7 @@ interface TravelService {
   id: string;
   title: string;
   animatedTitle: string;
-  description: string;
   images: { src: string; alt: string }[];
-  tags: string[];
   buttonLabel: string;
   href: ServiceHref;
   startDelayMs: number;
@@ -43,14 +41,11 @@ const travelServices: TravelService[] = [
     id: "car-rentals",
     title: "Car Rentals",
     animatedTitle: "Car Rentals",
-    description:
-      "Choose clean and comfortable vehicles for local travel, outstation journeys and family trips.",
     images: [
       { src: carSedan, alt: "Clean white sedan on a Bengaluru road" },
       { src: carErtiga, alt: "Silver Ertiga family MPV ready for a road trip" },
       { src: carInnova, alt: "Toyota Innova Crysta on a scenic Karnataka hill road" },
     ],
-    tags: ["Sedan", "SUV", "MUV", "Tempo Traveller"],
     buttonLabel: "View Our Fleet",
     href: "/car-rentals",
     startDelayMs: 0,
@@ -60,14 +55,11 @@ const travelServices: TravelService[] = [
     id: "tour-packages",
     title: "Tour Packages",
     animatedTitle: "Tour Packages",
-    description:
-      "Explore carefully designed packages covering the most beautiful destinations across South India.",
     images: [
       { src: tourMysore, alt: "Mysore Palace at golden hour, Karnataka" },
       { src: tourKerala, alt: "Traditional Kerala houseboat on the Alleppey backwaters" },
       { src: tourOoty, alt: "Rolling tea plantations near Ooty, Tamil Nadu" },
     ],
-    tags: ["Karnataka", "Kerala", "Tamil Nadu", "Andhra Pradesh"],
     buttonLabel: "Explore Packages",
     href: "/tour-packages",
     startDelayMs: 900,
@@ -79,14 +71,11 @@ const travelServices: TravelService[] = [
     id: "airport-transfers",
     title: "Airport Transfers",
     animatedTitle: "Airport Transfers",
-    description:
-      "Enjoy punctual Bengaluru airport pickup and drop services with professional drivers and comfortable vehicles.",
     images: [
       { src: airportTerminal, alt: "Bengaluru international airport terminal at dusk" },
       { src: airportPickup, alt: "Chauffeur assisting at an airport pickup" },
       { src: airportLuggage, alt: "Family loading luggage into an MPV at the airport" },
     ],
-    tags: ["Airport Pickup", "Airport Drop", "Hotel Transfer", "Corporate Transfer"],
     buttonLabel: "Book a Transfer",
     href: "/airport-transfer",
     startDelayMs: 1800,
@@ -331,28 +320,8 @@ function TravelServiceCard({
         <h3 className="font-heading text-[26px] font-bold text-[#1D1D1D] md:text-[28px]">
           {service.title}
         </h3>
-        <div className="mx-auto mt-2 flex items-center gap-2 text-[#C9A84C]/70" aria-hidden="true">
-          <span className="h-px w-7 bg-current" />
-          <span className="text-[10px]">✦</span>
-          <span className="h-px w-7 bg-current" />
-        </div>
-        <p className="mx-auto mt-4 max-w-[300px] text-[15px] leading-relaxed text-[#666666] md:text-[16px]">
-          {service.description}
-        </p>
 
-        <ul className="mt-5 flex flex-wrap justify-center gap-2">
-          {service.tags.map((tag) => (
-            <li
-              key={tag}
-              className="rounded-full px-3.5 py-1.5 text-[12px] font-medium text-[#1D1D1D]"
-              style={{ backgroundColor: "rgba(14,107,80,0.09)" }}
-            >
-              {tag}
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-auto pt-7">
+        <div className="mt-auto pt-8">
           <Link
             to={service.href}
             aria-label={service.buttonLabel}
