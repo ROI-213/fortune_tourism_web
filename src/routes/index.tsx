@@ -89,6 +89,73 @@ function HomePage() {
 }
 
 /* --- Hero Carousel --- */
+function TamilNaduHeroOverlay() {
+  const waHref = buildWhatsAppUrl({
+    destination: "Tamil Nadu",
+    service: "Tour Package",
+    message:
+      "Hello Fortune Tourism, I would like to enquire about Tamil Nadu tour packages.",
+  });
+  const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center px-4"
+      onMouseEnter={stop as unknown as React.MouseEventHandler}
+    >
+      <div className="pointer-events-auto flex w-full max-w-[560px] flex-col items-center text-center">
+        <p
+          className="font-heading italic text-[color:var(--color-navy)]"
+          style={{ fontSize: "clamp(18px, 2.4vw, 30px)" }}
+        >
+          — Explore —
+        </p>
+        <h2
+          className="mt-1 font-heading font-black tracking-[0.02em] text-[color:var(--color-navy)] drop-shadow-[0_2px_6px_rgba(255,240,210,0.6)]"
+          style={{ fontSize: "clamp(32px, 6vw, 72px)", lineHeight: 1 }}
+        >
+          TAMIL NADU
+        </h2>
+        <p
+          className="mt-3 font-heading text-[color:var(--color-navy)]/90"
+          style={{ fontSize: "clamp(12px, 1.4vw, 18px)" }}
+        >
+          ✦ Land of Heritage, Nature & Spirituality ✦
+        </p>
+        <blockquote
+          className="mt-3 font-heading italic text-[color:var(--color-navy)]/85"
+          style={{ fontSize: "clamp(11px, 1.15vw, 15px)", lineHeight: 1.5 }}
+        >
+          "Temples, coastlines and cool hill escapes—
+          <br />
+          Tamil Nadu is a journey of culture in every direction."
+        </blockquote>
+        <div className="mt-4 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noreferrer noopener"
+            onClick={stop}
+            onTouchStart={stop}
+            className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#25D366]"
+          >
+            <WhatsAppIcon className="h-4 w-4" />
+            WhatsApp
+          </a>
+          <Link
+            to="/contact"
+            search={{ service: "Tamil Nadu Tour Package", source: "Tamil Nadu Hero Banner" } as never}
+            onClick={stop as unknown as React.MouseEventHandler}
+            onTouchStart={stop as unknown as React.TouchEventHandler}
+            className="inline-flex items-center rounded-full bg-[color:var(--color-navy)] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-navy)]"
+          >
+            Enquire Now
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function KarnatakaHero() {
   const slides = [
     { src: karnatakaHero, alt: "Karnataka — One State. Infinite Wonders. Mysore Palace, Hampi, Jog Falls, Gokarna, Coorg.", overlay: false as const },
