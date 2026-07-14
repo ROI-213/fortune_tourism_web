@@ -5,7 +5,7 @@ type Stat = {
   value: number;
   suffix: string;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   display?: string; // override formatted display (e.g. "24/7")
 };
 
