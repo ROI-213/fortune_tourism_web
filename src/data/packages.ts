@@ -142,7 +142,7 @@ export const packages: TourPackage[] = [
     destinations: ["Munnar", "Thekkady", "Alleppey Backwaters", "Kochi"],
     vehicles: ["SUV", "Innova Crysta", "Tempo Traveller"],
     startingPrice: 24500,
-    image: "/images/state-kerala.jpg",
+    image: pkgMunnarAlleppey,
     summary: "Signature Kerala loop with tea gardens, spice trails and a night on the backwaters.",
     heroImage: "/images/packages/hero-munnar-alleppey.jpg",
     highlights: ["Munnar tea gardens", "Eravikulam National Park", "Thekkady spice trails", "Alleppey houseboat night", "Fort Kochi walk"],
@@ -360,7 +360,7 @@ export const packages: TourPackage[] = [
     destinations: ["Alleppey backwaters", "Houseboat"],
     vehicles: ["Sedan", "SUV"],
     startingPrice: 12500,
-    image: "/images/state-kerala.jpg",
+    image: pkgAlleppeyBackwaters,
     summary: "A slow night on the backwaters with home-cooked Kerala meals.",
     itinerary: [
       { day: 1, title: "Board houseboat", details: "Cruise, sunset." },
@@ -378,7 +378,7 @@ export const packages: TourPackage[] = [
     destinations: ["Thekkady", "Periyar Lake", "Spice plantation"],
     vehicles: ["SUV", "Innova"],
     startingPrice: 14500,
-    image: "/images/state-kerala.jpg",
+    image: pkgThekkady,
     summary: "Boat safaris on Periyar and a walk through cardamom hills.",
     itinerary: [
       { day: 1, title: "→ Thekkady", details: "Evening at leisure." },
@@ -397,7 +397,7 @@ export const packages: TourPackage[] = [
     destinations: ["Wayanad", "Edakkal Caves", "Waterfalls"],
     vehicles: ["SUV", "Innova"],
     startingPrice: 13500,
-    image: "/images/state-kerala.jpg",
+    image: pkgWayanad,
     summary: "Ancient caves, tea gardens and misty Western Ghats viewpoints.",
     itinerary: [
       { day: 1, title: "→ Wayanad", details: "Check-in, viewpoint." },
