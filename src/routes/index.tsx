@@ -147,40 +147,11 @@ function AndhraHeroOverlay() {
   ];
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-[2] flex flex-col items-center justify-between px-4 py-6 text-center md:py-10"
+      className="pointer-events-none absolute inset-0 z-[2] flex items-end justify-center px-4 pb-10 text-center md:pb-16"
       onMouseEnter={stop as unknown as React.MouseEventHandler}
     >
-      {/* Top block */}
-      <div className="pointer-events-auto flex w-full max-w-[900px] flex-col items-center">
-        <p className="font-serif italic text-[11px] tracking-[0.25em] text-[#3a2a10] md:text-sm">
-          Incredible Experiences. Endless Memories.
-        </p>
-        <h2
-          className="mt-1 font-heading font-black leading-[1] tracking-tight text-[#0F2E23] drop-shadow-[0_2px_6px_rgba(255,255,255,0.35)]"
-          style={{ fontSize: "clamp(28px, 6.5vw, 78px)" }}
-        >
-          ANDHRA PRADESH
-        </h2>
-        <div className="mt-2 flex items-center gap-2">
-          <span aria-hidden="true" className="h-px w-8 bg-[#8a6a2c]/70" />
-          <p className="font-serif text-[12px] text-[#5a4116] md:text-lg">
-            Where Heritage, Nature &amp; Culture Unite
-          </p>
-          <span aria-hidden="true" className="h-px w-8 bg-[#8a6a2c]/70" />
-        </div>
-        <blockquote className="mt-3 hidden max-w-[520px] font-serif italic text-[13px] leading-snug text-[#3a2a10]/90 md:block md:text-[15px]">
-          &ldquo;From timeless monuments to tranquil valleys and luminous shores,
-          Andhra Pradesh welcomes every kind of traveler.&rdquo;
-        </blockquote>
-      </div>
-
-      {/* Bottom block: features + buttons + strip */}
-      <div className="pointer-events-auto flex w-full max-w-[900px] flex-col items-center gap-3 md:gap-4">
-        <ul className="hidden flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-full border border-[#8a6a2c]/40 bg-[#0F2E23]/70 px-5 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#f4e5c0] backdrop-blur-sm md:flex md:text-[12px]">
-          {features.map((f) => (
-            <li key={f} className="whitespace-nowrap">{f}</li>
-          ))}
-        </ul>
+      {/* Buttons only — heading, subtitle, quote, features and bottom strip are baked into the banner image */}
+      <div className="pointer-events-auto flex w-full max-w-[560px] flex-col items-center">
         <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
           <a
             href={waHref}
@@ -204,9 +175,6 @@ function AndhraHeroOverlay() {
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <p className="hidden text-[10px] font-semibold uppercase tracking-[0.3em] text-[#f4e5c0] md:block">
-          Discover. <span className="text-[#f6d67a]">Explore.</span> Experience Andhra Pradesh.
-        </p>
       </div>
     </div>
   );
