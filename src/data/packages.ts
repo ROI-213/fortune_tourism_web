@@ -32,7 +32,7 @@ export const packages: TourPackage[] = [
     destinations: ["Mysuru Palace", "Coorg Coffee Estates", "Abbey Falls", "Dubare"],
     vehicles: ["Sedan", "SUV", "Innova Crysta"],
     startingPrice: 12500,
-    image: "/images/state-karnataka.jpg",
+    image: pkgMysuruHeritage,
     summary:
       "A weekend loop from Bengaluru covering the royal city of Mysuru and the misty coffee hills of Coorg.",
     heroImage: "/images/packages/hero-mysuru-coorg.jpg",
@@ -75,7 +75,7 @@ export const packages: TourPackage[] = [
     destinations: ["Mullayanagiri", "Baba Budangiri", "Coffee Estates", "Hebbe Falls"],
     vehicles: ["Sedan", "SUV"],
     startingPrice: 8500,
-    image: "/images/state-karnataka.jpg",
+    image: pkgChikmagalur,
     summary: "A quick escape to Karnataka's coffee country and the tallest peak in the state.",
     heroImage: "/images/packages/hero-chikmagalur.jpg",
     highlights: ["Sunrise at Mullayanagiri", "Coffee estate homestay", "Baba Budangiri drive", "Hebbe Falls trek"],
@@ -159,7 +159,7 @@ export const packages: TourPackage[] = [
     destinations: ["Hampi", "Virupaksha Temple", "Vittala Temple", "Hospet"],
     vehicles: ["Sedan", "SUV"],
     startingPrice: 13500,
-    image: "/images/state-karnataka.jpg",
+    image: pkgHampi,
     summary: "Stone chariots, boulder-strewn ruins and a UNESCO heritage weekend.",
     itinerary: [
       { day: 1, title: "Bengaluru → Hospet", details: "Overnight drive/day drive to Hospet base." },
@@ -178,7 +178,7 @@ export const packages: TourPackage[] = [
     destinations: ["Om Beach", "Kudle Beach", "Mirjan Fort"],
     vehicles: ["Sedan", "SUV"],
     startingPrice: 14500,
-    image: "/images/state-karnataka.jpg",
+    image: pkgGokarna,
     summary: "Quiet coastline, temple town mornings and long beach walks.",
     itinerary: [
       { day: 1, title: "Drive to Gokarna", details: "Check in, evening at Om Beach." },
@@ -197,7 +197,7 @@ export const packages: TourPackage[] = [
     destinations: ["Kabini", "Nagarhole", "Forest safari"],
     vehicles: ["SUV", "Innova"],
     startingPrice: 11500,
-    image: "/images/state-karnataka.jpg",
+    image: pkgKabini,
     summary: "Riverside lodges and jungle safari in Nagarhole tiger reserve.",
     itinerary: [
       { day: 1, title: "Bengaluru → Kabini", details: "Afternoon safari." },
