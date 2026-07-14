@@ -55,7 +55,7 @@ function VehicleDetail() {
             </div>
             <h2 className="mt-10 font-heading text-2xl">Features</h2>
             <ul className="mt-4 grid gap-2 md:grid-cols-2">
-              {vehicle.features.map((f) => (
+              {vehicle.features.map((f: string) => (
                 <li key={f} className="flex items-center gap-2 text-sm">
                   <CheckCircle2 className="h-4 w-4 text-[color:var(--color-emerald)]" /> {f}
                 </li>
