@@ -32,7 +32,7 @@ export function StateTourPackages() {
 
   return (
     <section className="bg-[#F8F2E7] py-16 md:py-20">
-      <div className="container-fortune space-y-10 md:space-y-14">
+      <div className="mx-auto w-[calc(100%-24px)] max-w-[1880px] space-y-10 md:w-[calc(100%-40px)] md:space-y-14 min-[1600px]:w-[calc(100%-64px)]">
         {STATES.map((s) => {
           const list = packages.filter((p) => p.states.includes(s.slug));
           if (list.length === 0) return null;
@@ -99,7 +99,7 @@ function StateRow({
   onEnquire: (p: TourPackage) => void;
 }) {
   return (
-    <div className="rounded-3xl border border-[#E8E1D5] bg-white p-5 shadow-[0_10px_30px_rgba(23,76,54,0.06)] md:p-8">
+    <div className="rounded-3xl border border-[#E8E1D5] bg-white p-5 shadow-[0_10px_30px_rgba(23,76,54,0.06)] md:p-7 lg:p-8">
       <Carousel opts={{ align: "start", loop: false }}>
         <div className="mb-6 flex items-end justify-between gap-4">
           <div className="min-w-0">
@@ -116,11 +116,11 @@ function StateRow({
           </div>
         </div>
 
-        <CarouselContent className="-ml-4">
+        <CarouselContent className="-ml-4 items-stretch">
           {items.map((p) => (
             <CarouselItem
               key={p.slug}
-              className="pl-4 basis-[86%] sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+              className="pl-4 basis-[86%] sm:basis-1/2 lg:basis-1/3 xl:basis-1/4 flex h-auto"
             >
               <PackageCard pkg={p} onEnquire={onEnquire} />
             </CarouselItem>
@@ -139,8 +139,8 @@ function PackageCard({
   onEnquire: (p: TourPackage) => void;
 }) {
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-[#E8E1D5] bg-white transition hover:-translate-y-1 hover:shadow-lg">
-      <div className="relative aspect-[4/5] overflow-hidden">
+    <article className="flex h-full w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[#E8E1D5] bg-white transition hover:-translate-y-1 hover:shadow-lg">
+      <div className="relative w-full overflow-hidden h-[240px] md:h-[260px] xl:h-[280px] min-[1600px]:h-[300px]">
         <img
           src={pkg.image}
           alt={pkg.title}
@@ -151,17 +151,17 @@ function PackageCard({
           <Clock className="h-3.5 w-3.5" /> {pkg.duration}
         </span>
       </div>
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="font-heading text-lg font-semibold text-[#0D3B2A] line-clamp-2">
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="font-heading text-[18px] md:text-[20px] font-semibold text-[#0D3B2A] line-clamp-2">
           {pkg.title}
         </h3>
-        <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground line-clamp-2">
+        <p className="mt-2 flex items-start gap-1.5 text-[13px] text-muted-foreground line-clamp-2">
           <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#174C36]" />
           <span>{pkg.destinations.slice(0, 4).join(" · ")}</span>
         </p>
-        <p className="mt-2 text-xs text-muted-foreground line-clamp-2">{pkg.summary}</p>
+        <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground line-clamp-2">{pkg.summary}</p>
         {pkg.startingPrice && (
-          <p className="mt-3 text-sm">
+          <p className="mt-3 text-[15px]">
             <span className="text-muted-foreground">From </span>
             <span className="font-semibold text-[#0D3B2A]">
               ₹{pkg.startingPrice.toLocaleString("en-IN")}
@@ -171,9 +171,11 @@ function PackageCard({
         <button
           type="button"
           onClick={() => onEnquire(pkg)}
-          className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-[#D5A63A] px-4 py-2 text-sm font-semibold text-[#0D3B2A] transition hover:-translate-y-0.5 hover:bg-[#0D3B2A] hover:text-white"
+          className="mt-auto pt-4 [&>span]:contents"
         >
-          Enquire Now <ArrowRight className="h-4 w-4" />
+          <span className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#D5A63A] px-4 py-2.5 text-sm font-semibold text-[#0D3B2A] transition hover:-translate-y-0.5 hover:bg-[#0D3B2A] hover:text-white">
+            Enquire Now <ArrowRight className="h-4 w-4" />
+          </span>
         </button>
       </div>
     </article>
