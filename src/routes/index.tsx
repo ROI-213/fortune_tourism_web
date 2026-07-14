@@ -13,6 +13,7 @@ import { EnquiryForm } from "@/components/site/EnquiryForm";
 import karnatakaHero from "@/assets/karnataka-hero.png";
 import andhraHero from "@/assets/andhra-hero.png";
 import tamilnaduHero from "@/assets/tamilnadu-hero.png";
+import pondicherryHero from "@/assets/pondicherry-hero.png";
 import { destinations } from "@/data/destinations";
 import { packages } from "@/data/packages";
 import { vehicles } from "@/data/vehicles";
@@ -76,6 +77,7 @@ function KarnatakaHero() {
     { src: karnatakaHero, alt: "Karnataka — One State. Infinite Wonders. Mysore Palace, Hampi, Jog Falls, Gokarna, Coorg." },
     { src: andhraHero, alt: "Andhra Pradesh — Charminar, Tirupati, Araku Valley, Borra Caves, Konaseema Backwaters." },
     { src: tamilnaduHero, alt: "Explore Tamil Nadu — Marina Beach, Meenakshi Temple, Ooty Hills, Brihadeeswarar Temple, Pamban Bridge." },
+    { src: pondicherryHero, alt: "Explore Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach, Basilica of the Sacred Heart." },
   ];
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
