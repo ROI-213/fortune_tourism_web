@@ -84,7 +84,7 @@ function HomePage() {
 
       <FleetBanner />
       <FleetShowcase />
-      <FleetPreview />
+      {/* FleetPreview removed */}
       <RouteMap />
       <WhyChooseUs />
       <HowItWorks />
