@@ -79,7 +79,7 @@ function HomePage() {
       <ExploreDestinationsBento />
       {/* ServicesGrid removed per request */}
       <StateTourPackages />
-      <FeaturedPackages />
+
       <FleetBanner />
       <FleetPreview />
       <RouteMap />
