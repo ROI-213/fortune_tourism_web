@@ -121,22 +121,6 @@ function HeroSlideOverlay({
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/45 via-black/25 to-black/60" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/30" />
       <div className="pointer-events-auto relative flex w-full max-w-[900px] flex-col items-center text-center text-white">
-        <p className="font-heading text-[10px] uppercase tracking-[0.3em] text-[#f6d67a] sm:text-xs md:text-sm">
-          Explore
-        </p>
-        <h1
-          className="mt-1 font-heading font-bold leading-[1.02] tracking-tight drop-shadow-[0_4px_18px_rgba(0,0,0,0.55)]"
-          style={{ fontSize: "clamp(1.9rem, 6.5vw, 4.5rem)" }}
-        >
-          {title}
-        </h1>
-        <div className="mt-2 flex items-center gap-2 sm:mt-3">
-          <span className="h-px w-6 bg-[#f6d67a]/80 sm:w-10" />
-          <p className="font-heading text-[11px] uppercase tracking-[0.22em] text-white/90 sm:text-sm md:text-base">
-            {subtitle}
-          </p>
-          <span className="h-px w-6 bg-[#f6d67a]/80 sm:w-10" />
-        </div>
         <p
           className="mx-auto mt-3 max-w-[92%] font-serif italic text-white/95 drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:mt-4 sm:max-w-[640px]"
           style={{ fontSize: "clamp(0.82rem, 1.9vw, 1.15rem)", lineHeight: 1.45 }}
