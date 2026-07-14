@@ -8,6 +8,8 @@ export interface TourPackage {
   vehicles: string[];
   startingPrice?: number;
   image: string;
+  heroImage?: string;
+  highlights?: string[];
   summary: string;
   itinerary: { day: number; title: string; details: string }[];
   inclusions: string[];
@@ -27,6 +29,8 @@ export const packages: TourPackage[] = [
     image: "/images/state-karnataka.jpg",
     summary:
       "A weekend loop from Bengaluru covering the royal city of Mysuru and the misty coffee hills of Coorg.",
+    heroImage: "/images/packages/hero-mysuru-coorg.jpg",
+    highlights: ["Visit Mysuru Palace", "Coorg coffee estate stay", "Abbey Falls viewpoint", "Dubare elephant camp", "Scenic Western Ghats drive"],
     itinerary: [
       { day: 1, title: "Bengaluru → Mysuru", details: "Depart early, visit Mysuru Palace, Brindavan Gardens and check into a heritage stay." },
       { day: 2, title: "Mysuru → Coorg", details: "Drive to Coorg via Dubare elephant camp, spend the evening in a coffee estate." },
@@ -46,6 +50,8 @@ export const packages: TourPackage[] = [
     startingPrice: 13500,
     image: "/images/state-tamilnadu.jpg",
     summary: "Cool weather, tea gardens and a slow train ride through the Nilgiris.",
+    heroImage: "/images/packages/hero-ooty.jpg",
+    highlights: ["Drive via Bandipur forest", "Doddabetta peak view", "Ooty tea museum", "Coonoor viewpoints", "Botanical Gardens"],
     itinerary: [
       { day: 1, title: "Bengaluru → Ooty", details: "Scenic drive via Bandipur & Mudumalai forest." },
       { day: 2, title: "Ooty local", details: "Doddabetta peak, tea museum, Ooty lake and Coonoor viewpoints." },
@@ -65,6 +71,8 @@ export const packages: TourPackage[] = [
     startingPrice: 8500,
     image: "/images/state-karnataka.jpg",
     summary: "A quick escape to Karnataka's coffee country and the tallest peak in the state.",
+    heroImage: "/images/packages/hero-chikmagalur.jpg",
+    highlights: ["Sunrise at Mullayanagiri", "Coffee estate homestay", "Baba Budangiri drive", "Hebbe Falls trek"],
     itinerary: [
       { day: 1, title: "Bengaluru → Chikmagalur", details: "Drive to a coffee estate homestay, evening walk." },
       { day: 2, title: "Peaks & falls", details: "Sunrise at Mullayanagiri, waterfalls, then drive back." },
@@ -83,6 +91,8 @@ export const packages: TourPackage[] = [
     startingPrice: 6500,
     image: "/images/state-andhra.jpg",
     summary: "Same-day return darshan trip with early pickup and comfortable seating.",
+    heroImage: "/images/packages/hero-tirupati.jpg",
+    highlights: ["Early morning pickup", "Darshan assistance", "Comfortable AC vehicle", "Same-day return"],
     itinerary: [
       { day: 1, title: "Bengaluru ↔ Tirupati", details: "Early departure, darshan assistance, return by night." },
     ],
@@ -100,6 +110,8 @@ export const packages: TourPackage[] = [
     startingPrice: 24500,
     image: "/images/state-kerala.jpg",
     summary: "Signature Kerala loop with tea gardens, spice trails and a night on the backwaters.",
+    heroImage: "/images/packages/hero-munnar-alleppey.jpg",
+    highlights: ["Munnar tea gardens", "Eravikulam National Park", "Thekkady spice trails", "Alleppey houseboat night", "Fort Kochi walk"],
     itinerary: [
       { day: 1, title: "Bengaluru → Munnar", details: "Long scenic drive, evening at leisure." },
       { day: 2, title: "Munnar sightseeing", details: "Tea gardens, Eravikulam, Mattupetty." },
@@ -121,6 +133,8 @@ export const packages: TourPackage[] = [
     startingPrice: 14500,
     image: "/images/state-puducherry.jpg",
     summary: "French quarter mornings, quiet beaches and a slow drive back through the eastern coast.",
+    heroImage: "/images/packages/hero-puducherry.jpg",
+    highlights: ["White Town heritage walk", "Promenade sunrise", "Paradise Beach ferry", "Auroville visit"],
     itinerary: [
       { day: 1, title: "Bengaluru → Puducherry", details: "Drive via Krishnagiri, evening on the Promenade." },
       { day: 2, title: "Puducherry", details: "White Town walk, Paradise Beach ferry, Auroville." },
