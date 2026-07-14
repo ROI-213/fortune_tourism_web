@@ -282,7 +282,7 @@ function KarnatakaHero() {
                 loading={idx === 0 ? "eager" : "lazy"}
                 fetchPriority={idx === 0 || idx === 1 || idx === 2 ? "high" : "auto"}
                 decoding="async"
-                className="h-full w-full object-contain [object-position:center_center]"
+                className="h-full w-full object-cover [object-position:center_center]"
               />
               {s.overlay === "tamilnadu" && <TamilNaduHeroOverlay />}
               {s.overlay === "andhra" && <AndhraHeroOverlay />}
