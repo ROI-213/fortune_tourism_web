@@ -645,12 +645,14 @@ function FAQSection() {
 
 /* --- Final CTA --- */
 function FinalCTA() {
+  const bgRef = useParallax<HTMLImageElement>(0.18);
   return (
     <section className="relative overflow-hidden">
-      <img src="/images/cta-road.jpg" alt="Scenic South India road at sunset" loading="lazy" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[color:var(--color-navy)]/85 via-[color:var(--color-navy)]/60 to-transparent" />
+      <img ref={bgRef} src="/images/cta-road.jpg" alt="Scenic South India road at sunset" loading="lazy" width={1920} height={1080} className="parallax absolute inset-0 h-[120%] w-full -top-[10%] object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[color:var(--color-navy)]/90 via-[color:var(--color-navy)]/65 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--color-navy)]/60 to-transparent" />
       <div className="relative container-fortune py-24 text-[color:var(--color-cream)] md:py-32">
-        <div className="max-w-xl">
+        <Reveal variant="up" className="max-w-xl">
           <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--color-gold)]">Ready when you are</p>
           <h2 className="mt-3 font-heading text-3xl md:text-5xl">Your next journey starts with Fortune Tourism</h2>
           <p className="mt-4 max-w-lg text-base opacity-90">
@@ -664,7 +666,7 @@ function FinalCTA() {
               Call {CONTACT.phone}
             </a>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
