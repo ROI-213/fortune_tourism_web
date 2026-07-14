@@ -13,6 +13,7 @@ import { useParallax } from "@/hooks/useParallax";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
 import { StateTourPackages } from "@/components/home/StateTourPackages";
 import { TravelServicesSection } from "@/components/home/TravelServicesSection";
+import { FleetBanner } from "@/components/home/FleetBanner";
 import karnatakaHero from "@/assets/karnataka-hero.png";
 import andhraHero from "@/assets/andhra-hero.png";
 import tamilnaduHero from "@/assets/tamilnadu-hero.png";
@@ -75,6 +76,7 @@ function HomePage() {
       <ServicesGrid />
       <StateTourPackages />
       <FeaturedPackages />
+      <FleetBanner />
       <FleetPreview />
       <RouteMap />
       <WhyChooseUs />
