@@ -73,7 +73,7 @@ function HomePage() {
       <TrustStatistics />
       <TravelServicesSection />
       <ExploreDestinationsBento />
-      <ServicesGrid />
+      {/* ServicesGrid removed per request */}
       <StateTourPackages />
       <FeaturedPackages />
       <FleetBanner />
