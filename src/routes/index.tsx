@@ -59,8 +59,8 @@ function HomePage() {
   return (
     <SiteLayout>
       <KarnatakaHero />
-      <TrustStatistics />
       <QuickEnquiry />
+      <TrustStatistics />
       <ServicesGrid />
       <StateTourPackages />
       <ExploreSouthIndia />
