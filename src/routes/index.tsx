@@ -133,9 +133,8 @@ function KarnatakaHero() {
                 loading={idx === 0 ? "eager" : "lazy"}
                 fetchPriority={idx === 0 ? "high" : "auto"}
                 decoding="async"
-                className={`h-full w-full object-cover [object-position:center_top] ${idx === i ? "hero-kenburns" : ""}`}
+                className="h-full w-full object-contain [object-position:center_center]"
               />
-              <div className="pointer-events-none absolute inset-0 luxe-overlay opacity-40" />
             </div>
           ))}
           <button

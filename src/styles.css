@@ -363,6 +363,7 @@
   height: calc(100svh - var(--desktop-header-height) - var(--hero-top-gap) - var(--hero-bottom-safe-space));
   min-height: 480px;
   max-height: 720px;
+  background-color: #f4ead8;
 }
 @supports not (height: 100svh) {
   .home-hero {
@@ -375,9 +376,14 @@
 @media (min-width: 1024px) and (max-width: 1439px) {
   .home-hero { min-height: 460px; max-height: 640px; }
 }
+@media (min-width: 1024px) and (max-height: 800px) {
+  .home-hero { min-height: 420px; max-height: 560px; }
+}
 @media (max-width: 1023px) {
   .home-hero {
-    height: clamp(420px, 68svh, 600px);
+    height: auto;
+    aspect-ratio: 16 / 9;
+    min-height: 0;
     max-height: none;
   }
 }
