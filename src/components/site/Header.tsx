@@ -39,18 +39,18 @@ export function Header() {
           : "bg-transparent text-primary-foreground")
       }
     >
-      <div className="container-fortune flex h-16 items-center justify-between md:h-20">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[color:var(--color-gold)] font-heading text-lg font-bold text-[color:var(--color-navy)]">
+      <div className="container-fortune flex h-14 flex-nowrap items-center justify-between gap-3 md:h-[72px]">
+        <Link to="/" className="flex min-w-0 items-center gap-2 shrink-0">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[color:var(--color-gold)] font-heading text-base font-bold text-[color:var(--color-navy)]">
             F
           </span>
           <span className="flex min-w-0 flex-col leading-tight">
-            <span className="font-heading text-lg font-semibold tracking-tight">Fortune Tourism</span>
-            <span className="text-[10px] uppercase tracking-[0.2em] opacity-80">South India Travel</span>
+            <span className="font-heading text-base font-semibold tracking-tight whitespace-nowrap md:text-lg">Fortune Tourism</span>
+            <span className="hidden text-[10px] uppercase tracking-[0.2em] opacity-80 sm:block">South India Travel</span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 lg:flex">
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-6 whitespace-nowrap lg:flex xl:gap-8">
           {NAV.map((item) => (
             <Link
               key={item.to}
@@ -63,10 +63,10 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <a
             href={CONTACT.phoneHref}
-            className="hidden items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-sm font-medium hover:bg-white/10 md:inline-flex"
+            className="hidden items-center gap-2 whitespace-nowrap rounded-full border border-white/25 px-3 py-1.5 text-sm font-medium hover:bg-white/10 md:inline-flex"
           >
             <Phone className="h-4 w-4" /> Call
           </a>
@@ -74,7 +74,7 @@ export function Header() {
             href={wa}
             target="_blank"
             rel="noreferrer noopener"
-            className="hidden items-center gap-2 rounded-full bg-[color:var(--color-emerald)] px-4 py-2 text-sm font-medium text-[color:var(--color-cream)] hover:brightness-110 md:inline-flex"
+            className="hidden items-center gap-2 whitespace-nowrap rounded-full bg-[color:var(--color-emerald)] px-3 py-1.5 text-sm font-medium text-[color:var(--color-cream)] hover:brightness-110 md:inline-flex"
           >
             <WhatsAppIcon className="h-4 w-4" /> WhatsApp
           </a>

@@ -64,12 +64,12 @@
 
 :root {
   --radius: 0.75rem;
-  --fortune-header: 4rem;
+  --fortune-header: 3.5rem;
 }
 
 @media (min-width: 768px) {
   :root {
-    --fortune-header: 5rem;
+    --fortune-header: 72px;
   }
 }
 
