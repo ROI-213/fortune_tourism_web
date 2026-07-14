@@ -93,11 +93,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Chauffeur-driven car rentals, curated tour packages and Bengaluru airport transfers across South India.",
+          "Chauffeur-driven car rentals, curated tour packages and Bengaluru airport transfers across Karnataka, Andhra Pradesh, Tamil Nadu, Kerala & Puducherry.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@fortunetourism" },
+      { name: "twitter:title", content: "Fortune Tourism | South India Car Rentals & Tour Packages" },
+      { name: "twitter:description", content: "Chauffeur-driven car rentals, curated tour packages and Bengaluru airport transfers across Karnataka, Andhra Pradesh, Tamil Nadu, Kerala & Puducherry." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/59db4ba4-f599-499d-9fb0-a505403fb82f/id-preview-1f2c2703--e815903c-b6da-4758-8428-588501e8ac9e.lovable.app-1784048337323.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/59db4ba4-f599-499d-9fb0-a505403fb82f/id-preview-1f2c2703--e815903c-b6da-4758-8428-588501e8ac9e.lovable.app-1784048337323.png" },
     ],
     links: [
       {

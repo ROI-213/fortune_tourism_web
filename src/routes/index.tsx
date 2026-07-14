@@ -59,10 +59,10 @@ export const Route = createFileRoute("/")({
         content:
           "Chauffeur-driven car rentals, curated tour packages and Bengaluru airport transfers across Karnataka, Andhra Pradesh, Tamil Nadu, Kerala & Puducherry.",
       },
-      { property: "og:title", content: "Fortune Tourism | South India Travel Experts" },
+      { property: "og:title", content: "Fortune Tourism | South India Car Rentals & Tour Packages" },
       {
         property: "og:description",
-        content: "Cars, tour packages and airport transfers built for the way South India travels.",
+        content: "Chauffeur-driven car rentals, curated tour packages and Bengaluru airport transfers across Karnataka, Andhra Pradesh, Tamil Nadu, Kerala & Puducherry.",
       },
     ],
   }),
