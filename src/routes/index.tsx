@@ -92,9 +92,8 @@ function HomePage() {
 function TamilNaduHeroOverlay() {
   const waHref = buildWhatsAppUrl({
     destination: "Tamil Nadu",
-    service: "Tour Package",
-    message:
-      "Hello Fortune Tourism, I would like to enquire about Tamil Nadu tour packages.",
+    service: "Tamil Nadu Tour Package",
+    notes: "Enquiry from Tamil Nadu hero banner",
   });
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
   return (
