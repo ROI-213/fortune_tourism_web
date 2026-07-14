@@ -748,8 +748,18 @@ function WhyChooseUs() {
     <section className="bg-[color:var(--color-lightgrey)] py-20 md:py-28">
       <div className="container-fortune grid gap-10 lg:grid-cols-2 lg:items-center">
         <Reveal variant="left">
-          <div className="card-lift relative overflow-hidden rounded-3xl shadow-xl">
-            <img src="/images/why-us-driver.jpg" alt="Professional Fortune Tourism chauffeur" loading="lazy" width={1200} height={1400} className="h-full w-full object-cover" />
+          <div className="card-lift relative overflow-hidden rounded-3xl shadow-xl h-[520px] md:h-[600px]">
+            <div className="why-marquee flex flex-col">
+              {[destKarnataka, destKerala, destTamilNadu, destPondicherry, destKarnataka, destKerala, destTamilNadu, destPondicherry].map((src, idx) => (
+                <img
+                  key={idx}
+                  src={src}
+                  alt="South India destination"
+                  loading="lazy"
+                  className="h-[520px] md:h-[600px] w-full flex-shrink-0 object-cover"
+                />
+              ))}
+            </div>
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[color:var(--color-navy)]/25 via-transparent to-transparent" />
           </div>
         </Reveal>
