@@ -169,7 +169,7 @@ function CarRentalsPage() {
         </div>
       </section>
 
-      <UseCases />
+      {/* UseCases removed */}
       <Inclusions />
       <WhyUs />
       <FinalCta />
