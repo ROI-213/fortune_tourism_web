@@ -4,12 +4,12 @@ import fleetBanner from "@/assets/fleet-banner.jpg";
 
 export function FleetBanner() {
   return (
-    <section className="bg-[color:var(--background)] py-12 md:py-16">
-      <div className="mx-auto w-[min(96%,1800px)]">
+    <section className="bg-[#f8f5ee] py-10 md:py-14">
+      <div className="mx-auto w-[calc(100%-24px)] max-w-[1880px] xl:w-[calc(100%-40px)]">
         {/* Desktop / tablet: integrated banner with curved white panel */}
         <div
-          className="relative hidden overflow-hidden rounded-[30px] bg-[#f5f0e8] shadow-[0_16px_40px_rgba(25,35,30,0.08)] md:block"
-          style={{ height: "clamp(520px, 43vw, 760px)" }}
+          className="relative hidden overflow-hidden rounded-[34px] bg-[#f8f4ec] shadow-[0_14px_36px_rgba(23,36,31,0.1)] md:block"
+          style={{ aspectRatio: "2.15 / 1", maxHeight: "740px", minHeight: "500px" }}
         >
           {/* Fleet image full-bleed */}
           <img
@@ -18,7 +18,8 @@ export function FleetBanner() {
             width={1920}
             height={832}
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-[68%] object-cover"
+            style={{ objectPosition: "center center" }}
           />
 
           {/* Soft blend from image into panel */}
@@ -27,7 +28,7 @@ export function FleetBanner() {
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                "linear-gradient(90deg, transparent 48%, rgba(255,252,246,0.14) 58%, rgba(255,252,246,0.75) 72%, #fffdf8 82%)",
+                "linear-gradient(90deg, transparent 46%, rgba(255,253,248,0.05) 54%, rgba(255,253,248,0.38) 62%, rgba(255,253,248,0.88) 72%, #fffdf8 82%)",
             }}
           />
 
@@ -37,22 +38,23 @@ export function FleetBanner() {
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
             className="absolute inset-y-0 right-0 h-full"
-            style={{ width: "58%" }}
+            style={{ width: "48%" }}
           >
             <path
-              d="M 30 100 C 12 82, 4 60, 14 32 C 22 12, 40 2, 62 0 L 100 0 L 100 100 Z"
+              d="M 30 0 C 12 10, 2 28, 1 50 C 0 72, 12 90, 30 100 L 100 100 L 100 0 Z"
               fill="#fffdf8"
             />
           </svg>
 
           {/* Panel content */}
-          <div className="absolute inset-y-0 right-0 flex w-[46%] flex-col justify-center px-8 lg:px-14 xl:px-16">
+          <div className="absolute inset-y-0 right-0 flex w-[42%] flex-col justify-center px-8 lg:px-12 xl:pl-14 xl:pr-[clamp(48px,5vw,110px)]">
             <h2
               className="font-[Playfair_Display,serif] font-bold uppercase text-[#12213b]"
               style={{
-                fontSize: "clamp(38px, 3.6vw, 68px)",
-                lineHeight: 0.98,
-                letterSpacing: "-0.03em",
+                fontSize: "clamp(34px, 3.2vw, 60px)",
+                lineHeight: 0.96,
+                letterSpacing: "-0.035em",
+                maxWidth: "560px",
               }}
             >
               Travel with
@@ -62,25 +64,25 @@ export function FleetBanner() {
               &amp; Trust.
             </h2>
 
-            <p className="mt-6 max-w-[440px] text-[15px] leading-relaxed text-[#4a5260] lg:text-base">
+            <p className="mt-5 max-w-[460px] text-[15px] leading-[1.5] text-[#58616d] lg:text-[17px]">
               Local trips, airport transfers, tour packages and outstation
               rides across Bengaluru and South India.
             </p>
 
-            <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0E6B50] lg:text-xs">
+            <p className="mt-4 max-w-[500px] text-[11px] font-semibold uppercase tracking-[0.12em] text-[#087453] lg:text-[13px]">
               Well-maintained vehicles • Professional drivers • Comfortable journeys
             </p>
 
-            <div className="mt-7 flex flex-wrap items-center gap-3">
+            <div className="mt-6 flex flex-wrap items-center gap-4">
               <Link
                 to="/car-rentals"
-                className="inline-flex items-center gap-2 rounded-full bg-[#0E6B50] px-7 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#0b5741] hover:shadow-lg"
+                className="inline-flex min-h-[54px] items-center gap-2 rounded-full bg-[#0E6B50] px-7 text-[14px] font-semibold text-white shadow-md transition hover:bg-[#0b5741] hover:shadow-lg"
               >
                 View Our Fleet <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 to="/contact"
-                className="inline-flex items-center gap-2 rounded-full border border-[#0E6B50]/40 bg-white px-7 py-3.5 text-sm font-semibold text-[#12213b] transition hover:border-[#0E6B50]"
+                className="inline-flex min-h-[54px] items-center gap-2 rounded-full border-2 border-[#0E6B50] bg-white px-7 text-[14px] font-semibold text-[#12213b] transition hover:bg-[#0E6B50]/5"
               >
                 Book Your Ride
               </Link>
@@ -88,15 +90,15 @@ export function FleetBanner() {
           </div>
 
           {/* Trust badge overlapping panel top-right */}
-          <div className="absolute right-8 top-8 lg:right-12 lg:top-10">
-            <div className="relative flex items-center justify-center rounded-full bg-[#0E6B50] text-center text-white shadow-[0_12px_30px_rgba(14,107,80,0.35)]"
-                 style={{ width: "clamp(115px, 9.5vw, 155px)", height: "clamp(115px, 9.5vw, 155px)" }}
+          <div className="absolute" style={{ top: "8%", right: "3.6%" }}>
+            <div className="relative flex items-center justify-center rounded-full bg-[#0E6B50] text-center text-white shadow-[0_12px_30px_rgba(14,107,80,0.3)]"
+                 style={{ width: "clamp(115px, 8.5vw, 155px)", aspectRatio: "1" }}
             >
               <span
                 aria-hidden
-                className="absolute inset-2 rounded-full border border-dashed border-white/60"
+                className="absolute inset-[6px] rounded-full border border-dashed border-white/60"
               />
-              <span className="relative px-3 text-[10px] font-bold uppercase leading-[1.25] tracking-[0.08em] lg:text-[12px]">
+              <span className="relative px-3 text-[10px] font-bold uppercase leading-[1.3] tracking-[0.08em] lg:text-[12px]">
                 Trusted
                 <br />
                 Bengaluru
