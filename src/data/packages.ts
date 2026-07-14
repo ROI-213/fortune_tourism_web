@@ -16,6 +16,12 @@ export interface TourPackage {
   exclusions: string[];
 }
 
+import pkgMysuruHeritage from "@/assets/pkg-mysuru-heritage.jpg";
+import pkgChikmagalur from "@/assets/pkg-chikmagalur.jpg";
+import pkgHampi from "@/assets/pkg-hampi.jpg";
+import pkgGokarna from "@/assets/pkg-gokarna.jpg";
+import pkgKabini from "@/assets/pkg-kabini.jpg";
+
 export const packages: TourPackage[] = [
   {
     slug: "bengaluru-mysuru-coorg",
