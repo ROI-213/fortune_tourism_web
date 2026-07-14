@@ -100,7 +100,7 @@ function HeroSection() {
           width={1920}
           height={1088}
           className="h-full w-full object-cover"
-          priority={true}
+          loading="eager"
         />
         <div className="absolute inset-0 bg-hero-gradient" />
       </div>
