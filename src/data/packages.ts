@@ -29,6 +29,10 @@ import pkgOotyAsset from "@/assets/pkg-ooty-real.jpg.asset.json";
 import pkgPuducherryAsset from "@/assets/pkg-puducherry-real.jpg.asset.json";
 import pkgMahabalipuramAsset from "@/assets/pkg-mahabalipuram-real.jpg.asset.json";
 import pkgKodaikanalAsset from "@/assets/pkg-kodaikanal-real.jpg.asset.json";
+import pkgMunnarAlleppeyAsset from "@/assets/pkg-munnar-alleppey.jpg.asset.json";
+import pkgAlleppeyBackwatersAsset from "@/assets/pkg-alleppey-backwaters.jpg.asset.json";
+import pkgThekkadyAsset from "@/assets/pkg-thekkady-periyar.jpg.asset.json";
+import pkgWayanadAsset from "@/assets/pkg-wayanad-nature.jpg.asset.json";
 const pkgTirupati = pkgTirupatiAsset.url;
 const pkgAraku = pkgArakuAsset.url;
 const pkgGandikota = pkgGandikotaAsset.url;
@@ -37,6 +41,10 @@ const pkgOoty = pkgOotyAsset.url;
 const pkgPuducherry = pkgPuducherryAsset.url;
 const pkgMahabalipuram = pkgMahabalipuramAsset.url;
 const pkgKodaikanal = pkgKodaikanalAsset.url;
+const pkgMunnarAlleppey = pkgMunnarAlleppeyAsset.url;
+const pkgAlleppeyBackwaters = pkgAlleppeyBackwatersAsset.url;
+const pkgThekkady = pkgThekkadyAsset.url;
+const pkgWayanad = pkgWayanadAsset.url;
 const pkgMysuruHeritage = pkgMysuruAsset.url;
 const pkgChikmagalur = pkgChikmagalurAsset.url;
 const pkgHampi = pkgHampiAsset.url;
@@ -134,7 +142,7 @@ export const packages: TourPackage[] = [
     destinations: ["Munnar", "Thekkady", "Alleppey Backwaters", "Kochi"],
     vehicles: ["SUV", "Innova Crysta", "Tempo Traveller"],
     startingPrice: 24500,
-    image: "/images/state-kerala.jpg",
+    image: pkgMunnarAlleppey,
     summary: "Signature Kerala loop with tea gardens, spice trails and a night on the backwaters.",
     heroImage: "/images/packages/hero-munnar-alleppey.jpg",
     highlights: ["Munnar tea gardens", "Eravikulam National Park", "Thekkady spice trails", "Alleppey houseboat night", "Fort Kochi walk"],
@@ -352,7 +360,7 @@ export const packages: TourPackage[] = [
     destinations: ["Alleppey backwaters", "Houseboat"],
     vehicles: ["Sedan", "SUV"],
     startingPrice: 12500,
-    image: "/images/state-kerala.jpg",
+    image: pkgAlleppeyBackwaters,
     summary: "A slow night on the backwaters with home-cooked Kerala meals.",
     itinerary: [
       { day: 1, title: "Board houseboat", details: "Cruise, sunset." },
@@ -370,7 +378,7 @@ export const packages: TourPackage[] = [
     destinations: ["Thekkady", "Periyar Lake", "Spice plantation"],
     vehicles: ["SUV", "Innova"],
     startingPrice: 14500,
-    image: "/images/state-kerala.jpg",
+    image: pkgThekkady,
     summary: "Boat safaris on Periyar and a walk through cardamom hills.",
     itinerary: [
       { day: 1, title: "→ Thekkady", details: "Evening at leisure." },
@@ -389,7 +397,7 @@ export const packages: TourPackage[] = [
     destinations: ["Wayanad", "Edakkal Caves", "Waterfalls"],
     vehicles: ["SUV", "Innova"],
     startingPrice: 13500,
-    image: "/images/state-kerala.jpg",
+    image: pkgWayanad,
     summary: "Ancient caves, tea gardens and misty Western Ghats viewpoints.",
     itinerary: [
       { day: 1, title: "→ Wayanad", details: "Check-in, viewpoint." },
