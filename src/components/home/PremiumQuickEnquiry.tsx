@@ -52,10 +52,10 @@ const CHIP_SUGGESTIONS = [
 ];
 
 const THUMBS = [
-  { label: "Mysuru Palace", src: thumbMysuru.url, dest: "Mysuru" },
-  { label: "Ooty Hills", src: thumbOoty.url, dest: "Ooty" },
-  { label: "Alleppey", src: thumbAlleppey.url, dest: "Alleppey" },
-  { label: "Puducherry", src: thumbPondi.url, dest: "White Town, Puducherry" },
+  { label: "Mysuru Palace", src: thumbMysuru, dest: "Mysuru" },
+  { label: "Ooty Hills", src: thumbOoty, dest: "Ooty" },
+  { label: "Alleppey", src: thumbAlleppey, dest: "Alleppey" },
+  { label: "Puducherry", src: thumbPondi, dest: "White Town, Puducherry" },
 ];
 
 const schema = z.object({

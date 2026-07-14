@@ -27,7 +27,7 @@ const services: Service[] = [
       "Well-maintained vehicles for every journey.",
       "Drive at your pace, in total comfort.",
     ],
-    image: cardCar.url,
+    image: cardCar,
     imageAlt: "White Toyota Innova driving on a scenic tea-estate road in South India",
     buttonLabel: "View Our Fleet",
     href: "/car-rentals",
@@ -40,7 +40,7 @@ const services: Service[] = [
       "Handpicked experiences across",
       "iconic destinations.",
     ],
-    image: cardTour.url,
+    image: cardTour,
     imageAlt: "South Indian temple gopuram reflected in a calm temple pond at sunrise",
     buttonLabel: "Explore Packages",
     href: "/tour-packages",
@@ -53,7 +53,7 @@ const services: Service[] = [
       "Timely pickups and drop-offs.",
       "Travel stress-free, every time.",
     ],
-    image: cardAirport.url,
+    image: cardAirport,
     imageAlt: "Chauffeur in a suit standing beside a black luxury sedan at the Bengaluru airport",
     buttonLabel: "Book a Transfer",
     href: "/airport-transfer",
@@ -69,7 +69,7 @@ export function TravelServicesSection() {
     >
       {/* Background */}
       <img
-        src={bgImg.url}
+        src={bgImg}
         alt=""
         aria-hidden="true"
         loading="lazy"
