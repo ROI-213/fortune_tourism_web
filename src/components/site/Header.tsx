@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Menu, Phone, X } from "lucide-react";
 import { NAV } from "@/data/site";
 import { CONTACT, buildWhatsAppUrl } from "@/lib/contact";
-import logoAsset from "@/assets/fortune-tourism-logo.png.asset.json";
+import logoAsset from "@/assets/fortune-tourism-logo.png";
 
 const WhatsAppIcon = ({ className = "" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">

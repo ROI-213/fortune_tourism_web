@@ -12,7 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
-import logoAsset from "@/assets/fortune-tourism-logo.png.asset.json";
+import logoAsset from "@/assets/fortune-tourism-logo.png";
 
 function NotFoundComponent() {
   return (

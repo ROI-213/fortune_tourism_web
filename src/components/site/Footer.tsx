@@ -4,7 +4,7 @@ import { CONTACT, buildWhatsAppUrl } from "@/lib/contact";
 import { NAV } from "@/data/site";
 import { destinations } from "@/data/destinations";
 import { WhatsAppIcon } from "./Header";
-import logoAsset from "@/assets/fortune-tourism-logo.png.asset.json";
+import logoAsset from "@/assets/fortune-tourism-logo.png";
 
 export function Footer() {
   const year = new Date().getFullYear();
