@@ -173,7 +173,7 @@ export const packages: TourPackage[] = [
     destinations: ["White Town", "Promenade", "Paradise Beach", "Auroville"],
     vehicles: ["Sedan", "SUV", "Innova"],
     startingPrice: 14500,
-    image: pkgPuducherry,
+    image: pkgPondiWhiteTown,
     summary: "French quarter mornings, quiet beaches and a slow drive back through the eastern coast.",
     heroImage: "/images/packages/hero-puducherry.jpg",
     highlights: ["White Town heritage walk", "Promenade sunrise", "Paradise Beach ferry", "Auroville visit"],
@@ -425,7 +425,7 @@ export const packages: TourPackage[] = [
     destinations: ["White Town", "Promenade", "French Quarter"],
     vehicles: ["Sedan", "SUV"],
     startingPrice: 9500,
-    image: "/images/state-puducherry.jpg",
+    image: pkgPondiPromenade,
     summary: "French colonial streets, cafés and long promenade evenings.",
     itinerary: [
       { day: 1, title: "Arrival", details: "White Town walk, promenade sunset." },
@@ -443,7 +443,7 @@ export const packages: TourPackage[] = [
     destinations: ["Auroville", "Matrimandir viewpoint", "Serenity Beach"],
     vehicles: ["Sedan", "SUV"],
     startingPrice: 10500,
-    image: "/images/state-puducherry.jpg",
+    image: pkgPondiMatrimandir,
     summary: "A quiet visit to the international township and its beach.",
     itinerary: [
       { day: 1, title: "→ Auroville", details: "Visitor centre, viewpoint." },
@@ -461,7 +461,7 @@ export const packages: TourPackage[] = [
     destinations: ["Beaches", "Botanical garden", "White Town", "Boat house"],
     vehicles: ["SUV", "Innova"],
     startingPrice: 15500,
-    image: "/images/state-puducherry.jpg",
+    image: pkgPondiParadise,
     summary: "Family-friendly beaches, gardens and the Chunnambar boat house.",
     itinerary: [
       { day: 1, title: "Arrival", details: "Beach evening." },
