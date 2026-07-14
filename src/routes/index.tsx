@@ -142,7 +142,7 @@ function TamilNaduHeroOverlay() {
           </a>
           <Link
             to="/contact"
-            search={{ service: "Tamil Nadu Tour Package", source: "Tamil Nadu Hero Banner" } as never}
+            hash="enquiry"
             onClick={stop as unknown as React.MouseEventHandler}
             onTouchStart={stop as unknown as React.TouchEventHandler}
             className="inline-flex items-center rounded-full bg-[color:var(--color-navy)] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-navy)]"
