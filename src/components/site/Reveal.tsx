@@ -1,15 +1,19 @@
 import { useEffect, useRef, type ReactNode } from "react";
 
+type RevealVariant = "up" | "down" | "left" | "right" | "scale" | "blur" | "fade";
+
 export function Reveal({
   children,
   delay = 0,
   className = "",
   as: Tag = "div",
+  variant = "up",
 }: {
   children: ReactNode;
   delay?: number;
   className?: string;
   as?: keyof React.JSX.IntrinsicElements;
+  variant?: RevealVariant;
 }) {
   const ref = useRef<HTMLElement | null>(null);
 
@@ -30,7 +34,7 @@ export function Reveal({
           }
         }
       },
-      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" },
+      { threshold: 0.12, rootMargin: "0px 0px -80px 0px" },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -38,7 +42,11 @@ export function Reveal({
 
   const Component = Tag as unknown as React.ElementType;
   return (
-    <Component ref={ref} className={`reveal ${className}`}>
+    <Component
+      ref={ref}
+      data-reveal={variant}
+      className={className}
+    >
       {children}
     </Component>
   );
