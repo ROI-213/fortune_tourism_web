@@ -516,16 +516,17 @@ function WhyChooseUs() {
   return (
     <section className="bg-[color:var(--color-lightgrey)] py-20 md:py-28">
       <div className="container-fortune grid gap-10 lg:grid-cols-2 lg:items-center">
-        <Reveal>
-          <div className="relative overflow-hidden rounded-3xl">
+        <Reveal variant="left">
+          <div className="card-lift relative overflow-hidden rounded-3xl shadow-xl">
             <img src="/images/why-us-driver.jpg" alt="Professional Fortune Tourism chauffeur" loading="lazy" width={1200} height={1400} className="h-full w-full object-cover" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[color:var(--color-navy)]/25 via-transparent to-transparent" />
           </div>
         </Reveal>
         <div>
           <SectionHeader eyebrow="Why travel with us" title="Small details, big journeys" />
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
             {trustPoints.map((t, idx) => (
-              <Reveal key={t.title} delay={idx * 60}>
+              <Reveal key={t.title} delay={idx * 90} variant="right">
                 <div className="flex gap-4">
                   <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[color:var(--color-navy)]/10 text-[color:var(--color-navy)]">
                     <t.icon className="h-5 w-5" />
@@ -554,7 +555,7 @@ function HowItWorks() {
           <div className="pointer-events-none absolute left-6 top-0 hidden h-full w-px bg-border md:left-1/2 md:h-px md:w-full md:top-8" />
           <div className="grid gap-8 md:grid-cols-4">
             {bookingSteps.map((s, idx) => (
-              <Reveal key={s.n} delay={idx * 100}>
+              <Reveal key={s.n} delay={idx * 120} variant="scale">
                 <div className="relative flex items-start gap-4 md:block">
                   <div className="z-10 grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[color:var(--color-gold)] font-heading text-lg font-semibold text-[color:var(--color-navy)] md:mx-auto">
                     {s.n}
@@ -582,7 +583,7 @@ function Testimonials() {
       <div className="container-fortune">
         <SectionHeader eyebrow="Traveller stories" title="Loved by families, groups and companies" inverse center />
         <div className="mx-auto mt-12 max-w-3xl">
-          <div className="rounded-3xl bg-white/5 p-8 backdrop-blur md:p-10">
+          <div className="glass-dark rounded-3xl p-8 md:p-10">
             <div className="flex items-center gap-1 text-[color:var(--color-gold)]">
               {Array.from({ length: testimonials[i].rating }).map((_, k) => (
                 <Star key={k} className="h-4 w-4 fill-current" />
