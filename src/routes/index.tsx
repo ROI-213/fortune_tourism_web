@@ -93,71 +93,63 @@ function HomePage() {
 }
 
 /* --- Hero Carousel --- */
-function TamilNaduHeroOverlay() {
+function HeroSlideOverlay({
+  state,
+  title,
+  subtitle,
+  quote,
+}: {
+  state: string;
+  title: string;
+  subtitle: string;
+  quote: string;
+}) {
   const waHref = buildWhatsAppUrl({
-    destination: "Tamil Nadu",
-    service: "Tamil Nadu Tour Package",
-    notes: "Enquiry from Tamil Nadu hero banner",
+    destination: state,
+    service: `${state} Tour Package`,
+    notes: `Enquiry from ${state} hero banner`,
   });
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-[2] flex items-start justify-center px-4"
-      style={{ paddingTop: "44%" }}
+      className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center px-4"
       onMouseEnter={stop as unknown as React.MouseEventHandler}
     >
-      <div className="pointer-events-auto flex w-full max-w-[420px] flex-col items-center text-center">
-        <div className="flex flex-row items-center justify-center gap-2">
-          <a
-            href={waHref}
-            target="_blank"
-            rel="noreferrer noopener"
-            onClick={stop}
-            onTouchStart={stop}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white shadow-md transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#25D366] md:px-4 md:py-2 md:text-sm"
-          >
-            <WhatsAppIcon className="h-3.5 w-3.5 md:h-4 md:w-4" />
-            WhatsApp
-          </a>
-          <Link
-            to="/contact"
-            hash="enquiry"
-            onClick={stop as unknown as React.MouseEventHandler}
-            onTouchStart={stop as unknown as React.TouchEventHandler}
-            className="inline-flex items-center rounded-full bg-[color:var(--color-navy)] px-3 py-1.5 text-xs font-semibold text-white shadow-md transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-navy)] md:px-4 md:py-2 md:text-sm"
-          >
-            Enquire Now
-          </Link>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/45 via-black/25 to-black/60" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/30" />
+      <div className="pointer-events-auto relative flex w-full max-w-[900px] flex-col items-center text-center text-white">
+        <p className="font-heading text-[10px] uppercase tracking-[0.3em] text-[#f6d67a] sm:text-xs md:text-sm">
+          Explore
+        </p>
+        <h1
+          className="mt-1 font-heading font-bold leading-[1.02] tracking-tight drop-shadow-[0_4px_18px_rgba(0,0,0,0.55)]"
+          style={{ fontSize: "clamp(1.9rem, 6.5vw, 4.5rem)" }}
+        >
+          {title}
+        </h1>
+        <div className="mt-2 flex items-center gap-2 sm:mt-3">
+          <span className="h-px w-6 bg-[#f6d67a]/80 sm:w-10" />
+          <p className="font-heading text-[11px] uppercase tracking-[0.22em] text-white/90 sm:text-sm md:text-base">
+            {subtitle}
+          </p>
+          <span className="h-px w-6 bg-[#f6d67a]/80 sm:w-10" />
         </div>
-      </div>
-    </div>
-  );
-}
-
-function AndhraHeroOverlay() {
-  const waHref = buildWhatsAppUrl({
-    destination: "Andhra Pradesh",
-    service: "Andhra Pradesh Tour Package",
-    notes: "Enquiry from Andhra Pradesh hero banner",
-  });
-  const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 z-[2] flex items-end justify-center px-4 pb-10 text-center md:pb-16"
-      onMouseEnter={stop as unknown as React.MouseEventHandler}
-    >
-      {/* Buttons only — heading, subtitle, quote, features and bottom strip are baked into the banner image */}
-      <div className="pointer-events-auto flex w-full max-w-[560px] flex-col items-center">
-        <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
+        <p
+          className="mx-auto mt-3 max-w-[92%] font-serif italic text-white/95 drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)] sm:mt-4 sm:max-w-[640px]"
+          style={{ fontSize: "clamp(0.82rem, 1.9vw, 1.15rem)", lineHeight: 1.45 }}
+        >
+          &ldquo;{quote}&rdquo;
+        </p>
+        <div className="mt-4 flex flex-row items-center justify-center gap-2 sm:mt-6 sm:gap-3">
           <a
             href={waHref}
             target="_blank"
             rel="noreferrer noopener"
             onClick={stop}
             onTouchStart={stop}
-            className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#25D366]"
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] px-4 py-2 text-xs font-semibold text-white shadow-lg transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm"
           >
-            <WhatsAppIcon className="h-4 w-4" />
+            <WhatsAppIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             WhatsApp
           </a>
           <Link
@@ -165,52 +157,10 @@ function AndhraHeroOverlay() {
             hash="enquiry"
             onClick={stop as unknown as React.MouseEventHandler}
             onTouchStart={stop as unknown as React.TouchEventHandler}
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-b from-[#f6d67a] to-[#d4a53a] px-5 py-2.5 text-sm font-semibold text-[#2b1d05] shadow-md transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#d4a53a]"
+            className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-[#f6d67a] to-[#d4a53a] px-4 py-2 text-xs font-semibold text-[#2b1d05] shadow-lg transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm"
           >
             Enquire Now
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PondicherryHeroOverlay() {
-  const waHref = buildWhatsAppUrl({
-    destination: "Pondicherry",
-    service: "Pondicherry Tour Package",
-    notes: "Enquiry from Pondicherry hero banner",
-  });
-  const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 z-[2] flex items-end justify-start px-4 pb-10 md:px-12 md:pb-16"
-      onMouseEnter={stop as unknown as React.MouseEventHandler}
-    >
-      {/* Buttons only — heading, subtitle and quote are baked into the banner image */}
-      <div className="pointer-events-auto">
-        <div className="flex flex-col items-start gap-2 sm:flex-row sm:gap-3">
-          <a
-            href={waHref}
-            target="_blank"
-            rel="noreferrer noopener"
-            onClick={stop}
-            onTouchStart={stop}
-            className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#25D366]"
-          >
-            <WhatsAppIcon className="h-4 w-4" />
-            WhatsApp
-          </a>
-          <Link
-            to="/contact"
-            hash="enquiry"
-            onClick={stop as unknown as React.MouseEventHandler}
-            onTouchStart={stop as unknown as React.TouchEventHandler}
-            className="inline-flex items-center gap-2 rounded-full border-2 border-[#b07d2a] bg-[#fdf6e8] px-5 py-2.5 text-sm font-semibold text-[#0f1b3d] shadow-md transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b07d2a] focus-visible:ring-offset-2"
-          >
-            Enquire Now
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Link>
         </div>
       </div>
@@ -220,23 +170,46 @@ function PondicherryHeroOverlay() {
 
 function KarnatakaHero() {
   const slides = [
-    { src: karnatakaHero, alt: "Karnataka — One State. Infinite Wonders. Mysore Palace, Hampi, Jog Falls, Gokarna, Coorg.", overlay: false as const },
+    {
+      src: karnatakaHero,
+      alt: "Karnataka — Mysore Palace, Vidhana Soudha, Hampi chariot, Jog Falls and Coorg tea gardens.",
+      state: "Karnataka",
+      title: "KARNATAKA",
+      subtitle: "One State. Endless Experiences.",
+      quote: "From royal palaces to whispering waterfalls — every road here tells a story.",
+    },
     {
       src: andhraHero,
-      alt: "Andhra Pradesh tourism collage featuring Charminar, Araku Valley train, Tirupati Temple, Borra Caves and Coastal Andhra sunset.",
-      overlay: "andhra" as const,
+      alt: "Andhra Pradesh — Tirupati temple, Charminar, Araku Valley train, Borra Caves and coastal sunsets.",
+      state: "Andhra Pradesh",
+      title: "ANDHRA PRADESH",
+      subtitle: "Spiritual. Scenic. Unforgettable.",
+      quote: "Temple bells, hill trains and golden shores — the soul of the south awaits.",
     },
     {
       src: tamilnaduHero,
-      alt: "Tamil Nadu tourism collage featuring Meenakshi Amman Temple, Brihadeeswarar Temple, Marina Beach, Ooty Mountain Railway and Vivekananda Rock Memorial.",
-      overlay: "tamilnadu" as const,
+      alt: "Tamil Nadu — Meenakshi Amman Temple, Brihadeeswarar Temple, Marina Beach, Nilgiri Railway and Vivekananda Rock.",
+      state: "Tamil Nadu",
+      title: "TAMIL NADU",
+      subtitle: "Land of Heritage, Nature & Spirituality.",
+      quote: "Temples, coastlines and cool hill escapes — a journey of culture in every direction.",
     },
     {
       src: pondicherryHero,
-      alt: "Explore Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach, Basilica of the Sacred Heart.",
-      overlay: "pondicherry" as const,
+      alt: "Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach and the Basilica.",
+      state: "Pondicherry",
+      title: "PONDICHERRY",
+      subtitle: "A French Soul by the Sea.",
+      quote: "Cobbled lanes, café mornings and turquoise waters — a little Europe on Indian shores.",
     },
-    { src: keralaHero, alt: "Kerala — Kathakali artist, tea plantations, backwaters and houseboats, Chinese fishing nets, temple architecture.", overlay: false as const },
+    {
+      src: keralaHero,
+      alt: "Kerala — Kathakali artist, Munnar tea hills, Alleppey backwaters, Chinese fishing nets and temple architecture.",
+      state: "Kerala",
+      title: "KERALA",
+      subtitle: "God's Own Country.",
+      quote: "Backwaters, misty hills and coconut coasts — where nature slows time down.",
+    },
   ];
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -267,29 +240,24 @@ function KarnatakaHero() {
               key={idx}
               className={`absolute inset-0 overflow-hidden transition-opacity duration-1000 ease-out ${idx === i ? "opacity-100" : "pointer-events-none opacity-0"}`}
               aria-hidden={idx === i ? "false" : "true"}
-              aria-label={
-                s.overlay === "tamilnadu"
-                  ? "Explore Tamil Nadu tour packages"
-                  : s.overlay === "andhra"
-                  ? "Explore Andhra Pradesh tour packages"
-                  : s.overlay === "pondicherry"
-                  ? "Explore Pondicherry tour packages"
-                  : undefined
-              }
+              aria-label={`Explore ${s.state} tour packages`}
             >
               <img
                 src={s.src}
                 alt={s.alt}
                 width={1920}
-                height={850}
+                height={1080}
                 loading={idx === 0 ? "eager" : "lazy"}
-                fetchPriority={idx === 0 || idx === 1 || idx === 2 ? "high" : "auto"}
+                fetchPriority={idx === 0 ? "high" : "auto"}
                 decoding="async"
                 className="h-full w-full object-cover [object-position:center_center]"
               />
-              {s.overlay === "tamilnadu" && <TamilNaduHeroOverlay />}
-              {s.overlay === "andhra" && <AndhraHeroOverlay />}
-              {s.overlay === "pondicherry" && <PondicherryHeroOverlay />}
+              <HeroSlideOverlay
+                state={s.state}
+                title={s.title}
+                subtitle={s.subtitle}
+                quote={s.quote}
+              />
             </div>
           ))}
           <button

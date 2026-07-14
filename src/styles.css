@@ -382,8 +382,11 @@
 @media (max-width: 1023px) {
   .home-hero {
     height: auto;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 5;
     min-height: 0;
     max-height: none;
   }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+  .home-hero { aspect-ratio: 16 / 10; }
 }
