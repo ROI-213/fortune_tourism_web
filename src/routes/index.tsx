@@ -19,7 +19,8 @@ import andhraHeroAsset from "@/assets/andhra-hero.jpg.asset.json";
 const andhraHero = andhraHeroAsset.url;
 import tamilnaduHeroAsset from "@/assets/tamilnadu-hero.jpg.asset.json";
 const tamilnaduHero = tamilnaduHeroAsset.url;
-import pondicherryHero from "@/assets/pondicherry-hero.png";
+import pondicherryHeroAsset from "@/assets/pondicherry-hero.jpg.asset.json";
+const pondicherryHero = pondicherryHeroAsset.url;
 import keralaHero from "@/assets/kerala-hero.png";
 import southIndiaSpecial from "@/assets/south-india-special.jpg";
 import destKarnataka from "@/assets/destination-gallery/karnataka.jpg.asset.json";
@@ -211,6 +212,69 @@ function AndhraHeroOverlay() {
   );
 }
 
+function PondicherryHeroOverlay() {
+  const waHref = buildWhatsAppUrl({
+    destination: "Pondicherry",
+    service: "Pondicherry Tour Package",
+    notes: "Enquiry from Pondicherry hero banner",
+  });
+  const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-[2] flex items-center px-4 md:px-10"
+      onMouseEnter={stop as unknown as React.MouseEventHandler}
+    >
+      <div className="pointer-events-auto w-full max-w-[520px] text-left">
+        <h2
+          className="font-heading font-bold leading-[0.95] tracking-tight text-[#0f1b3d]"
+          style={{ fontSize: "clamp(30px, 5.5vw, 68px)" }}
+        >
+          Explore
+        </h2>
+        <h2
+          className="font-heading font-bold leading-[0.95] tracking-tight text-[#b07d2a]"
+          style={{ fontSize: "clamp(32px, 6vw, 74px)" }}
+        >
+          Pondicherry
+        </h2>
+        <div className="mt-4 flex items-center gap-2">
+          <span aria-hidden="true" className="h-px w-8 bg-[#b07d2a]/70" />
+          <p className="font-serif text-[13px] text-[#0f1b3d] md:text-[15px]">
+            Timeless Streets. Golden Shores. Peaceful Escapes.
+          </p>
+        </div>
+        <blockquote className="mt-4 hidden max-w-[400px] font-serif italic text-[13px] leading-snug text-[#0f1b3d]/85 md:block md:text-[15px]">
+          &ldquo;A coastal retreat where every street is charming, every sunset
+          is golden, and every moment feels peaceful.&rdquo;
+        </blockquote>
+        <div className="mt-5 flex flex-col items-start gap-2 sm:flex-row sm:gap-3">
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noreferrer noopener"
+            onClick={stop}
+            onTouchStart={stop}
+            className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#25D366]"
+          >
+            <WhatsAppIcon className="h-4 w-4" />
+            WhatsApp
+          </a>
+          <Link
+            to="/contact"
+            hash="enquiry"
+            onClick={stop as unknown as React.MouseEventHandler}
+            onTouchStart={stop as unknown as React.TouchEventHandler}
+            className="inline-flex items-center gap-2 rounded-full border-2 border-[#b07d2a] bg-[#fdf6e8] px-5 py-2.5 text-sm font-semibold text-[#0f1b3d] shadow-md transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b07d2a] focus-visible:ring-offset-2"
+          >
+            Enquire Now
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function KarnatakaHero() {
   const slides = [
     { src: karnatakaHero, alt: "Karnataka — One State. Infinite Wonders. Mysore Palace, Hampi, Jog Falls, Gokarna, Coorg.", overlay: false as const },
@@ -224,7 +288,11 @@ function KarnatakaHero() {
       alt: "Tamil Nadu tourism collage featuring Meenakshi Amman Temple, Brihadeeswarar Temple, Marina Beach, Ooty Mountain Railway and Vivekananda Rock Memorial.",
       overlay: "tamilnadu" as const,
     },
-    { src: pondicherryHero, alt: "Explore Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach, Basilica of the Sacred Heart.", overlay: false as const },
+    {
+      src: pondicherryHero,
+      alt: "Explore Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach, Basilica of the Sacred Heart.",
+      overlay: "pondicherry" as const,
+    },
     { src: keralaHero, alt: "Kerala — Kathakali artist, tea plantations, backwaters and houseboats, Chinese fishing nets, temple architecture.", overlay: false as const },
   ];
   const [i, setI] = useState(0);
@@ -261,6 +329,8 @@ function KarnatakaHero() {
                   ? "Explore Tamil Nadu tour packages"
                   : s.overlay === "andhra"
                   ? "Explore Andhra Pradesh tour packages"
+                  : s.overlay === "pondicherry"
+                  ? "Explore Pondicherry tour packages"
                   : undefined
               }
             >
@@ -276,6 +346,7 @@ function KarnatakaHero() {
               />
               {s.overlay === "tamilnadu" && <TamilNaduHeroOverlay />}
               {s.overlay === "andhra" && <AndhraHeroOverlay />}
+              {s.overlay === "pondicherry" && <PondicherryHeroOverlay />}
             </div>
           ))}
           <button
