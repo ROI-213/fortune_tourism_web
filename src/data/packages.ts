@@ -33,6 +33,10 @@ import pkgMunnarAlleppeyAsset from "@/assets/pkg-munnar-alleppey.jpg.asset.json"
 import pkgAlleppeyBackwatersAsset from "@/assets/pkg-alleppey-backwaters.jpg.asset.json";
 import pkgThekkadyAsset from "@/assets/pkg-thekkady-periyar.jpg.asset.json";
 import pkgWayanadAsset from "@/assets/pkg-wayanad-nature.jpg.asset.json";
+import pkgPondiWhiteTownAsset from "@/assets/pkg-pondi-whitetown.jpg.asset.json";
+import pkgPondiPromenadeAsset from "@/assets/pkg-pondi-promenade.jpg.asset.json";
+import pkgPondiMatrimandirAsset from "@/assets/pkg-pondi-matrimandir.jpg.asset.json";
+import pkgPondiParadiseAsset from "@/assets/pkg-pondi-paradise.jpg.asset.json";
 const pkgTirupati = pkgTirupatiAsset.url;
 const pkgAraku = pkgArakuAsset.url;
 const pkgGandikota = pkgGandikotaAsset.url;
@@ -45,6 +49,10 @@ const pkgMunnarAlleppey = pkgMunnarAlleppeyAsset.url;
 const pkgAlleppeyBackwaters = pkgAlleppeyBackwatersAsset.url;
 const pkgThekkady = pkgThekkadyAsset.url;
 const pkgWayanad = pkgWayanadAsset.url;
+const pkgPondiWhiteTown = pkgPondiWhiteTownAsset.url;
+const pkgPondiPromenade = pkgPondiPromenadeAsset.url;
+const pkgPondiMatrimandir = pkgPondiMatrimandirAsset.url;
+const pkgPondiParadise = pkgPondiParadiseAsset.url;
 const pkgMysuruHeritage = pkgMysuruAsset.url;
 const pkgChikmagalur = pkgChikmagalurAsset.url;
 const pkgHampi = pkgHampiAsset.url;
@@ -165,7 +173,7 @@ export const packages: TourPackage[] = [
     destinations: ["White Town", "Promenade", "Paradise Beach", "Auroville"],
     vehicles: ["Sedan", "SUV", "Innova"],
     startingPrice: 14500,
-    image: pkgPuducherry,
+    image: pkgPondiWhiteTown,
     summary: "French quarter mornings, quiet beaches and a slow drive back through the eastern coast.",
     heroImage: "/images/packages/hero-puducherry.jpg",
     highlights: ["White Town heritage walk", "Promenade sunrise", "Paradise Beach ferry", "Auroville visit"],
@@ -417,7 +425,7 @@ export const packages: TourPackage[] = [
     destinations: ["White Town", "Promenade", "French Quarter"],
     vehicles: ["Sedan", "SUV"],
     startingPrice: 9500,
-    image: "/images/state-puducherry.jpg",
+    image: pkgPondiPromenade,
     summary: "French colonial streets, cafés and long promenade evenings.",
     itinerary: [
       { day: 1, title: "Arrival", details: "White Town walk, promenade sunset." },
@@ -435,7 +443,7 @@ export const packages: TourPackage[] = [
     destinations: ["Auroville", "Matrimandir viewpoint", "Serenity Beach"],
     vehicles: ["Sedan", "SUV"],
     startingPrice: 10500,
-    image: "/images/state-puducherry.jpg",
+    image: pkgPondiMatrimandir,
     summary: "A quiet visit to the international township and its beach.",
     itinerary: [
       { day: 1, title: "→ Auroville", details: "Visitor centre, viewpoint." },
@@ -453,7 +461,7 @@ export const packages: TourPackage[] = [
     destinations: ["Beaches", "Botanical garden", "White Town", "Boat house"],
     vehicles: ["SUV", "Innova"],
     startingPrice: 15500,
-    image: "/images/state-puducherry.jpg",
+    image: pkgPondiParadise,
     summary: "Family-friendly beaches, gardens and the Chunnambar boat house.",
     itinerary: [
       { day: 1, title: "Arrival", details: "Beach evening." },
