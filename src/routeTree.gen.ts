@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TourPackagesRouteImport } from './routes/tour-packages'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ServicesRouteImport } from './routes/services'
 import { Route as CarRentalsRouteImport } from './routes/car-rentals'
 import { Route as AirportTransferRouteImport } from './routes/airport-transfer'
 import { Route as IndexRouteImport } from './routes/index'
@@ -25,6 +26,11 @@ const TourPackagesRoute = TourPackagesRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CarRentalsRoute = CarRentalsRouteImport.update({
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/airport-transfer': typeof AirportTransferRoute
   '/car-rentals': typeof CarRentalsRouteWithChildren
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tour-packages': typeof TourPackagesRouteWithChildren
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/airport-transfer': typeof AirportTransferRoute
   '/car-rentals': typeof CarRentalsRouteWithChildren
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tour-packages': typeof TourPackagesRouteWithChildren
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/airport-transfer': typeof AirportTransferRoute
   '/car-rentals': typeof CarRentalsRouteWithChildren
+  '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tour-packages': typeof TourPackagesRouteWithChildren
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/airport-transfer'
     | '/car-rentals'
+    | '/services'
     | '/sitemap.xml'
     | '/tour-packages'
     | '/car-rentals/$vehicleId'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/airport-transfer'
     | '/car-rentals'
+    | '/services'
     | '/sitemap.xml'
     | '/tour-packages'
     | '/car-rentals/$vehicleId'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/airport-transfer'
     | '/car-rentals'
+    | '/services'
     | '/sitemap.xml'
     | '/tour-packages'
     | '/car-rentals/$vehicleId'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AirportTransferRoute: typeof AirportTransferRoute
   CarRentalsRoute: typeof CarRentalsRouteWithChildren
+  ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TourPackagesRoute: typeof TourPackagesRouteWithChildren
 }
@@ -133,6 +146,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/car-rentals': {
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AirportTransferRoute: AirportTransferRoute,
   CarRentalsRoute: CarRentalsRouteWithChildren,
+  ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TourPackagesRoute: TourPackagesRouteWithChildren,
 }
