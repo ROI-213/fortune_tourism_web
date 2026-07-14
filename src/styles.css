@@ -350,6 +350,20 @@
     from { transform: scale(1.0); }
     to   { transform: scale(1.06); }
   }
+
+  /* Why-us vertical auto-scroll marquee (4 images, duplicated for loop) */
+  .why-marquee {
+    animation: why-marquee-scroll 24s linear infinite;
+    will-change: transform;
+  }
+  .why-marquee:hover { animation-play-state: paused; }
+  @keyframes why-marquee-scroll {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .why-marquee { animation: none; }
+  }
 }
 
 /* Home hero: fit within first viewport on desktops */
