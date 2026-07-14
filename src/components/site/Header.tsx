@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, Phone, X } from "lucide-react";
 import { NAV } from "@/data/site";
 import { CONTACT, buildWhatsAppUrl } from "@/lib/contact";
@@ -11,95 +11,129 @@ const WhatsAppIcon = ({ className = "" }: { className?: string }) => (
 );
 
 export function Header() {
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isHome = pathname === "/";
   const wa = buildWhatsAppUrl({ service: "General enquiry" });
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
 
-  const solid = true;
-  void scrolled;
-  void isHome;
-
   return (
-    <header
-      className={
-        "fixed inset-x-0 top-0 z-50 transition-colors duration-300 " +
-        (solid
-          ? "bg-primary text-primary-foreground shadow-md/40 backdrop-blur"
-          : "bg-transparent text-primary-foreground")
-      }
-    >
-      <div className="container-fortune flex h-14 flex-nowrap items-center justify-between gap-3 md:h-[72px]">
-        <Link to="/" className="flex min-w-0 items-center gap-2 shrink-0">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[color:var(--color-gold)] font-heading text-base font-bold text-[color:var(--color-navy)]">
-            F
-          </span>
-          <span className="flex min-w-0 flex-col leading-tight">
-            <span className="font-heading text-base font-semibold tracking-tight whitespace-nowrap md:text-lg">Fortune Tourism</span>
-            <span className="hidden text-[10px] uppercase tracking-[0.2em] opacity-80 sm:block">South India Travel</span>
-          </span>
-        </Link>
-
-        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-6 whitespace-nowrap lg:flex xl:gap-8">
-          {NAV.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="nav-underline text-sm font-medium opacity-90 hover:opacity-100"
-              data-active={pathname === item.to}
+    <header className="sticky top-0 z-50 w-full bg-[#f7f1e7]">
+      <div className="mx-auto w-[calc(100%-24px)] max-w-[1440px] px-0 pt-3 pb-2 md:w-[calc(100%-56px)] md:pt-5">
+        <nav
+          className="grid items-center rounded-[28px] border border-white/80 bg-[rgba(255,253,248,0.98)] px-4 py-2.5 shadow-[0_18px_40px_rgba(68,45,15,0.10),0_4px_12px_rgba(68,45,15,0.06)] md:rounded-[40px] md:px-8 md:py-4"
+          style={{ gridTemplateColumns: "auto 1fr auto", columnGap: "clamp(16px,3vw,48px)" }}
+          aria-label="Primary"
+        >
+          {/* Brand */}
+          <Link to="/" className="flex items-center gap-3 md:gap-5">
+            <span
+              className="grid shrink-0 place-items-center rounded-2xl text-[color:var(--color-gold)] shadow-[inset_0_-2px_0_rgba(0,0,0,0.15)]"
+              style={{
+                width: "clamp(44px,4.5vw,80px)",
+                height: "clamp(44px,4.5vw,80px)",
+                background: "linear-gradient(145deg,#064933,#013b2a)",
+                fontFamily: 'Georgia,"Times New Roman",serif',
+                fontSize: "clamp(28px,3vw,52px)",
+                fontWeight: 500,
+                lineHeight: 1,
+              }}
+              aria-hidden="true"
             >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+              F
+            </span>
+            <span
+              className="whitespace-nowrap font-heading"
+              style={{ fontSize: "clamp(18px,2vw,34px)", fontWeight: 600, lineHeight: 1 }}
+            >
+              <span style={{ color: "#063f2d" }}>Fortune</span>{" "}
+              <span style={{ color: "#d79a17" }}>Tourism</span>
+            </span>
+          </Link>
 
-        <div className="flex shrink-0 items-center gap-2">
-          <a
-            href={CONTACT.phoneHref}
-            className="hidden items-center gap-2 whitespace-nowrap rounded-full border border-white/25 px-3 py-1.5 text-sm font-medium hover:bg-white/10 md:inline-flex"
+          {/* Center menu */}
+          <div
+            className="hidden min-w-0 items-center justify-center whitespace-nowrap lg:flex"
+            style={{ gap: "clamp(18px,2.4vw,44px)" }}
           >
-            <Phone className="h-4 w-4" /> Call
-          </a>
-          <a
-            href={wa}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="hidden items-center gap-2 whitespace-nowrap rounded-full bg-[color:var(--color-emerald)] px-3 py-1.5 text-sm font-medium text-[color:var(--color-cream)] hover:brightness-110 md:inline-flex"
-          >
-            <WhatsAppIcon className="h-4 w-4" /> WhatsApp
-          </a>
-          <a href={CONTACT.phoneHref} className="rounded-full border border-white/25 p-2 md:hidden" aria-label="Call">
-            <Phone className="h-5 w-5" />
-          </a>
-          <a
-            href={wa}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="rounded-full bg-[color:var(--color-emerald)] p-2 text-[color:var(--color-cream)] md:hidden"
-            aria-label="WhatsApp"
-          >
-            <WhatsAppIcon className="h-5 w-5" />
-          </a>
-          <button
-            onClick={() => setOpen(true)}
-            aria-label="Open menu"
-            className="rounded-full border border-white/25 p-2 lg:hidden"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-        </div>
+            {NAV.map((item) => {
+              const active = pathname === item.to;
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="relative text-[15px] font-medium text-[#191919] transition-colors hover:text-[#c98d12] xl:text-[17px]"
+                  style={
+                    active
+                      ? { color: "#d28f00", fontWeight: 600 }
+                      : undefined
+                  }
+                >
+                  {item.label}
+                  {active && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-1/2 -translate-x-1/2 rounded-full"
+                      style={{
+                        bottom: -10,
+                        width: 40,
+                        height: 3,
+                        background: "#d59a0a",
+                      }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3 md:gap-5">
+            <span
+              aria-hidden="true"
+              className="hidden lg:block"
+              style={{ width: 1, height: 40, background: "rgba(20,20,20,0.20)" }}
+            />
+            <a
+              href={CONTACT.phoneHref}
+              className="hidden items-center gap-2 whitespace-nowrap text-[15px] font-medium text-[#151515] hover:text-[#063f2d] md:inline-flex xl:text-[17px]"
+            >
+              <Phone className="h-5 w-5" style={{ color: "#063f2d" }} />
+              <span className="hidden xl:inline">Call Now</span>
+            </a>
+            <a
+              href={wa}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="hidden items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-[15px] font-medium text-white shadow-[0_8px_18px_rgba(4,83,55,0.16)] transition-transform hover:-translate-y-0.5 md:inline-flex md:px-5 md:py-2.5 xl:text-[17px]"
+              style={{ background: "linear-gradient(135deg,#086a46,#07583d)" }}
+            >
+              <WhatsAppIcon className="h-5 w-5" />
+              WhatsApp
+            </a>
+
+            {/* Mobile icons */}
+            <a
+              href={wa}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="WhatsApp"
+              className="grid h-11 w-11 place-items-center rounded-full text-white md:hidden"
+              style={{ background: "linear-gradient(135deg,#086a46,#07583d)" }}
+            >
+              <WhatsAppIcon className="h-5 w-5" />
+            </a>
+            <button
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+              className="grid h-11 w-11 place-items-center rounded-full border border-[color:rgba(6,63,45,0.2)] text-[#063f2d] lg:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          </div>
+        </nav>
       </div>
 
       {open && (
