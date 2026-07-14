@@ -91,11 +91,15 @@ function HomePage() {
 /* --- Hero Carousel --- */
 function KarnatakaHero() {
   const slides = [
-    { src: karnatakaHero, alt: "Karnataka — One State. Infinite Wonders. Mysore Palace, Hampi, Jog Falls, Gokarna, Coorg." },
-    { src: andhraHero, alt: "Andhra Pradesh — Charminar, Tirupati, Araku Valley, Borra Caves, Konaseema Backwaters." },
-    { src: tamilnaduHero, alt: "Explore Tamil Nadu — Marina Beach, Meenakshi Temple, Ooty Hills, Brihadeeswarar Temple, Pamban Bridge." },
-    { src: pondicherryHero, alt: "Explore Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach, Basilica of the Sacred Heart." },
-    { src: keralaHero, alt: "Kerala — Kathakali artist, tea plantations, backwaters and houseboats, Chinese fishing nets, temple architecture." },
+    { src: karnatakaHero, alt: "Karnataka — One State. Infinite Wonders. Mysore Palace, Hampi, Jog Falls, Gokarna, Coorg.", overlay: false as const },
+    { src: andhraHero, alt: "Andhra Pradesh — Charminar, Tirupati, Araku Valley, Borra Caves, Konaseema Backwaters.", overlay: false as const },
+    {
+      src: tamilnaduHero,
+      alt: "Tamil Nadu tourism collage featuring Meenakshi Amman Temple, Brihadeeswarar Temple, Marina Beach, Ooty Mountain Railway and Vivekananda Rock Memorial.",
+      overlay: true as const,
+    },
+    { src: pondicherryHero, alt: "Explore Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach, Basilica of the Sacred Heart.", overlay: false as const },
+    { src: keralaHero, alt: "Kerala — Kathakali artist, tea plantations, backwaters and houseboats, Chinese fishing nets, temple architecture.", overlay: false as const },
   ];
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -126,6 +130,7 @@ function KarnatakaHero() {
               key={idx}
               className={`absolute inset-0 overflow-hidden transition-opacity duration-1000 ease-out ${idx === i ? "opacity-100" : "opacity-0"}`}
               aria-hidden={idx === i ? "false" : "true"}
+              aria-label={s.overlay ? "Explore Tamil Nadu tour packages" : undefined}
             >
               <img
                 src={s.src}
@@ -133,10 +138,11 @@ function KarnatakaHero() {
                 width={1920}
                 height={850}
                 loading={idx === 0 ? "eager" : "lazy"}
-                fetchPriority={idx === 0 ? "high" : "auto"}
+                fetchPriority={idx === 0 || idx === 2 ? "high" : "auto"}
                 decoding="async"
                 className="h-full w-full object-contain [object-position:center_center]"
               />
+              {s.overlay && <TamilNaduHeroOverlay />}
             </div>
           ))}
           <button
