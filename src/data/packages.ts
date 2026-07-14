@@ -25,10 +25,18 @@ import pkgTirupatiAsset from "@/assets/pkg-tirupati-real.jpg.asset.json";
 import pkgArakuAsset from "@/assets/pkg-araku-real.jpg.asset.json";
 import pkgGandikotaAsset from "@/assets/pkg-gandikota-real.jpg.asset.json";
 import pkgSrisailamAsset from "@/assets/pkg-srisailam-real.jpg.asset.json";
+import pkgOotyAsset from "@/assets/pkg-ooty-real.jpg.asset.json";
+import pkgPuducherryAsset from "@/assets/pkg-puducherry-real.jpg.asset.json";
+import pkgMahabalipuramAsset from "@/assets/pkg-mahabalipuram-real.jpg.asset.json";
+import pkgKodaikanalAsset from "@/assets/pkg-kodaikanal-real.jpg.asset.json";
 const pkgTirupati = pkgTirupatiAsset.url;
 const pkgAraku = pkgArakuAsset.url;
 const pkgGandikota = pkgGandikotaAsset.url;
 const pkgSrisailam = pkgSrisailamAsset.url;
+const pkgOoty = pkgOotyAsset.url;
+const pkgPuducherry = pkgPuducherryAsset.url;
+const pkgMahabalipuram = pkgMahabalipuramAsset.url;
+const pkgKodaikanal = pkgKodaikanalAsset.url;
 const pkgMysuruHeritage = pkgMysuruAsset.url;
 const pkgChikmagalur = pkgChikmagalurAsset.url;
 const pkgHampi = pkgHampiAsset.url;
@@ -66,7 +74,7 @@ export const packages: TourPackage[] = [
     destinations: ["Ooty", "Coonoor", "Doddabetta", "Botanical Gardens"],
     vehicles: ["SUV", "Innova", "Innova Crysta"],
     startingPrice: 13500,
-    image: "/images/state-tamilnadu.jpg",
+    image: pkgOoty,
     summary: "Cool weather, tea gardens and a slow train ride through the Nilgiris.",
     heroImage: "/images/packages/hero-ooty.jpg",
     highlights: ["Drive via Bandipur forest", "Doddabetta peak view", "Ooty tea museum", "Coonoor viewpoints", "Botanical Gardens"],
@@ -149,7 +157,7 @@ export const packages: TourPackage[] = [
     destinations: ["White Town", "Promenade", "Paradise Beach", "Auroville"],
     vehicles: ["Sedan", "SUV", "Innova"],
     startingPrice: 14500,
-    image: "/images/state-puducherry.jpg",
+    image: pkgPuducherry,
     summary: "French quarter mornings, quiet beaches and a slow drive back through the eastern coast.",
     heroImage: "/images/packages/hero-puducherry.jpg",
     highlights: ["White Town heritage walk", "Promenade sunrise", "Paradise Beach ferry", "Auroville visit"],
@@ -286,7 +294,7 @@ export const packages: TourPackage[] = [
     destinations: ["Chennai", "Marina Beach", "Mahabalipuram"],
     vehicles: ["Sedan", "SUV"],
     startingPrice: 8500,
-    image: "/images/state-tamilnadu.jpg",
+    image: pkgMahabalipuram,
     summary: "City heritage, seaside temples and shore-carved rock reliefs.",
     itinerary: [
       { day: 1, title: "Chennai local", details: "Marina, Kapaleeshwarar." },
@@ -304,7 +312,7 @@ export const packages: TourPackage[] = [
     destinations: ["Kodaikanal Lake", "Coaker's Walk", "Pillar Rocks"],
     vehicles: ["SUV", "Innova"],
     startingPrice: 14500,
-    image: "/images/state-tamilnadu.jpg",
+    image: pkgKodaikanal,
     summary: "Cool climate, lake mornings and pine-scented viewpoints.",
     itinerary: [
       { day: 1, title: "Drive to Kodai", details: "Evening at the lake." },
