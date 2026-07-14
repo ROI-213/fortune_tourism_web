@@ -64,6 +64,16 @@
 
 :root {
   --radius: 0.75rem;
+  --fortune-header: 4rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --fortune-header: 5rem;
+  }
+}
+
+:root {
 
   /* Brand palette */
   --brand-navy: oklch(0.22 0.055 260);       /* #0B1F3A */
