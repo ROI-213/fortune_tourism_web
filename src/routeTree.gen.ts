@@ -17,7 +17,6 @@ import { Route as CarRentalsRouteImport } from './routes/car-rentals'
 import { Route as AirportTransferRouteImport } from './routes/airport-transfer'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TourPackagesPackageIdRouteImport } from './routes/tour-packages.$packageId'
 import { Route as CarRentalsVehicleIdRouteImport } from './routes/car-rentals.$vehicleId'
 
 const TourPackagesRoute = TourPackagesRouteImport.update({
@@ -60,11 +59,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TourPackagesPackageIdRoute = TourPackagesPackageIdRouteImport.update({
-  id: '/$packageId',
-  path: '/$packageId',
-  getParentRoute: () => TourPackagesRoute,
-} as any)
 const CarRentalsVehicleIdRoute = CarRentalsVehicleIdRouteImport.update({
   id: '/$vehicleId',
   path: '/$vehicleId',
@@ -79,9 +73,8 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/tour-packages': typeof TourPackagesRouteWithChildren
+  '/tour-packages': typeof TourPackagesRoute
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
-  '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -91,9 +84,8 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/tour-packages': typeof TourPackagesRouteWithChildren
+  '/tour-packages': typeof TourPackagesRoute
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
-  '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,9 +96,8 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/tour-packages': typeof TourPackagesRouteWithChildren
+  '/tour-packages': typeof TourPackagesRoute
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
-  '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -120,7 +111,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/tour-packages'
     | '/car-rentals/$vehicleId'
-    | '/tour-packages/$packageId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -132,7 +122,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/tour-packages'
     | '/car-rentals/$vehicleId'
-    | '/tour-packages/$packageId'
   id:
     | '__root__'
     | '/'
@@ -144,7 +133,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/tour-packages'
     | '/car-rentals/$vehicleId'
-    | '/tour-packages/$packageId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -155,7 +143,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  TourPackagesRoute: typeof TourPackagesRouteWithChildren
+  TourPackagesRoute: typeof TourPackagesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -216,13 +204,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tour-packages/$packageId': {
-      id: '/tour-packages/$packageId'
-      path: '/$packageId'
-      fullPath: '/tour-packages/$packageId'
-      preLoaderRoute: typeof TourPackagesPackageIdRouteImport
-      parentRoute: typeof TourPackagesRoute
-    }
     '/car-rentals/$vehicleId': {
       id: '/car-rentals/$vehicleId'
       path: '/$vehicleId'
@@ -245,18 +226,6 @@ const CarRentalsRouteWithChildren = CarRentalsRoute._addFileChildren(
   CarRentalsRouteChildren,
 )
 
-interface TourPackagesRouteChildren {
-  TourPackagesPackageIdRoute: typeof TourPackagesPackageIdRoute
-}
-
-const TourPackagesRouteChildren: TourPackagesRouteChildren = {
-  TourPackagesPackageIdRoute: TourPackagesPackageIdRoute,
-}
-
-const TourPackagesRouteWithChildren = TourPackagesRoute._addFileChildren(
-  TourPackagesRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
@@ -265,7 +234,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  TourPackagesRoute: TourPackagesRouteWithChildren,
+  TourPackagesRoute: TourPackagesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
