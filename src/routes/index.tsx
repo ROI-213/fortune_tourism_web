@@ -93,7 +93,8 @@ function KarnatakaHero() {
   const touch = { x: 0 };
   return (
     <section
-      className="relative w-full overflow-hidden bg-black"
+      className="relative w-full overflow-hidden bg-[#f7f1e7]"
+      style={{ height: "calc(100svh - 4rem)" }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={(e) => { touch.x = e.touches[0].clientX; setPaused(true); }}
@@ -103,7 +104,7 @@ function KarnatakaHero() {
       }}
       aria-roledescription="carousel"
     >
-      <div className="relative w-full" style={{ aspectRatio: "3 / 2" }}>
+      <div className="relative w-full h-full md:[height:calc(100svh-5rem)]">
         {slides.map((s, idx) => (
           <img
             key={idx}
@@ -112,7 +113,7 @@ function KarnatakaHero() {
             loading={idx === 0 ? "eager" : "eager"}
             fetchPriority={idx === 0 ? "high" : "auto"}
             decoding="async"
-            className={`absolute inset-0 w-full h-full object-contain object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "opacity-0"}`}
+            className={`absolute inset-0 block w-full h-full max-w-full max-h-full object-contain object-center transition-opacity duration-700 ${idx === i ? "opacity-100" : "opacity-0"}`}
             aria-hidden={idx === i ? "false" : "true"}
           />
         ))}
