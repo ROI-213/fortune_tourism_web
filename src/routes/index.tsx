@@ -100,20 +100,21 @@ function TamilNaduHeroOverlay() {
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-[2] flex items-end justify-center px-4 pb-10 md:pb-16"
+      className="pointer-events-none absolute inset-0 z-[2] flex items-start justify-center px-4"
+      style={{ paddingTop: "44%" }}
       onMouseEnter={stop as unknown as React.MouseEventHandler}
     >
-      <div className="pointer-events-auto flex w-full max-w-[560px] flex-col items-center text-center">
-        <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
+      <div className="pointer-events-auto flex w-full max-w-[420px] flex-col items-center text-center">
+        <div className="flex flex-row items-center justify-center gap-2">
           <a
             href={waHref}
             target="_blank"
             rel="noreferrer noopener"
             onClick={stop}
             onTouchStart={stop}
-            className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#25D366]"
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white shadow-md transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#25D366] md:px-4 md:py-2 md:text-sm"
           >
-            <WhatsAppIcon className="h-4 w-4" />
+            <WhatsAppIcon className="h-3.5 w-3.5 md:h-4 md:w-4" />
             WhatsApp
           </a>
           <Link
@@ -121,7 +122,7 @@ function TamilNaduHeroOverlay() {
             hash="enquiry"
             onClick={stop as unknown as React.MouseEventHandler}
             onTouchStart={stop as unknown as React.TouchEventHandler}
-            className="inline-flex items-center rounded-full bg-[color:var(--color-navy)] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-navy)]"
+            className="inline-flex items-center rounded-full bg-[color:var(--color-navy)] px-3 py-1.5 text-xs font-semibold text-white shadow-md transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-navy)] md:px-4 md:py-2 md:text-sm"
           >
             Enquire Now
           </Link>
