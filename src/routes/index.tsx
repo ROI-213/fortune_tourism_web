@@ -16,7 +16,8 @@ import { TravelServicesSection } from "@/components/home/TravelServicesSection";
 import { FleetBanner } from "@/components/home/FleetBanner";
 import karnatakaHero from "@/assets/karnataka-hero.png";
 import andhraHero from "@/assets/andhra-hero.png";
-import tamilnaduHero from "@/assets/tamilnadu-hero.png";
+import tamilnaduHeroAsset from "@/assets/tamilnadu-hero.jpg.asset.json";
+const tamilnaduHero = tamilnaduHeroAsset.url;
 import pondicherryHero from "@/assets/pondicherry-hero.png";
 import keralaHero from "@/assets/kerala-hero.png";
 import southIndiaSpecial from "@/assets/south-india-special.jpg";
@@ -88,13 +89,83 @@ function HomePage() {
 }
 
 /* --- Hero Carousel --- */
+function TamilNaduHeroOverlay() {
+  const waHref = buildWhatsAppUrl({
+    destination: "Tamil Nadu",
+    service: "Tamil Nadu Tour Package",
+    notes: "Enquiry from Tamil Nadu hero banner",
+  });
+  const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center px-4"
+      onMouseEnter={stop as unknown as React.MouseEventHandler}
+    >
+      <div className="pointer-events-auto flex w-full max-w-[560px] flex-col items-center text-center">
+        <p
+          className="font-heading italic text-[color:var(--color-navy)]"
+          style={{ fontSize: "clamp(18px, 2.4vw, 30px)" }}
+        >
+          — Explore —
+        </p>
+        <h2
+          className="mt-1 font-heading font-black tracking-[0.02em] text-[color:var(--color-navy)] drop-shadow-[0_2px_6px_rgba(255,240,210,0.6)]"
+          style={{ fontSize: "clamp(32px, 6vw, 72px)", lineHeight: 1 }}
+        >
+          TAMIL NADU
+        </h2>
+        <p
+          className="mt-3 font-heading text-[color:var(--color-navy)]/90"
+          style={{ fontSize: "clamp(12px, 1.4vw, 18px)" }}
+        >
+          ✦ Land of Heritage, Nature & Spirituality ✦
+        </p>
+        <blockquote
+          className="mt-3 font-heading italic text-[color:var(--color-navy)]/85"
+          style={{ fontSize: "clamp(11px, 1.15vw, 15px)", lineHeight: 1.5 }}
+        >
+          "Temples, coastlines and cool hill escapes—
+          <br />
+          Tamil Nadu is a journey of culture in every direction."
+        </blockquote>
+        <div className="mt-4 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noreferrer noopener"
+            onClick={stop}
+            onTouchStart={stop}
+            className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#25D366]"
+          >
+            <WhatsAppIcon className="h-4 w-4" />
+            WhatsApp
+          </a>
+          <Link
+            to="/contact"
+            hash="enquiry"
+            onClick={stop as unknown as React.MouseEventHandler}
+            onTouchStart={stop as unknown as React.TouchEventHandler}
+            className="inline-flex items-center rounded-full bg-[color:var(--color-navy)] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-navy)]"
+          >
+            Enquire Now
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function KarnatakaHero() {
   const slides = [
-    { src: karnatakaHero, alt: "Karnataka — One State. Infinite Wonders. Mysore Palace, Hampi, Jog Falls, Gokarna, Coorg." },
-    { src: andhraHero, alt: "Andhra Pradesh — Charminar, Tirupati, Araku Valley, Borra Caves, Konaseema Backwaters." },
-    { src: tamilnaduHero, alt: "Explore Tamil Nadu — Marina Beach, Meenakshi Temple, Ooty Hills, Brihadeeswarar Temple, Pamban Bridge." },
-    { src: pondicherryHero, alt: "Explore Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach, Basilica of the Sacred Heart." },
-    { src: keralaHero, alt: "Kerala — Kathakali artist, tea plantations, backwaters and houseboats, Chinese fishing nets, temple architecture." },
+    { src: karnatakaHero, alt: "Karnataka — One State. Infinite Wonders. Mysore Palace, Hampi, Jog Falls, Gokarna, Coorg.", overlay: false as const },
+    { src: andhraHero, alt: "Andhra Pradesh — Charminar, Tirupati, Araku Valley, Borra Caves, Konaseema Backwaters.", overlay: false as const },
+    {
+      src: tamilnaduHero,
+      alt: "Tamil Nadu tourism collage featuring Meenakshi Amman Temple, Brihadeeswarar Temple, Marina Beach, Ooty Mountain Railway and Vivekananda Rock Memorial.",
+      overlay: true as const,
+    },
+    { src: pondicherryHero, alt: "Explore Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach, Basilica of the Sacred Heart.", overlay: false as const },
+    { src: keralaHero, alt: "Kerala — Kathakali artist, tea plantations, backwaters and houseboats, Chinese fishing nets, temple architecture.", overlay: false as const },
   ];
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -125,6 +196,7 @@ function KarnatakaHero() {
               key={idx}
               className={`absolute inset-0 overflow-hidden transition-opacity duration-1000 ease-out ${idx === i ? "opacity-100" : "opacity-0"}`}
               aria-hidden={idx === i ? "false" : "true"}
+              aria-label={s.overlay ? "Explore Tamil Nadu tour packages" : undefined}
             >
               <img
                 src={s.src}
@@ -132,10 +204,11 @@ function KarnatakaHero() {
                 width={1920}
                 height={850}
                 loading={idx === 0 ? "eager" : "lazy"}
-                fetchPriority={idx === 0 ? "high" : "auto"}
+                fetchPriority={idx === 0 || idx === 2 ? "high" : "auto"}
                 decoding="async"
                 className="h-full w-full object-contain [object-position:center_center]"
               />
+              {s.overlay && <TamilNaduHeroOverlay />}
             </div>
           ))}
           <button
