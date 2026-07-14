@@ -69,6 +69,22 @@ function HomePage() {
 }
 
 /* --- Hero Carousel --- */
+function KarnatakaHero() {
+  return (
+    <section className="w-full">
+      <img
+        src={karnatakaHero}
+        alt="Karnataka — One State. Infinite Wonders. Discover Mysore Palace, Hampi, Jog Falls, Gokarna and Coorg."
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
+        className="block w-full h-auto"
+        style={{ aspectRatio: "3 / 2", objectFit: "contain", objectPosition: "center" }}
+      />
+    </section>
+  );
+}
+
 function HeroCarousel() {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
