@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -77,25 +78,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Fortune Travels | Curated Journeys for the Modern Explorer" },
+      { title: "Fortune Tourism | South India Car Rentals & Tour Packages" },
       {
         name: "description",
         content:
-          "Discover hand-crafted travel experiences with Fortune Travels. Luxury itineraries, hidden gems, and unforgettable adventures tailored just for you.",
+          "Chauffeur-driven car rentals, curated tour packages and Bengaluru airport transfers across Karnataka, Andhra Pradesh, Tamil Nadu, Kerala & Puducherry.",
       },
-      { name: "author", content: "Fortune Travels" },
+      { name: "author", content: "Fortune Tourism" },
       {
         property: "og:title",
-        content: "Fortune Travels | Curated Journeys for the Modern Explorer",
+        content: "Fortune Tourism | South India Car Rentals & Tour Packages",
       },
       {
         property: "og:description",
         content:
-          "Discover hand-crafted travel experiences with Fortune Travels. Luxury itineraries, hidden gems, and unforgettable adventures tailored just for you.",
+          "Chauffeur-driven car rentals, curated tour packages and Bengaluru airport transfers across South India.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@fortunetravels" },
+      { name: "twitter:site", content: "@fortunetourism" },
     ],
     links: [
       {
@@ -107,8 +108,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap",
       },
+      { rel: "preload", as: "image", href: "/images/state-karnataka.jpg" },
     ],
   }),
   shellComponent: RootShell,
@@ -138,6 +140,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );
 }
