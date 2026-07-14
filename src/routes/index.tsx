@@ -16,6 +16,7 @@ import andhraHero from "@/assets/andhra-hero.png";
 import tamilnaduHero from "@/assets/tamilnadu-hero.png";
 import pondicherryHero from "@/assets/pondicherry-hero.png";
 import keralaHero from "@/assets/kerala-hero.png";
+import TrustStatistics from "@/components/home/TrustStatistics";
 import { destinations } from "@/data/destinations";
 import { packages } from "@/data/packages";
 import { vehicles } from "@/data/vehicles";
@@ -58,6 +59,7 @@ function HomePage() {
   return (
     <SiteLayout>
       <KarnatakaHero />
+      <TrustStatistics />
       <QuickEnquiry />
       <ServicesGrid />
       <StateTourPackages />
