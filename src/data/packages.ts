@@ -16,11 +16,15 @@ export interface TourPackage {
   exclusions: string[];
 }
 
-import pkgMysuruHeritage from "@/assets/pkg-mysuru-heritage.jpg";
-import pkgChikmagalur from "@/assets/pkg-chikmagalur.jpg";
-import pkgHampi from "@/assets/pkg-hampi.jpg";
-import pkgGokarna from "@/assets/pkg-gokarna.jpg";
+import pkgMysuruAsset from "@/assets/pkg-mysuru-palace.jpg.asset.json";
+import pkgChikmagalurAsset from "@/assets/pkg-chikmagalur-real.jpg.asset.json";
+import pkgHampiAsset from "@/assets/pkg-hampi-real.jpg.asset.json";
+import pkgGokarnaAsset from "@/assets/pkg-gokarna-om-beach.jpg.asset.json";
 import pkgKabini from "@/assets/pkg-kabini.jpg";
+const pkgMysuruHeritage = pkgMysuruAsset.url;
+const pkgChikmagalur = pkgChikmagalurAsset.url;
+const pkgHampi = pkgHampiAsset.url;
+const pkgGokarna = pkgGokarnaAsset.url;
 
 export const packages: TourPackage[] = [
   {
