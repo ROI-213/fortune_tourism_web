@@ -4,12 +4,12 @@ import fleetBanner from "@/assets/fleet-banner.jpg";
 
 export function FleetBanner() {
   return (
-    <section className="bg-[#f8f5ee] py-10 md:py-14">
+    <section className="bg-[#f8f5ee] py-6 md:py-8">
       <div className="mx-auto w-[calc(100%-24px)] max-w-[1880px] xl:w-[calc(100%-40px)]">
         {/* Desktop / tablet: integrated banner with curved white panel */}
         <div
           className="relative hidden overflow-hidden rounded-[34px] bg-[#f8f4ec] shadow-[0_14px_36px_rgba(23,36,31,0.1)] md:block"
-          style={{ aspectRatio: "2.15 / 1", maxHeight: "740px", minHeight: "500px" }}
+          style={{ aspectRatio: "2.8 / 1", maxHeight: "520px", minHeight: "360px" }}
         >
           {/* Fleet image full-bleed */}
           <img
