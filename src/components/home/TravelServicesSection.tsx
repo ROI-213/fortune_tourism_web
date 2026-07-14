@@ -113,37 +113,9 @@ export function TravelServicesSection() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [manualNonce, setManualNonce] = useState(0);
   const reduced = usePrefersReducedMotion();
-  const headingPhrases = useMemo(
-    () => travelServices.map((s) => s.animatedTitle),
-    [],
-  );
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    let id: number | undefined;
-    const tick = () =>
-      setActiveIdx((i) => (i + 1) % headingPhrases.length);
-    const start = () => {
-      stop();
-      id = window.setInterval(tick, HEADING_INTERVAL_MS);
-    };
-    const stop = () => {
-      if (id !== undefined) window.clearInterval(id);
-      id = undefined;
-    };
-    const onVis = () => (document.hidden ? stop() : start());
-    start();
-    document.addEventListener("visibilitychange", onVis);
-    return () => {
-      stop();
-      document.removeEventListener("visibilitychange", onVis);
-    };
-  }, [headingPhrases.length, manualNonce]);
-
-  const longestPhrase = useMemo(
-    () => headingPhrases.reduce((a, b) => (a.length >= b.length ? a : b)),
-    [headingPhrases],
-  );
+  // Reference the manual nonce so unused-var lint stays quiet after removing
+  // the auto-advance heading rotator.
+  void manualNonce;
 
   const goTo = (idx: number) => {
     setActiveIdx(((idx % travelServices.length) + travelServices.length) % travelServices.length);
@@ -153,44 +125,42 @@ export function TravelServicesSection() {
   return (
     <section className="relative overflow-hidden bg-[#f6efe0] py-16 md:py-24">
       <TravelDecor />
-      <div className="relative mx-auto w-full max-w-[1540px] px-4 md:px-8">
-        <AnimatedServiceHeading
-          phrases={headingPhrases}
-          activeIdx={activeIdx}
-          longestPhrase={longestPhrase}
-          reduced={reduced}
-        />
+      <div className="relative mx-auto w-full max-w-[1240px] px-4 md:px-8">
+        <h2 className="text-center font-heading text-[26px] font-bold leading-[1.15] tracking-tight text-foreground md:text-[38px] lg:text-[44px]">
+          Travel smarter with our{" "}
+          <span className="text-[color:var(--color-emerald)]">Tour Packages</span>
+        </h2>
 
-        <div className="mx-auto mt-4 flex items-center justify-center gap-3 text-[color:var(--color-emerald)]/70" aria-hidden="true">
+        <div className="mx-auto mt-3 flex items-center justify-center gap-3 text-[color:var(--color-emerald)]/70" aria-hidden="true">
           <span className="h-px w-10 bg-current opacity-50" />
           <span className="text-xs">✦</span>
           <span className="h-px w-10 bg-current opacity-50" />
         </div>
 
-        <p className="mx-auto mt-4 max-w-[820px] text-center text-base leading-relaxed text-muted-foreground md:text-lg">
+        <p className="mx-auto mt-4 max-w-[720px] text-center text-[15px] leading-relaxed text-muted-foreground md:text-base">
           Comfortable, reliable and carefully planned travel solutions for every
           journey.
         </p>
 
-        <div className="relative mt-12 md:mt-16">
+        <div className="relative mt-10 md:mt-12">
           <button
             type="button"
             aria-label="Previous service"
             onClick={() => goTo(activeIdx - 1)}
-            className="absolute left-0 top-1/2 z-20 hidden h-12 w-12 -translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-black/5 bg-white text-[color:var(--color-emerald)] shadow-[0_10px_24px_-12px_rgba(11,31,58,0.25)] transition hover:scale-105 hover:bg-white md:flex lg:h-14 lg:w-14 lg:-translate-x-4"
+            className="absolute left-0 top-1/2 z-20 hidden h-11 w-11 -translate-x-5 -translate-y-1/2 items-center justify-center rounded-full border border-black/5 bg-white text-[color:var(--color-emerald)] shadow-[0_10px_24px_-12px_rgba(11,31,58,0.25)] transition hover:scale-105 hover:bg-white md:flex lg:-translate-x-8"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             type="button"
             aria-label="Next service"
             onClick={() => goTo(activeIdx + 1)}
-            className="absolute right-0 top-1/2 z-20 hidden h-12 w-12 translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-black/5 bg-white text-[color:var(--color-emerald)] shadow-[0_10px_24px_-12px_rgba(11,31,58,0.25)] transition hover:scale-105 hover:bg-white md:flex lg:h-14 lg:w-14 lg:translate-x-4"
+            className="absolute right-0 top-1/2 z-20 hidden h-11 w-11 translate-x-5 -translate-y-1/2 items-center justify-center rounded-full border border-black/5 bg-white text-[color:var(--color-emerald)] shadow-[0_10px_24px_-12px_rgba(11,31,58,0.25)] transition hover:scale-105 hover:bg-white md:flex lg:translate-x-8"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-5 w-5" />
           </button>
 
-          <div className="grid grid-cols-1 items-stretch gap-6 md:gap-7 lg:gap-8 lg:[grid-template-columns:0.96fr_1.08fr_0.96fr]">
+          <div className="grid grid-cols-1 items-stretch gap-5 md:gap-6 lg:grid-cols-3">
             {travelServices.map((s, idx) => (
               <TravelServiceCard
                 key={s.id}
@@ -201,7 +171,7 @@ export function TravelServicesSection() {
             ))}
           </div>
 
-          <div className="mt-8 flex items-center justify-center gap-2" role="tablist" aria-label="Active service">
+          <div className="mt-7 flex items-center justify-center gap-2" role="tablist" aria-label="Active service">
             {travelServices.map((s, idx) => {
               const active = idx === activeIdx;
               return (
@@ -213,10 +183,10 @@ export function TravelServicesSection() {
                   aria-label={`Show ${s.title}`}
                   onClick={() => goTo(idx)}
                   className={
-                    "h-2 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-emerald)]/60 " +
+                    "h-2 w-2 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-emerald)]/60 " +
                     (active
-                      ? "w-7 bg-[color:var(--color-emerald)]"
-                      : "w-2 bg-black/15 hover:bg-black/25")
+                      ? "bg-[color:var(--color-emerald)]"
+                      : "bg-black/15 hover:bg-black/25")
                   }
                 />
               );
@@ -353,28 +323,28 @@ function TravelServiceCard({
         )}
       </div>
 
-      <div className="relative -mt-9 grid h-[72px] w-[72px] place-items-center self-center rounded-full border-[5px] border-white bg-[color:var(--color-emerald)] text-white shadow-[0_10px_22px_-8px_rgba(14,107,80,0.5)]">
-        <Icon className="h-7 w-7" />
+      <div className="relative -mt-8 grid h-[62px] w-[62px] place-items-center self-center rounded-full border-[5px] border-white bg-[color:var(--color-emerald)] text-white shadow-[0_10px_22px_-8px_rgba(14,107,80,0.5)]">
+        <Icon className="h-6 w-6" />
       </div>
 
-      <div className="flex flex-1 flex-col px-6 pb-7 pt-4 text-center md:px-7">
-        <h3 className="font-heading text-[24px] font-semibold text-foreground md:text-[28px]">
+      <div className="flex flex-1 flex-col px-5 pb-6 pt-3 text-center md:px-6">
+        <h3 className="font-heading text-[22px] font-semibold text-foreground md:text-[24px]">
           {service.title}
         </h3>
-        <div className="mx-auto mt-2 flex items-center gap-2 text-[color:var(--color-emerald)]/60" aria-hidden="true">
+        <div className="mx-auto mt-1.5 flex items-center gap-2 text-[color:var(--color-emerald)]/60" aria-hidden="true">
           <span className="h-px w-6 bg-current" />
           <span className="text-[10px]">◆</span>
           <span className="h-px w-6 bg-current" />
         </div>
-        <p className="mx-auto mt-3 max-w-[36ch] text-[15px] leading-relaxed text-muted-foreground md:text-base">
+        <p className="mx-auto mt-3 max-w-[34ch] text-[14px] leading-relaxed text-muted-foreground">
           {service.description}
         </p>
 
-        <ul className="mt-5 flex flex-wrap justify-center gap-2">
+        <ul className="mt-4 flex flex-wrap justify-center gap-2">
           {service.tags.map((tag) => (
             <li
               key={tag}
-              className="rounded-full bg-[color:var(--color-emerald)]/8 px-3 py-1 text-xs font-medium text-[color:var(--color-navy)]"
+              className="rounded-full px-3 py-1 text-[11px] font-medium text-[color:var(--color-navy)]"
               style={{ backgroundColor: "rgba(14,107,80,0.08)" }}
             >
               {tag}
@@ -382,12 +352,12 @@ function TravelServiceCard({
           ))}
         </ul>
 
-        <div className="mt-auto pt-7">
+        <div className="mt-auto pt-6">
           <Link
             to={service.href}
             aria-label={service.buttonLabel}
             className={
-              "group/btn flex h-[54px] w-full items-center justify-center gap-2 rounded-full px-6 text-sm font-bold uppercase tracking-wide transition-all duration-300 active:translate-y-px " +
+              "group/btn flex h-[46px] w-full items-center justify-center gap-2 rounded-full px-5 text-[12px] font-bold uppercase tracking-[0.12em] transition-all duration-300 active:translate-y-px " +
               (isActive
                 ? "bg-[color:var(--color-emerald)] text-white shadow-[0_12px_26px_-12px_rgba(14,107,80,0.6)] hover:brightness-95"
                 : "border-[1.5px] border-[color:var(--color-emerald)] bg-white text-[color:var(--color-emerald)] hover:bg-[color:var(--color-emerald)] hover:text-white")
@@ -492,8 +462,8 @@ function ServiceImageSlideshow({
       className={
         "relative w-full overflow-hidden bg-muted " +
         (featured
-          ? "h-[240px] md:h-[280px] lg:h-[300px]"
-          : "h-[220px] md:h-[250px] lg:h-[270px]")
+          ? "h-[190px] md:h-[210px] lg:h-[220px]"
+          : "h-[180px] md:h-[200px] lg:h-[210px]")
       }
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
