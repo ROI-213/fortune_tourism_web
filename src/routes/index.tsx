@@ -182,33 +182,12 @@ function PondicherryHeroOverlay() {
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-[2] flex items-center px-4 md:px-10"
+      className="pointer-events-none absolute inset-0 z-[2] flex items-end justify-start px-4 pb-10 md:px-12 md:pb-16"
       onMouseEnter={stop as unknown as React.MouseEventHandler}
     >
-      <div className="pointer-events-auto w-full max-w-[520px] text-left">
-        <h2
-          className="font-heading font-bold leading-[0.95] tracking-tight text-[#0f1b3d]"
-          style={{ fontSize: "clamp(30px, 5.5vw, 68px)" }}
-        >
-          Explore
-        </h2>
-        <h2
-          className="font-heading font-bold leading-[0.95] tracking-tight text-[#b07d2a]"
-          style={{ fontSize: "clamp(32px, 6vw, 74px)" }}
-        >
-          Pondicherry
-        </h2>
-        <div className="mt-4 flex items-center gap-2">
-          <span aria-hidden="true" className="h-px w-8 bg-[#b07d2a]/70" />
-          <p className="font-serif text-[13px] text-[#0f1b3d] md:text-[15px]">
-            Timeless Streets. Golden Shores. Peaceful Escapes.
-          </p>
-        </div>
-        <blockquote className="mt-4 hidden max-w-[400px] font-serif italic text-[13px] leading-snug text-[#0f1b3d]/85 md:block md:text-[15px]">
-          &ldquo;A coastal retreat where every street is charming, every sunset
-          is golden, and every moment feels peaceful.&rdquo;
-        </blockquote>
-        <div className="mt-5 flex flex-col items-start gap-2 sm:flex-row sm:gap-3">
+      {/* Buttons only — heading, subtitle and quote are baked into the banner image */}
+      <div className="pointer-events-auto">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:gap-3">
           <a
             href={waHref}
             target="_blank"
