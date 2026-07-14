@@ -95,7 +95,7 @@ const HOTEL_TIERS = [
 ];
 
 function PackageDetail() {
-  const { pkg } = Route.useLoaderData();
+  const { pkg } = Route.useLoaderData() as { pkg: TourPackage };
   const heroImg = pkg.heroImage ?? pkg.image;
 
   // Gallery: hero + state imagery
