@@ -28,7 +28,9 @@ export function Header() {
     setOpen(false);
   }, [pathname]);
 
-  const solid = scrolled || !isHome;
+  const solid = true;
+  void scrolled;
+  void isHome;
 
   return (
     <header
