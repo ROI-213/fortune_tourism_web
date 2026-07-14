@@ -10,6 +10,7 @@ import {
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Reveal } from "@/components/site/Reveal";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
+import karnatakaHero from "@/assets/karnataka-hero.png";
 import { destinations } from "@/data/destinations";
 import { packages } from "@/data/packages";
 import { vehicles } from "@/data/vehicles";
@@ -50,8 +51,8 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   return (
-    <SiteLayout transparentHeader>
-      <HeroCarousel />
+    <SiteLayout>
+      <KarnatakaHero />
       <QuickEnquiry />
       <ServicesGrid />
       <ExploreSouthIndia />
