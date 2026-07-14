@@ -14,6 +14,7 @@ import karnatakaHero from "@/assets/karnataka-hero.png";
 import andhraHero from "@/assets/andhra-hero.png";
 import tamilnaduHero from "@/assets/tamilnadu-hero.png";
 import pondicherryHero from "@/assets/pondicherry-hero.png";
+import keralaHero from "@/assets/kerala-hero.png";
 import { destinations } from "@/data/destinations";
 import { packages } from "@/data/packages";
 import { vehicles } from "@/data/vehicles";
@@ -78,6 +79,7 @@ function KarnatakaHero() {
     { src: andhraHero, alt: "Andhra Pradesh — Charminar, Tirupati, Araku Valley, Borra Caves, Konaseema Backwaters." },
     { src: tamilnaduHero, alt: "Explore Tamil Nadu — Marina Beach, Meenakshi Temple, Ooty Hills, Brihadeeswarar Temple, Pamban Bridge." },
     { src: pondicherryHero, alt: "Explore Pondicherry — French Quarter, Promenade Beach, Auroville Matrimandir, Paradise Beach, Basilica of the Sacred Heart." },
+    { src: keralaHero, alt: "Kerala — Kathakali artist, tea plantations, backwaters and houseboats, Chinese fishing nets, temple architecture." },
   ];
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
