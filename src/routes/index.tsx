@@ -19,6 +19,12 @@ import tamilnaduHero from "@/assets/tamilnadu-hero.png";
 import pondicherryHero from "@/assets/pondicherry-hero.png";
 import keralaHero from "@/assets/kerala-hero.png";
 import southIndiaSpecial from "@/assets/south-india-special.jpg";
+import destKarnataka from "@/assets/destination-gallery/karnataka.jpg.asset.json";
+import destTamilNadu from "@/assets/destination-gallery/tamilnadu.jpg.asset.json";
+import destKerala from "@/assets/destination-gallery/kerala.jpg.asset.json";
+import destAndhra from "@/assets/destination-gallery/andhra.jpg.asset.json";
+import destPondicherry from "@/assets/destination-gallery/pondicherry.jpg.asset.json";
+import destSouthIndia from "@/assets/destination-gallery/southindia.jpg.asset.json";
 import TrustStatistics from "@/components/home/TrustStatistics";
 import { destinations } from "@/data/destinations";
 import { packages } from "@/data/packages";
@@ -373,45 +379,57 @@ function ExploreDestinationsBento() {
   const tiles = [
     {
       name: "Karnataka",
-      image: karnatakaHero,
+      image: destKarnataka.url,
+      alt: "Mysore Palace (Amba Vilas), Karnataka",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-2",
       minH: "min-h-[420px] md:min-h-[560px]",
+      position: "center 30%",
     },
     {
       name: "Tamil Nadu",
-      image: tamilnaduHero,
+      image: destTamilNadu.url,
+      alt: "Brihadeeswarar Temple, Thanjavur, Tamil Nadu",
       to: "/tour-packages" as const,
       area: "md:col-span-2 md:row-span-1",
       minH: "min-h-[220px] md:min-h-[275px]",
+      position: "center 55%",
     },
     {
       name: "Kerala",
-      image: keralaHero,
+      image: destKerala.url,
+      alt: "Houseboat on the Alleppey backwaters, Kerala",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
       minH: "min-h-[220px] md:min-h-[275px]",
+      position: "center center",
     },
     {
       name: "Andhra Pradesh",
-      image: andhraHero,
+      image: destAndhra.url,
+      alt: "Tirumala Venkateswara Temple, Tirupati, Andhra Pradesh",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
       minH: "min-h-[220px] md:min-h-[275px]",
+      position: "center 40%",
     },
     {
       name: "Pondicherry",
-      image: pondicherryHero,
+      image: destPondicherry.url,
+      alt: "French Quarter heritage street, Pondicherry",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
       minH: "min-h-[220px] md:min-h-[275px]",
+      position: "center center",
     },
     {
       name: "South India Special Tours",
-      image: southIndiaSpecial,
+      image: destSouthIndia.url,
+      alt: "Kerala backwater houseboat — a signature South India experience",
       to: "/tour-packages" as const,
       area: "md:col-span-1 md:row-span-1",
       minH: "min-h-[220px] md:min-h-[275px]",
+      position: "center center",
     },
   ];
 
@@ -448,11 +466,13 @@ function ExploreDestinationsBento() {
               >
                 <img
                   src={t.image}
-                  alt={t.name}
+                  alt={t.alt}
                   loading="lazy"
+                  decoding="async"
                   width={1600}
                   height={1000}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.08]"
+                  style={{ objectPosition: t.position }}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.03]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-br from-[color:var(--color-navy)]/10 via-transparent to-[color:var(--color-gold)]/15 opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
