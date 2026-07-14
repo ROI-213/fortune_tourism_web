@@ -317,7 +317,7 @@ function FleetCard({
     <article
       data-fleet-card
       className={
-        "fleet-showcase-card group relative flex shrink-0 flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_16px_44px_rgba(23,36,31,0.08)] transition-all duration-500 md:flex-row " +
+        "fleet-showcase-card group relative flex shrink-0 flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_16px_44px_rgba(23,36,31,0.08)] transition-all duration-500 md:h-[min(560px,calc(100vh-320px))] md:flex-row " +
         (active ? "opacity-100" : "opacity-90")
       }
       style={{
@@ -357,7 +357,7 @@ function FleetCard({
       </div>
 
       {/* Info */}
-      <div className="flex w-full flex-col justify-between gap-4 bg-[#fffdf8] p-6 md:w-[32%] md:p-8">
+      <div className="flex w-full flex-col justify-start gap-5 bg-[#fffdf8] p-6 md:w-[32%] md:p-8">
         <div>
           <h3
             className="font-[Playfair_Display,serif] font-bold text-[#12213b]"
@@ -401,7 +401,7 @@ function FleetCard({
           )}
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="mt-auto flex flex-col gap-2 pt-4">
           <Link
             to="/contact"
             hash="enquiry"
