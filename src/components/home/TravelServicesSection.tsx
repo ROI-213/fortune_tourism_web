@@ -462,8 +462,8 @@ function ServiceImageSlideshow({
       className={
         "relative w-full overflow-hidden bg-muted " +
         (featured
-          ? "h-[190px] md:h-[210px] lg:h-[220px]"
-          : "h-[180px] md:h-[200px] lg:h-[210px]")
+          ? "h-[260px] md:h-[300px] lg:h-[320px]"
+          : "h-[240px] md:h-[280px] lg:h-[300px]")
       }
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
