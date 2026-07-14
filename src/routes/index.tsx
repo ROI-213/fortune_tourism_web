@@ -10,6 +10,7 @@ import {
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Reveal } from "@/components/site/Reveal";
 import { EnquiryForm } from "@/components/site/EnquiryForm";
+import { StateTourPackages } from "@/components/home/StateTourPackages";
 import karnatakaHero from "@/assets/karnataka-hero.png";
 import andhraHero from "@/assets/andhra-hero.png";
 import tamilnaduHero from "@/assets/tamilnadu-hero.png";
@@ -59,6 +60,7 @@ function HomePage() {
       <KarnatakaHero />
       <QuickEnquiry />
       <ServicesGrid />
+      <StateTourPackages />
       <ExploreSouthIndia />
       <FeaturedPackages />
       <FleetPreview />
