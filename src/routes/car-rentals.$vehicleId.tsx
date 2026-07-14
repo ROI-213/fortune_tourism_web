@@ -212,7 +212,7 @@ function VehicleDetail() {
                   <MessageCircle className="h-4 w-4" /> WhatsApp
                 </a>
                 <a
-                  href={`tel:${PHONE}`}
+                  href={`${CONTACT.phoneHref}`}
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-white px-4 py-2.5 text-sm font-semibold hover:border-[color:var(--color-navy)]/40"
                 >
                   <Phone className="h-4 w-4" /> Call
@@ -457,7 +457,7 @@ function VehicleDetail() {
 
       {/* Mobile fixed booking bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 gap-2 border-t border-border bg-white p-2 shadow-lg lg:hidden" style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}>
-        <a href={`tel:${PHONE}`} className="inline-flex items-center justify-center gap-1 rounded-full border border-border py-2.5 text-xs font-semibold">
+        <a href={`${CONTACT.phoneHref}`} className="inline-flex items-center justify-center gap-1 rounded-full border border-border py-2.5 text-xs font-semibold">
           <Phone className="h-4 w-4" /> Call
         </a>
         <a href={waUrl} target="_blank" rel="noopener" className="inline-flex items-center justify-center gap-1 rounded-full bg-[color:var(--color-emerald)] py-2.5 text-xs font-semibold text-white">
