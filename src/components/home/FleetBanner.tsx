@@ -41,14 +41,6 @@ export function FleetBanner() {
             style={{ width: "48%" }}
           >
             <path
-              d="M 27 0 C 11 9, 2 25, 1 42 C 0 59, 10 72, 25 80 L 100 80 L 100 0 Z M 25 80 L 100 80 L 100 100 L 25 100 Z"
-              fill="#fffdf8"
-            />
-            <path
-              d="M 27 0 C 11 9, 2 25, 1 42 C 0 59, 10 72, 25 80 L 100 80 L 100 100 L 0 100 L 0 0 Z"
-              fill="transparent"
-            />
-            <path
               d="M 30 0 C 12 10, 2 28, 1 50 C 0 72, 12 90, 30 100 L 100 100 L 100 0 Z"
               fill="#fffdf8"
             />
