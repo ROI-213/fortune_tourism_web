@@ -17,8 +17,8 @@ const allPackages = [
     destinations: ["Mysuru Palace", "Coorg Coffee Estates", "Abbey Falls", "Dubare"],
     vehicles: ["Sedan", "SUV", "Innova Crysta"],
     starting_price: 12500,
-    image: "/images/packages/mysuru-coorg.jpg",
-    hero_image: "/images/packages/hero-mysuru-coorg.jpg",
+    image: "/images/packages/pkg-mysuru-palace.jpg",
+    hero_image: "/images/packages/pkg-mysuru-palace.jpg",
     summary: "A weekend loop from Bengaluru covering the royal city of Mysuru and the misty coffee hills of Coorg.",
     highlights: ["Visit Mysuru Palace", "Coorg coffee estate stay", "Abbey Falls viewpoint", "Dubare elephant camp", "Scenic Western Ghats drive"],
     itinerary: [
@@ -38,8 +38,8 @@ const allPackages = [
     destinations: ["Ooty", "Coonoor", "Doddabetta", "Botanical Gardens"],
     vehicles: ["SUV", "Innova", "Innova Crysta"],
     starting_price: 13500,
-    image: "/images/packages/ooty.jpg",
-    hero_image: "/images/packages/hero-ooty.jpg",
+    image: "/images/packages/pkg-ooty-real.jpg",
+    hero_image: "/images/packages/pkg-ooty-real.jpg",
     summary: "Cool weather, tea gardens and a slow train ride through the Nilgiris.",
     highlights: ["Drive via Bandipur forest", "Doddabetta peak view", "Ooty tea museum", "Coonoor viewpoints", "Botanical Gardens"],
     itinerary: [
@@ -59,8 +59,8 @@ const allPackages = [
     destinations: ["Mullayanagiri", "Baba Budangiri", "Coffee Estates", "Hebbe Falls"],
     vehicles: ["Sedan", "SUV"],
     starting_price: 8500,
-    image: "/images/packages/chikmagalur.jpg",
-    hero_image: "/images/packages/hero-chikmagalur.jpg",
+    image: "/images/packages/pkg-chikmagalur-real.jpg",
+    hero_image: "/images/packages/pkg-chikmagalur-real.jpg",
     summary: "A quick escape to Karnataka's coffee country and the tallest peak in the state.",
     highlights: ["Sunrise at Mullayanagiri", "Coffee estate homestay", "Baba Budangiri drive", "Hebbe Falls trek"],
     itinerary: [
@@ -79,8 +79,8 @@ const allPackages = [
     destinations: ["Tirumala Temple", "Padmavathi Temple", "Kalahasti"],
     vehicles: ["Sedan", "Innova Crysta", "Tempo Traveller"],
     starting_price: 8500,
-    image: "/images/packages/tirupati.jpg",
-    hero_image: "/images/packages/hero-tirupati.jpg",
+    image: "/images/packages/pkg-tirupati-real.jpg",
+    hero_image: "/images/packages/pkg-tirupati-real.jpg",
     summary: "Comfortable door-to-door temple car service from Bengaluru with experienced drivers familiar with Tirumala routes.",
     highlights: ["Same-day return option", "Driver knows parking & hair-cutting locations", "Clean AC car with zero toll hassle"],
     itinerary: [
@@ -90,7 +90,7 @@ const allPackages = [
     exclusions: ["Darshan tickets", "Food & accommodation"],
   },
   {
-    slug: "kerala-backwaters-hills",
+    slug: "bengaluru-munnar-alleppey",
     title: "Munnar & Alleppey Backwaters",
     duration: "4 Days · 3 Nights",
     from_city: "Kochi / Bengaluru",
@@ -98,8 +98,8 @@ const allPackages = [
     destinations: ["Munnar Tea Gardens", "Mattupetty Dam", "Alleppey Houseboat"],
     vehicles: ["Innova Crysta", "SUV"],
     starting_price: 19500,
-    image: "/images/packages/kerala.jpg",
-    hero_image: "/images/packages/hero-kerala.jpg",
+    image: "/images/packages/pkg-munnar-alleppey.jpg",
+    hero_image: "/images/packages/pkg-munnar-alleppey.jpg",
     summary: "Tea gardens, waterfalls and a night on a private houseboat floating down Alleppey backwaters.",
     highlights: ["Munnar tea estate walks", "Cheeyappara waterfalls", "Alleppey houseboat experience", "Fresh Kerala cuisine"],
     itinerary: [
@@ -112,7 +112,7 @@ const allPackages = [
     exclusions: ["Stay & Meals"],
   },
   {
-    slug: "puducherry-french-beaches",
+    slug: "bengaluru-puducherry",
     title: "Puducherry French Quarter & Beaches",
     duration: "2 Days · 1 Night",
     from_city: "Bengaluru / Chennai",
@@ -120,8 +120,8 @@ const allPackages = [
     destinations: ["White Town", "Promenade Beach", "Auroville", "Paradise Beach"],
     vehicles: ["Sedan", "SUV"],
     starting_price: 9800,
-    image: "/images/packages/puducherry.jpg",
-    hero_image: "/images/packages/hero-puducherry.jpg",
+    image: "/images/packages/pkg-pondi-whitetown.jpg",
+    hero_image: "/images/packages/pkg-pondi-whitetown.jpg",
     summary: "French heritage architecture, seaside cafes, Auroville peace dome, and golden beaches.",
     highlights: ["Yellow-colonial streets walk", "Seaside promenade evening", "Auroville Matrimandir viewpoint", "Boat ride to Paradise Beach"],
     itinerary: [
@@ -140,8 +140,8 @@ const allPackages = [
     destinations: ["Hampi", "Virupaksha Temple", "Vittala Temple", "Hospet"],
     vehicles: ["Sedan", "SUV"],
     starting_price: 13500,
-    image: "/images/packages/hampi.jpg",
-    hero_image: "/images/packages/hampi.jpg",
+    image: "/images/packages/pkg-hampi-real.jpg",
+    hero_image: "/images/packages/pkg-hampi-real.jpg",
     summary: "Stone chariots, boulder-strewn ruins and a UNESCO heritage weekend.",
     highlights: ["Virupaksha temple", "Vittala stone chariot", "Sunset at Hemakuta Hill", "Coracle ride"],
     itinerary: [
@@ -161,8 +161,8 @@ const allPackages = [
     destinations: ["Om Beach", "Kudle Beach", "Half Moon Beach", "Mahabaleshwar Temple"],
     vehicles: ["SUV", "Innova"],
     starting_price: 14500,
-    image: "/images/packages/gokarna.jpg",
-    hero_image: "/images/packages/gokarna.jpg",
+    image: "/images/packages/pkg-gokarna-om-beach.jpg",
+    hero_image: "/images/packages/pkg-gokarna-om-beach.jpg",
     summary: "Cliffside walks, quiet beaches and Mahabaleshwar temple.",
     highlights: ["Om Beach view", "Kudle beach sunset", "Temple visit", "Beach trail walk"],
     itinerary: [
@@ -174,7 +174,7 @@ const allPackages = [
     exclusions: ["Stay", "Meals"],
   },
   {
-    slug: "kabini-safari",
+    slug: "kabini-wildlife",
     title: "Kabini Jungle Safari & Wildlife",
     duration: "2 Days · 1 Night",
     from_city: "Bengaluru",
@@ -182,8 +182,8 @@ const allPackages = [
     destinations: ["Kabini River", "Nagarhole National Park", "Jungle Safari"],
     vehicles: ["SUV", "Innova Crysta"],
     starting_price: 11500,
-    image: "/images/packages/kabini.jpg",
-    hero_image: "/images/packages/kabini.jpg",
+    image: "/images/packages/pkg-kabini.jpg",
+    hero_image: "/images/packages/pkg-kabini.jpg",
     summary: "Leopards, elephants and riverfront lodge stays near Nagarhole.",
     highlights: ["Nagarhole Jeep Safari", "Kabini river boat cruise", "Elephant sightings", "Forest stay"],
     itinerary: [
@@ -194,7 +194,7 @@ const allPackages = [
     exclusions: ["Safari tickets", "Resort stay"],
   },
   {
-    slug: "araku-vizag",
+    slug: "vizag-araku",
     title: "Araku Valley & Borra Caves",
     duration: "3 Days · 2 Nights",
     from_city: "Visakhapatnam",
@@ -202,8 +202,8 @@ const allPackages = [
     destinations: ["Araku Valley", "Borra Caves", "Coffee Plantations", "Katiki Waterfalls"],
     vehicles: ["Sedan", "SUV"],
     starting_price: 11500,
-    image: "/images/packages/araku.jpg",
-    hero_image: "/images/packages/araku.jpg",
+    image: "/images/packages/pkg-araku-real.jpg",
+    hero_image: "/images/packages/pkg-araku-real.jpg",
     summary: "Tribal culture, natural cave formations and cool valley drives.",
     highlights: ["Borra Caves exploration", "Araku coffee museum", "Tribal dance show", "Katiki waterfall trek"],
     itinerary: [
@@ -215,7 +215,7 @@ const allPackages = [
     exclusions: ["Stay", "Meals"],
   },
   {
-    slug: "gandikota-grand-canyon",
+    slug: "gandikota-belum",
     title: "Gandikota & Belum Caves",
     duration: "2 Days · 1 Night",
     from_city: "Bengaluru",
@@ -223,8 +223,8 @@ const allPackages = [
     destinations: ["Gandikota Fort", "Pennar River Gorge", "Belum Caves"],
     vehicles: ["Sedan", "SUV"],
     starting_price: 8500,
-    image: "/images/packages/gandikota.jpg",
-    hero_image: "/images/packages/gandikota.jpg",
+    image: "/images/packages/pkg-gandikota-real.jpg",
+    hero_image: "/images/packages/pkg-gandikota-real.jpg",
     summary: "The Grand Canyon of India paired with underground subterranean caves.",
     highlights: ["Gandikota fort sunset", "Pennar river gorge view", "Belum underground caves", "Rayalaseema countryside drive"],
     itinerary: [
@@ -235,7 +235,7 @@ const allPackages = [
     exclusions: ["Stay", "Meals"],
   },
   {
-    slug: "srisailam-mallikarjuna",
+    slug: "srisailam-temple",
     title: "Srisailam Jyotirlinga Darshan",
     duration: "2 Days · 1 Night",
     from_city: "Hyderabad / Bengaluru",
@@ -243,8 +243,8 @@ const allPackages = [
     destinations: ["Mallikarjuna Swamy Temple", "Pathala Ganga", "Srisailam Dam"],
     vehicles: ["Sedan", "SUV", "Innova"],
     starting_price: 12500,
-    image: "/images/packages/srisailam.jpg",
-    hero_image: "/images/packages/srisailam.jpg",
+    image: "/images/packages/pkg-srisailam-real.jpg",
+    hero_image: "/images/packages/pkg-srisailam-real.jpg",
     summary: "Sacred Jyotirlinga temple nestled in the Nallamala forest hills.",
     highlights: ["Mallikarjuna temple darshan", "Pathala Ganga ropeway", "Srisailam dam view", "Nallamala forest drive"],
     itinerary: [
@@ -255,7 +255,7 @@ const allPackages = [
     exclusions: ["Stay", "Meals"],
   },
   {
-    slug: "mahabalipuram-kanchipuram",
+    slug: "chennai-mahabalipuram",
     title: "Mahabalipuram & Kanchipuram Heritage",
     duration: "2 Days · 1 Night",
     from_city: "Chennai / Bengaluru",
@@ -263,8 +263,8 @@ const allPackages = [
     destinations: ["Shore Temple", "Pancha Rathas", "Kanchi Kamakshi Temple", "Silk Weaving"],
     vehicles: ["Sedan", "SUV"],
     starting_price: 9500,
-    image: "/images/packages/mahabalipuram.jpg",
-    hero_image: "/images/packages/mahabalipuram.jpg",
+    image: "/images/packages/pkg-mahabalipuram-real.jpg",
+    hero_image: "/images/packages/pkg-mahabalipuram-real.jpg",
     summary: "Pallava rock-cut architecture by the sea and temple city silk heritage.",
     highlights: ["UNESCO Shore temple", "Krishna's Butterball", "Kanchipuram silk weaving tour", "Kamakshi temple"],
     itinerary: [
@@ -275,7 +275,7 @@ const allPackages = [
     exclusions: ["Stay", "Meals"],
   },
   {
-    slug: "kodaikanal-princess",
+    slug: "kodaikanal",
     title: "Kodaikanal Hill Station Escape",
     duration: "3 Days · 2 Nights",
     from_city: "Bengaluru / Madurai",
@@ -283,8 +283,8 @@ const allPackages = [
     destinations: ["Kodai Lake", "Coaker's Walk", "Pillar Rocks", "Pine Forest"],
     vehicles: ["SUV", "Innova Crysta"],
     starting_price: 15500,
-    image: "/images/packages/kodaikanal.jpg",
-    hero_image: "/images/packages/kodaikanal.jpg",
+    image: "/images/packages/pkg-kodaikanal-real.jpg",
+    hero_image: "/images/packages/pkg-kodaikanal-real.jpg",
     summary: "Mist-covered lake, pine forests and cool mountain air in Palani Hills.",
     highlights: ["Kodai lake boating", "Coaker's walk valley view", "Pillar Rocks mist", "Pine forest walk"],
     itinerary: [
@@ -296,7 +296,7 @@ const allPackages = [
     exclusions: ["Stay", "Meals"],
   },
   {
-    slug: "alleppey-houseboat-luxury",
+    slug: "alleppey-houseboat",
     title: "Alleppey Houseboat & Beach Stay",
     duration: "2 Days · 1 Night",
     from_city: "Kochi / Trivandrum",
@@ -304,8 +304,8 @@ const allPackages = [
     destinations: ["Alleppey Backwaters", "Marari Beach", "Punnamada Lake"],
     vehicles: ["Sedan", "SUV"],
     starting_price: 11500,
-    image: "/images/packages/alleppey.jpg",
-    hero_image: "/images/packages/alleppey.jpg",
+    image: "/images/packages/pkg-alleppey-backwaters.jpg",
+    hero_image: "/images/packages/pkg-alleppey-backwaters.jpg",
     summary: "Overnight private houseboat cruise with traditional Keralan meals.",
     highlights: ["Private deluxe houseboat", "Vembanad lake cruise", "Village canal ride", "Fresh fish lunch"],
     itinerary: [
@@ -324,8 +324,8 @@ const allPackages = [
     destinations: ["Periyar Wildlife Sanctuary", "Spice Plantations", "Elephant Junction"],
     vehicles: ["Sedan", "SUV"],
     starting_price: 10500,
-    image: "/images/packages/thekkady.jpg",
-    hero_image: "/images/packages/thekkady.jpg",
+    image: "/images/packages/pkg-thekkady-periyar.jpg",
+    hero_image: "/images/packages/pkg-thekkady-periyar.jpg",
     summary: "Cardamom hills, Periyar lake boat safari and spice garden tours.",
     highlights: ["Periyar boat safari", "Spice plantation walk", "Elephant bath & ride", "Kathakali show"],
     itinerary: [
@@ -344,8 +344,8 @@ const allPackages = [
     destinations: ["Banasura Sagar Dam", "Edakkal Caves", "Chembra Peak", "Soochipara Falls"],
     vehicles: ["SUV", "Innova"],
     starting_price: 13500,
-    image: "/images/packages/wayanad.jpg",
-    hero_image: "/images/packages/wayanad.jpg",
+    image: "/images/packages/pkg-wayanad-nature.jpg",
+    hero_image: "/images/packages/pkg-wayanad-nature.jpg",
     summary: "Prehistoric cave carvings, earth dams, tea plantations and heart-shaped lake.",
     highlights: ["Edakkal cave carvings", "Banasura dam speedboating", "Soochipara waterfall trek", "Tea estate stay"],
     itinerary: [
@@ -359,30 +359,16 @@ const allPackages = [
 ];
 
 async function seed() {
-  console.log("Seeding all 17 Tour Packages into PostgreSQL...");
+  console.log("Re-seeding all 17 Tour Packages into PostgreSQL with matching slugs & public images...");
+  // First clear old mismatched packages
+  await pool.query(`DELETE FROM packages`);
+
   for (const pkg of allPackages) {
     const res = await pool.query(
       `INSERT INTO packages 
        (slug, title, duration, from_city, states, destinations, vehicles, starting_price, image, hero_image, summary, highlights, itinerary, inclusions, exclusions)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-       ON CONFLICT (slug) 
-       DO UPDATE SET
-         title = EXCLUDED.title,
-         duration = EXCLUDED.duration,
-         from_city = EXCLUDED.from_city,
-         states = EXCLUDED.states,
-         destinations = EXCLUDED.destinations,
-         vehicles = EXCLUDED.vehicles,
-         starting_price = EXCLUDED.starting_price,
-         image = EXCLUDED.image,
-         hero_image = EXCLUDED.hero_image,
-         summary = EXCLUDED.summary,
-         highlights = EXCLUDED.highlights,
-         itinerary = EXCLUDED.itinerary,
-         inclusions = EXCLUDED.inclusions,
-         exclusions = EXCLUDED.exclusions,
-         updated_at = NOW()
-       RETURNING id, title`,
+       RETURNING id, title, slug`,
       [
         pkg.slug,
         pkg.title,
@@ -401,9 +387,9 @@ async function seed() {
         pkg.exclusions || [],
       ]
     );
-    console.log(`✓ Stored in PostgreSQL: ${res.rows[0].title} (ID: ${res.rows[0].id})`);
+    console.log(`✓ Stored in PostgreSQL: ${res.rows[0].title} (slug: ${res.rows[0].slug})`);
   }
-  console.log("ALL TOUR PACKAGES STORED IN POSTGRESQL SUCCESSFULLY!");
+  console.log("ALL TOUR PACKAGES RE-SEEDED SUCCESSFULLY!");
   await pool.end();
 }
 

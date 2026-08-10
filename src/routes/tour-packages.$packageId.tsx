@@ -30,39 +30,8 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/tour-packages/$packageId")({
-  loader: async ({ params }) => {
-    let pkg = findPackage(params.packageId);
-    if (!pkg) {
-      try {
-        const res = await fetch(`/api/packages?slug=${params.packageId}`);
-        const d = await res.json();
-        if (d.success && d.package) {
-          const p = d.package;
-          pkg = {
-            slug: p.slug,
-            title: p.title,
-            duration: p.duration,
-            from: p.from_city || "Bengaluru",
-            states: Array.isArray(p.states) ? p.states : ["karnataka"],
-            destinations: Array.isArray(p.destinations) ? p.destinations : [],
-            vehicles: Array.isArray(p.vehicles) ? p.vehicles : ["Sedan", "SUV"],
-            startingPrice: Number(p.starting_price || 0),
-            image: p.image || "/images/packages/default.jpg",
-            heroImage: p.hero_image || p.image,
-            summary: p.summary,
-            highlights: Array.isArray(p.highlights) ? p.highlights : [],
-            itinerary: Array.isArray(p.itinerary)
-              ? p.itinerary
-              : typeof p.itinerary === "string"
-                ? JSON.parse(p.itinerary)
-                : [],
-            inclusions: Array.isArray(p.inclusions) ? p.inclusions : [],
-            exclusions: Array.isArray(p.exclusions) ? p.exclusions : [],
-          };
-        }
-      } catch (e) {}
-    }
-    if (!pkg) throw notFound();
+  loader: ({ params }) => {
+    const pkg = findPackage(params.packageId);
     return { pkg };
   },
   head: ({ loaderData }) => ({

@@ -37,26 +37,26 @@ import pkgPondiWhiteTownAsset from "@/assets/pkg-pondi-whitetown.jpg";
 import pkgPondiPromenadeAsset from "@/assets/pkg-pondi-promenade.jpg";
 import pkgPondiMatrimandirAsset from "@/assets/pkg-pondi-matrimandir.jpg";
 import pkgPondiParadiseAsset from "@/assets/pkg-pondi-paradise.jpg";
-const pkgTirupati = pkgTirupatiAsset;
-const pkgAraku = pkgArakuAsset;
-const pkgGandikota = pkgGandikotaAsset;
-const pkgSrisailam = pkgSrisailamAsset;
-const pkgOoty = pkgOotyAsset;
-const pkgPuducherry = pkgPuducherryAsset;
-const pkgMahabalipuram = pkgMahabalipuramAsset;
-const pkgKodaikanal = pkgKodaikanalAsset;
-const pkgMunnarAlleppey = pkgMunnarAlleppeyAsset;
-const pkgAlleppeyBackwaters = pkgAlleppeyBackwatersAsset;
-const pkgThekkady = pkgThekkadyAsset;
-const pkgWayanad = pkgWayanadAsset;
-const pkgPondiWhiteTown = pkgPondiWhiteTownAsset;
-const pkgPondiPromenade = pkgPondiPromenadeAsset;
-const pkgPondiMatrimandir = pkgPondiMatrimandirAsset;
-const pkgPondiParadise = pkgPondiParadiseAsset;
-const pkgMysuruHeritage = pkgMysuruAsset;
-const pkgChikmagalur = pkgChikmagalurAsset;
-const pkgHampi = pkgHampiAsset;
-const pkgGokarna = pkgGokarnaAsset;
+const pkgTirupati = "/images/packages/pkg-tirupati-real.jpg";
+const pkgAraku = "/images/packages/pkg-araku-real.jpg";
+const pkgGandikota = "/images/packages/pkg-gandikota-real.jpg";
+const pkgSrisailam = "/images/packages/pkg-srisailam-real.jpg";
+const pkgOoty = "/images/packages/pkg-ooty-real.jpg";
+const pkgPuducherry = "/images/packages/pkg-puducherry-real.jpg";
+const pkgMahabalipuram = "/images/packages/pkg-mahabalipuram-real.jpg";
+const pkgKodaikanal = "/images/packages/pkg-kodaikanal-real.jpg";
+const pkgMunnarAlleppey = "/images/packages/pkg-munnar-alleppey.jpg";
+const pkgAlleppeyBackwaters = "/images/packages/pkg-alleppey-backwaters.jpg";
+const pkgThekkady = "/images/packages/pkg-thekkady-periyar.jpg";
+const pkgWayanad = "/images/packages/pkg-wayanad-nature.jpg";
+const pkgPondiWhiteTown = "/images/packages/pkg-pondi-whitetown.jpg";
+const pkgPondiPromenade = "/images/packages/pkg-pondi-promenade.jpg";
+const pkgPondiMatrimandir = "/images/packages/pkg-pondi-matrimandir.jpg";
+const pkgPondiParadise = "/images/packages/pkg-pondi-paradise.jpg";
+const pkgMysuruHeritage = "/images/packages/pkg-mysuru-palace.jpg";
+const pkgChikmagalur = "/images/packages/pkg-chikmagalur-real.jpg";
+const pkgHampi = "/images/packages/pkg-hampi-real.jpg";
+const pkgGokarna = "/images/packages/pkg-gokarna-om-beach.jpg";
 
 export const packages: TourPackage[] = [
   {
@@ -474,5 +474,21 @@ export const packages: TourPackage[] = [
 ];
 
 export function findPackage(slug: string) {
-  return packages.find((p) => p.slug === slug);
+  if (!slug) return packages[0];
+  const normalized = slug.toLowerCase().trim();
+  let found = packages.find((p) => p.slug === normalized);
+  if (found) return found;
+
+  // Fuzzy match fallback by slug or title
+  found = packages.find(
+    (p) =>
+      p.slug.includes(normalized) ||
+      normalized.includes(p.slug) ||
+      p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").includes(normalized) ||
+      normalized.includes(p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"))
+  );
+  if (found) return found;
+
+  // Default fallback to first package if completely unknown
+  return packages[0];
 }
