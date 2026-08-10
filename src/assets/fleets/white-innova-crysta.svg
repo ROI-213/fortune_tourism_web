@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-label="White Innova Crysta MPV on a white background">
+  <title>White Innova Crysta</title>
+  <rect width="1600" height="1000" fill="#ffffff"/>
+  <ellipse cx="800" cy="800" rx="555" ry="26" fill="rgba(18,33,59,0.10)"/>
+  <path d="M 220,645 L 220,595 C 220,555 242,525 278,512 L 470,485 C 505,478 535,468 565,455 L 600,438 C 620,426 655,420 700,420 L 1040,420 C 1090,420 1120,432 1145,452 L 1220,500 C 1250,518 1275,532 1280,560 L 1280,600 L 1280,645 Z" fill="#ffffff" stroke="#c9d1da" stroke-width="4"/>
+  <path d="M 220,645 L 220,595 C 220,555 242,525 278,512 L 470,485 C 505,478 535,468 565,455 L 600,438 C 620,426 655,420 700,420 L 1040,420 C 1090,420 1120,432 1145,452 L 1220,500 C 1250,518 1275,532 1280,560 L 1280,600 L 1280,645 L 220,645 Z" fill="#eef1f4" clip-path="url(#clipInnova)"/>
+  <clipPath id="clipInnova"><rect x="0" y="580" width="1600" height="120"/></clipPath>
+  <rect x="720" y="404" width="330" height="14" rx="7" fill="#d5dce4"/>
+  <path d="M 300,637 L 1260,637" stroke="#eef1f4" stroke-width="12"/>
+  <path d="M 560,485 L 560,458 C 578,442 625,434 680,434 L 985,434 C 1018,434 1045,445 1068,464 L 1165,508 L 560,508 Z" fill="#22304a" stroke="#16202f" stroke-width="2"/>
+  <path d="M 560,485 L 560,458 C 578,442 625,434 680,434 L 720,434 L 720,485 L 560,485 Z" fill="#3d4f70"/>
+  <line x1="720" y1="436" x2="720" y2="504" stroke="#3d4f70" stroke-width="4"/>
+  <line x1="900" y1="436" x2="900" y2="504" stroke="#3d4f70" stroke-width="4"/>
+  <line x1="880" y1="510" x2="880" y2="636" stroke="#d5dce4" stroke-width="3"/>
+  <line x1="600" y1="565" x2="630" y2="565" stroke="#c9d1da" stroke-width="8" stroke-linecap="round"/>
+  <line x1="1000" y1="565" x2="1030" y2="565" stroke="#c9d1da" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 235,548 L 290,528 L 290,580 L 245,595 Z" fill="#eef2f8" stroke="#c0c9d4" stroke-width="3"/>
+  <path d="M 1162,552 L 1268,578 L 1268,598 L 1167,572 Z" fill="#eef2f8" stroke="#c0c9d4" stroke-width="3"/>
+  <path d="M 1190,602 L 1275,602 L 1272,622 L 1195,622 Z" fill="#1d2430" opacity="0.85"/>
+  <circle cx="1150" cy="642" r="112" fill="#242a33"/>
+  <circle cx="1150" cy="642" r="72" fill="#e6ebf1" stroke="#9aa4af" stroke-width="10"/>
+  <circle cx="1150" cy="642" r="23" fill="#9aa4af"/>
+  <line x1="1150" y1="570" x2="1150" y2="714" stroke="#9aa4af" stroke-width="6"/>
+  <line x1="1078" y1="642" x2="1222" y2="642" stroke="#9aa4af" stroke-width="6"/>
+  <circle cx="430" cy="642" r="112" fill="#242a33"/>
+  <circle cx="430" cy="642" r="72" fill="#e6ebf1" stroke="#9aa4af" stroke-width="10"/>
+  <circle cx="430" cy="642" r="23" fill="#9aa4af"/>
+  <line x1="430" y1="570" x2="430" y2="714" stroke="#9aa4af" stroke-width="6"/>
+  <line x1="358" y1="642" x2="502" y2="642" stroke="#9aa4af" stroke-width="6"/>
+</svg>

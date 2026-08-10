@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-label="White hatchback on a white background">
+  <title>White hatchback</title>
+  <rect width="1600" height="1000" fill="#ffffff"/>
+  <ellipse cx="800" cy="800" rx="530" ry="26" fill="rgba(18,33,59,0.10)"/>
+  <path d="M 280,655 L 280,612 C 280,572 302,538 342,522 L 545,466 C 588,453 625,436 678,436 L 968,436 C 1034,436 1082,454 1127,494 L 1228,570 C 1263,595 1283,611 1285,638 L 1285,655 Z" fill="#ffffff" stroke="#c9d1da" stroke-width="4"/>
+  <path d="M 280,655 L 280,612 C 280,572 302,538 342,522 L 545,466 C 588,453 625,436 678,436 L 968,436 C 1034,436 1082,454 1127,494 L 1228,570 C 1263,595 1283,611 1285,638 L 1285,655 L 280,655 Z" fill="#eef1f4" clip-path="url(#clipHatch)"/>
+  <clipPath id="clipHatch"><rect x="0" y="590" width="1600" height="120"/></clipPath>
+  <path d="M 285,648 L 1280,648" stroke="#eef1f4" stroke-width="6"/>
+  <path d="M 585,510 L 585,466 C 588,452 605,447 640,447 L 845,447 C 880,447 902,452 928,460 L 1005,500 L 585,510 Z" fill="#22304a" stroke="#16202f" stroke-width="2"/>
+  <path d="M 515,505 L 498,472 C 504,465 516,460 532,458 L 562,453 L 562,503 Z" fill="#22304a" stroke="#16202f" stroke-width="2"/>
+  <path d="M 585,474 C 595,462 612,458 630,458 L 650,458 L 650,474 L 585,474 Z" fill="#3d4f70"/>
+  <line x1="720" y1="462" x2="720" y2="508" stroke="#3d4f70" stroke-width="4"/>
+  <line x1="760" y1="580" x2="810" y2="580" stroke="#c9d1da" stroke-width="8" stroke-linecap="round"/>
+  <line x1="1010" y1="505" x2="1000" y2="610" stroke="#d5dce4" stroke-width="3"/>
+  <path d="M 285,585 L 335,556 L 340,575 L 292,602 Z" fill="#eef2f8" stroke="#c0c9d4" stroke-width="3"/>
+  <path d="M 1198,552 L 1262,582 L 1260,597 L 1196,567 Z" fill="#eef2f8" stroke="#c0c9d4" stroke-width="3"/>
+  <path d="M 1195,618 L 1280,618 L 1278,638 L 1198,638 Z" fill="#1d2430" opacity="0.85"/>
+  <circle cx="1150" cy="655" r="105" fill="#242a33"/>
+  <circle cx="1150" cy="655" r="68" fill="#e6ebf1" stroke="#9aa4af" stroke-width="10"/>
+  <circle cx="1150" cy="655" r="22" fill="#9aa4af"/>
+  <line x1="1150" y1="587" x2="1150" y2="723" stroke="#9aa4af" stroke-width="6"/>
+  <line x1="1082" y1="655" x2="1218" y2="655" stroke="#9aa4af" stroke-width="6"/>
+  <circle cx="490" cy="655" r="105" fill="#242a33"/>
+  <circle cx="490" cy="655" r="68" fill="#e6ebf1" stroke="#9aa4af" stroke-width="10"/>
+  <circle cx="490" cy="655" r="22" fill="#9aa4af"/>
+  <line x1="490" y1="587" x2="490" y2="723" stroke="#9aa4af" stroke-width="6"/>
+  <line x1="422" y1="655" x2="558" y2="655" stroke="#9aa4af" stroke-width="6"/>
+</svg>

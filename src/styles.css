@@ -1,0 +1,406 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Fortune Tourism design system.
+ *
+ * Deep navy brand, emerald for nature/tourism accents, warm gold as a
+ * premium highlight, cream paper, charcoal ink, light grey neutrals.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-navy: var(--brand-navy);
+  --color-emerald: var(--brand-emerald);
+  --color-gold: var(--brand-gold);
+  --color-cream: var(--brand-cream);
+  --color-charcoal: var(--brand-charcoal);
+  --color-lightgrey: var(--brand-lightgrey);
+  --font-heading: "Playfair Display", ui-serif, Georgia, serif;
+  --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.75rem;
+  --fortune-header: 88px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --fortune-header: 120px;
+  }
+}
+
+:root {
+
+  /* Brand palette */
+  --brand-navy: oklch(0.22 0.055 260);       /* #0B1F3A */
+  --brand-emerald: oklch(0.46 0.10 165);     /* #0E6B50 */
+  --brand-gold: oklch(0.77 0.13 85);         /* #D6A84B */
+  --brand-cream: oklch(0.97 0.010 85);       /* #F8F5EF */
+  --brand-charcoal: oklch(0.26 0.010 260);   /* #20242A */
+  --brand-lightgrey: oklch(0.95 0.005 250);  /* #EEF1F4 */
+
+  --background: var(--brand-cream);
+  --foreground: var(--brand-charcoal);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--brand-charcoal);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--brand-charcoal);
+  --primary: var(--brand-navy);
+  --primary-foreground: var(--brand-cream);
+  --secondary: var(--brand-emerald);
+  --secondary-foreground: var(--brand-cream);
+  --muted: var(--brand-lightgrey);
+  --muted-foreground: oklch(0.42 0.02 260);
+  --accent: var(--brand-gold);
+  --accent-foreground: var(--brand-navy);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.98 0.005 85);
+  --border: oklch(0.90 0.008 250);
+  --input: oklch(0.90 0.008 250);
+  --ring: var(--brand-navy);
+  --chart-1: var(--brand-navy);
+  --chart-2: var(--brand-emerald);
+  --chart-3: var(--brand-gold);
+  --chart-4: oklch(0.65 0.1 195);
+  --chart-5: oklch(0.45 0.08 260);
+  --sidebar: var(--brand-cream);
+  --sidebar-foreground: var(--brand-charcoal);
+  --sidebar-primary: var(--brand-navy);
+  --sidebar-primary-foreground: var(--brand-cream);
+  --sidebar-accent: var(--brand-lightgrey);
+  --sidebar-accent-foreground: var(--brand-navy);
+  --sidebar-border: oklch(0.90 0.008 250);
+  --sidebar-ring: var(--brand-navy);
+}
+
+.dark {
+  --background: var(--brand-navy);
+  --foreground: var(--brand-cream);
+  --card: oklch(0.28 0.04 260);
+  --card-foreground: var(--brand-cream);
+  --popover: oklch(0.28 0.04 260);
+  --popover-foreground: var(--brand-cream);
+  --primary: var(--brand-gold);
+  --primary-foreground: var(--brand-navy);
+  --secondary: var(--brand-emerald);
+  --secondary-foreground: var(--brand-cream);
+  --muted: oklch(0.30 0.03 260);
+  --muted-foreground: oklch(0.78 0.02 250);
+  --accent: var(--brand-gold);
+  --accent-foreground: var(--brand-navy);
+  --destructive: oklch(0.65 0.2 25);
+  --destructive-foreground: oklch(0.98 0.005 85);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: var(--brand-gold);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .bg-hero-gradient {
+    background-image: linear-gradient(
+      to top,
+      oklch(0.15 0.04 260 / 0.80) 0%,
+      oklch(0.15 0.04 260 / 0.35) 55%,
+      oklch(0.15 0.04 260 / 0.10) 100%
+    );
+  }
+
+  .container-fortune {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    max-width: 80rem;
+  }
+
+  @media (min-width: 768px) {
+    .container-fortune { padding-inline: 2rem; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  }
+  .reveal.in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Cinematic reveal variants — set data-reveal on the element */
+  [data-reveal] {
+    opacity: 0;
+    will-change: opacity, transform, filter;
+    transition:
+      opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
+      filter 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  [data-reveal="up"]     { transform: translate3d(0, 40px, 0); }
+  [data-reveal="down"]   { transform: translate3d(0, -40px, 0); }
+  [data-reveal="left"]   { transform: translate3d(-48px, 0, 0); }
+  [data-reveal="right"]  { transform: translate3d(48px, 0, 0); }
+  [data-reveal="scale"]  { transform: scale(0.94); }
+  [data-reveal="blur"]   { filter: blur(14px); transform: translate3d(0, 24px, 0); }
+  [data-reveal="fade"]   { transform: none; }
+  [data-reveal].in {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  /* Parallax layer — hook sets --py in px */
+  .parallax {
+    will-change: transform;
+    transform: translate3d(0, var(--py, 0px), 0);
+    transition: transform 120ms linear;
+  }
+
+  /* Cinematic hero ken burns — slower, layered */
+  .hero-kenburns {
+    animation: hero-kb 14s ease-out both;
+  }
+  @keyframes hero-kb {
+    0%   { transform: scale(1.05) translate3d(0, 0, 0); }
+    100% { transform: scale(1.14) translate3d(-1.5%, -1%, 0); }
+  }
+
+  /* Luxury surface treatments */
+  .glass {
+    background: color-mix(in oklab, white 55%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid color-mix(in oklab, white 60%, transparent);
+  }
+  .glass-dark {
+    background: color-mix(in oklab, black 35%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid color-mix(in oklab, white 12%, transparent);
+  }
+  .card-lift {
+    transition:
+      transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 500ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 500ms ease;
+  }
+  .card-lift:hover {
+    transform: translate3d(0, -6px, 0);
+    box-shadow:
+      0 24px 48px -18px color-mix(in oklab, var(--brand-navy) 40%, transparent),
+      0 8px 20px -12px color-mix(in oklab, var(--brand-navy) 25%, transparent);
+  }
+  .shine {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .shine::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 30%,
+      color-mix(in oklab, white 55%, transparent) 50%,
+      transparent 70%
+    );
+    transform: translateX(-120%);
+    transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .shine:hover::before { transform: translateX(120%); }
+
+  /* Section-scale gradient wash */
+  .luxe-overlay {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--brand-navy) 0%, transparent) 0%,
+      color-mix(in oklab, var(--brand-navy) 45%, transparent) 65%,
+      color-mix(in oklab, var(--brand-navy) 80%, transparent) 100%
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .animate-kenburns { animation: none !important; }
+    [data-reveal] { opacity: 1; transform: none; filter: none; transition: none; }
+    .parallax { transform: none !important; }
+    .hero-kenburns { animation: none !important; }
+    .shine::before { display: none; }
+  }
+
+  .animate-kenburns {
+    animation: kenburns 12s ease-out both;
+  }
+
+  @keyframes kenburns {
+    0% { transform: scale(1.08) translate3d(0,0,0); }
+    100% { transform: scale(1.16) translate3d(-1%, -1%, 0); }
+  }
+
+  .nav-underline {
+    position: relative;
+  }
+  .nav-underline::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -6px;
+    height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+  .nav-underline:hover::after,
+  .nav-underline[data-active="true"]::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .draw-route {
+    stroke-dasharray: 1200;
+    stroke-dashoffset: 1200;
+    animation: draw 3s ease-out 0.2s forwards;
+  }
+  @keyframes draw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  /* Slideshow subtle zoom while the slide is active */
+  .kb-zoom {
+    animation: kb-zoom 4200ms ease-out both;
+  }
+  @keyframes kb-zoom {
+    from { transform: scale(1.0); }
+    to   { transform: scale(1.06); }
+  }
+
+  /* Why-us vertical auto-scroll marquee (4 images, duplicated for loop) */
+  .why-marquee {
+    animation: why-marquee-scroll 24s linear infinite;
+    will-change: transform;
+  }
+  .why-marquee:hover { animation-play-state: paused; }
+  @keyframes why-marquee-scroll {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .why-marquee { animation: none; }
+  }
+}
+
+/* Home hero: fit within first viewport on desktops */
+:root {
+  --desktop-header-height: 84px;
+  --hero-top-gap: 20px;
+  --hero-bottom-safe-space: 40px;
+}
+
+.home-hero {
+  height: calc(100svh - var(--desktop-header-height) - var(--hero-top-gap) - var(--hero-bottom-safe-space));
+  min-height: 480px;
+  max-height: 720px;
+  background-color: #f4ead8;
+}
+@supports not (height: 100svh) {
+  .home-hero {
+    height: calc(100vh - var(--desktop-header-height) - var(--hero-top-gap) - var(--hero-bottom-safe-space));
+  }
+}
+@media (min-width: 1440px) {
+  .home-hero { max-height: 720px; }
+}
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .home-hero { min-height: 460px; max-height: 640px; }
+}
+@media (min-width: 1024px) and (max-height: 800px) {
+  .home-hero { min-height: 420px; max-height: 560px; }
+}
+@media (max-width: 1023px) {
+  .home-hero {
+    height: auto;
+    aspect-ratio: 4 / 5;
+    min-height: 0;
+    max-height: none;
+  }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+  .home-hero { aspect-ratio: 16 / 10; }
+}

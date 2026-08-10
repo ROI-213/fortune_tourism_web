@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-label="White SUV on a white background">
+  <title>White SUV</title>
+  <rect width="1600" height="1000" fill="#ffffff"/>
+  <ellipse cx="800" cy="800" rx="545" ry="26" fill="rgba(18,33,59,0.10)"/>
+  <path d="M 235,640 L 235,590 C 235,548 258,515 295,505 L 505,475 C 540,468 570,452 600,440 L 640,420 C 660,405 690,398 740,398 L 1000,398 C 1050,398 1080,410 1105,430 L 1180,480 C 1215,502 1245,520 1262,545 C 1275,562 1280,580 1280,600 L 1280,640 Z" fill="#ffffff" stroke="#c9d1da" stroke-width="4"/>
+  <path d="M 235,640 L 235,590 C 235,548 258,515 295,505 L 505,475 C 540,468 570,452 600,440 L 640,420 C 660,405 690,398 740,398 L 1000,398 C 1050,398 1080,410 1105,430 L 1180,480 C 1215,502 1245,520 1262,545 C 1275,562 1280,580 1280,600 L 1280,640 L 235,640 Z" fill="#eef1f4" clip-path="url(#clipSUV)"/>
+  <clipPath id="clipSUV"><rect x="0" y="575" width="1600" height="120"/></clipPath>
+  <rect x="740" y="380" width="290" height="16" rx="8" fill="#d5dce4"/>
+  <path d="M 300,632 L 1255,632" stroke="#eef1f4" stroke-width="14"/>
+  <path d="M 580,480 L 580,452 C 595,438 640,430 700,430 L 950,430 C 985,430 1012,442 1035,462 L 1125,505 L 580,505 Z" fill="#22304a" stroke="#16202f" stroke-width="2"/>
+  <path d="M 580,480 L 580,452 C 595,438 640,430 700,430 L 820,430 L 820,480 L 580,480 Z" fill="#3d4f70"/>
+  <line x1="820" y1="432" x2="820" y2="502" stroke="#3d4f70" stroke-width="4"/>
+  <path d="M 505,500 L 478,470 C 486,462 500,458 516,456 L 548,452 L 548,498 Z" fill="#22304a" stroke="#16202f" stroke-width="2"/>
+  <line x1="560" y1="570" x2="590" y2="570" stroke="#c9d1da" stroke-width="8" stroke-linecap="round"/>
+  <line x1="1000" y1="570" x2="1030" y2="570" stroke="#c9d1da" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 250,520 L 300,505 L 300,562 L 255,572 Z" fill="#eef2f8" stroke="#c0c9d4" stroke-width="3"/>
+  <path d="M 1145,548 L 1264,563 L 1264,583 L 1150,570 Z" fill="#eef2f8" stroke="#c0c9d4" stroke-width="3"/>
+  <path d="M 1175,592 L 1275,592 L 1272,614 L 1180,614 Z" fill="#1d2430" opacity="0.85"/>
+  <circle cx="1180" cy="640" r="115" fill="#242a33"/>
+  <circle cx="1180" cy="640" r="74" fill="#e6ebf1" stroke="#9aa4af" stroke-width="10"/>
+  <circle cx="1180" cy="640" r="24" fill="#9aa4af"/>
+  <line x1="1180" y1="566" x2="1180" y2="714" stroke="#9aa4af" stroke-width="6"/>
+  <line x1="1106" y1="640" x2="1254" y2="640" stroke="#9aa4af" stroke-width="6"/>
+  <circle cx="360" cy="640" r="115" fill="#242a33"/>
+  <circle cx="360" cy="640" r="74" fill="#e6ebf1" stroke="#9aa4af" stroke-width="10"/>
+  <circle cx="360" cy="640" r="24" fill="#9aa4af"/>
+  <line x1="360" y1="566" x2="360" y2="714" stroke="#9aa4af" stroke-width="6"/>
+  <line x1="286" y1="640" x2="434" y2="640" stroke="#9aa4af" stroke-width="6"/>
+</svg>

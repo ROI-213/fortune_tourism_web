@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-label="White premium sedan on a white background">
+  <title>White premium sedan</title>
+  <rect width="1600" height="1000" fill="#ffffff"/>
+  <ellipse cx="800" cy="800" rx="555" ry="26" fill="rgba(18,33,59,0.10)"/>
+  <path d="M 220,615 L 220,580 C 220,540 240,510 275,498 L 470,478 C 520,470 550,460 585,450 L 610,438 C 630,428 660,422 700,422 L 1000,422 C 1040,422 1070,432 1095,450 L 1185,495 C 1220,512 1250,528 1272,548 C 1292,566 1300,582 1300,600 L 1300,615 Z" fill="#ffffff" stroke="#c9d1da" stroke-width="4"/>
+  <path d="M 220,615 L 220,580 C 220,540 240,510 275,498 L 470,478 C 520,470 550,460 585,450 L 610,438 C 630,428 660,422 700,422 L 1000,422 C 1040,422 1070,432 1095,450 L 1185,495 C 1220,512 1250,528 1272,548 C 1292,566 1300,582 1300,600 L 1300,615 L 220,615 Z" fill="#eef1f4" clip-path="url(#clipPremium)"/>
+  <clipPath id="clipPremium"><rect x="0" y="552" width="1600" height="120"/></clipPath>
+  <path d="M 225,610 L 1295,610" stroke="#eef1f4" stroke-width="6"/>
+  <path d="M 585,468 L 585,450 C 600,438 640,432 690,432 L 955,432 C 985,432 1010,442 1030,462 L 1135,505 L 585,505 Z" fill="#22304a" stroke="#16202f" stroke-width="2"/>
+  <path d="M 585,468 L 585,450 C 600,438 640,432 690,432 L 780,432 L 780,468 L 585,468 Z" fill="#3d4f70"/>
+  <line x1="780" y1="434" x2="780" y2="502" stroke="#3d4f70" stroke-width="4"/>
+  <line x1="605" y1="545" x2="635" y2="545" stroke="#c9d1da" stroke-width="8" stroke-linecap="round"/>
+  <line x1="1015" y1="545" x2="1045" y2="545" stroke="#c9d1da" stroke-width="8" stroke-linecap="round"/>
+  <line x1="475" y1="505" x2="295" y2="545" stroke="#d5dce4" stroke-width="3"/>
+  <line x1="1145" y1="515" x2="1115" y2="598" stroke="#d5dce4" stroke-width="3"/>
+  <path d="M 235,540 L 285,524 L 285,545 L 240,558 Z" fill="#eef2f8" stroke="#c0c9d4" stroke-width="3"/>
+  <path d="M 1178,545 L 1286,568 L 1286,584 L 1184,561 Z" fill="#eef2f8" stroke="#c0c9d4" stroke-width="3"/>
+  <path d="M 1195,588 L 1290,588 L 1287,608 L 1200,608 Z" fill="#1d2430" opacity="0.85"/>
+  <circle cx="1175" cy="608" r="105" fill="#242a33"/>
+  <circle cx="1175" cy="608" r="68" fill="#e6ebf1" stroke="#9aa4af" stroke-width="10"/>
+  <circle cx="1175" cy="608" r="22" fill="#9aa4af"/>
+  <line x1="1175" y1="540" x2="1175" y2="676" stroke="#9aa4af" stroke-width="6"/>
+  <line x1="1107" y1="608" x2="1243" y2="608" stroke="#9aa4af" stroke-width="6"/>
+  <circle cx="375" cy="608" r="105" fill="#242a33"/>
+  <circle cx="375" cy="608" r="68" fill="#e6ebf1" stroke="#9aa4af" stroke-width="10"/>
+  <circle cx="375" cy="608" r="22" fill="#9aa4af"/>
+  <line x1="375" y1="540" x2="375" y2="676" stroke="#9aa4af" stroke-width="6"/>
+  <line x1="307" y1="608" x2="443" y2="608" stroke="#9aa4af" stroke-width="6"/>
+</svg>

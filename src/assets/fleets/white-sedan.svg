@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-label="White sedan on a white background">
+  <title>White sedan</title>
+  <rect width="1600" height="1000" fill="#ffffff"/>
+  <ellipse cx="800" cy="800" rx="540" ry="26" fill="rgba(18,33,59,0.10)"/>
+  <path d="M 240,620 L 240,580 C 240,545 260,515 295,505 L 480,485 C 520,478 545,470 575,462 L 600,450 C 620,438 660,430 700,430 L 960,430 C 1000,430 1030,440 1050,455 L 1160,500 C 1190,512 1215,522 1240,535 C 1265,548 1280,565 1280,588 L 1280,620 Z" fill="#ffffff" stroke="#c9d1da" stroke-width="4"/>
+  <path d="M 240,620 L 240,580 C 240,545 260,515 295,505 L 480,485 C 520,478 545,470 575,462 L 600,450 C 620,438 660,430 700,430 L 960,430 C 1000,430 1030,440 1050,455 L 1160,500 C 1190,512 1215,522 1240,535 C 1265,548 1280,565 1280,588 L 1280,620 L 240,620 Z" fill="#eef1f4" clip-path="url(#clipSedan)"/>
+  <clipPath id="clipSedan"><rect x="0" y="555" width="1600" height="120"/></clipPath>
+  <path d="M 245,615 L 1275,615" stroke="#eef1f4" stroke-width="6"/>
+  <path d="M 600,470 L 600,452 C 612,442 645,436 685,436 L 910,436 C 940,436 966,446 988,466 L 1098,512 L 600,512 Z" fill="#22304a" stroke="#16202f" stroke-width="2"/>
+  <path d="M 600,470 L 600,452 C 612,442 645,436 685,436 L 760,436 L 760,470 L 600,470 Z" fill="#3d4f70"/>
+  <line x1="760" y1="438" x2="760" y2="508" stroke="#3d4f70" stroke-width="4"/>
+  <line x1="620" y1="555" x2="650" y2="555" stroke="#c9d1da" stroke-width="8" stroke-linecap="round"/>
+  <line x1="1000" y1="555" x2="1030" y2="555" stroke="#c9d1da" stroke-width="8" stroke-linecap="round"/>
+  <line x1="485" y1="512" x2="315" y2="550" stroke="#d5dce4" stroke-width="3"/>
+  <line x1="1110" y1="520" x2="1080" y2="600" stroke="#d5dce4" stroke-width="3"/>
+  <path d="M 255,548 L 305,532 L 305,552 L 260,564 Z" fill="#eef2f8" stroke="#c0c9d4" stroke-width="3"/>
+  <path d="M 1162,548 L 1266,572 L 1266,588 L 1168,564 Z" fill="#eef2f8" stroke="#c0c9d4" stroke-width="3"/>
+  <path d="M 1175,594 L 1275,594 L 1272,614 L 1180,614 Z" fill="#1d2430" opacity="0.85"/>
+  <circle cx="1165" cy="615" r="105" fill="#242a33"/>
+  <circle cx="1165" cy="615" r="68" fill="#e6ebf1" stroke="#9aa4af" stroke-width="10"/>
+  <circle cx="1165" cy="615" r="22" fill="#9aa4af"/>
+  <line x1="1165" y1="547" x2="1165" y2="683" stroke="#9aa4af" stroke-width="6"/>
+  <line x1="1097" y1="615" x2="1233" y2="615" stroke="#9aa4af" stroke-width="6"/>
+  <circle cx="410" cy="615" r="105" fill="#242a33"/>
+  <circle cx="410" cy="615" r="68" fill="#e6ebf1" stroke="#9aa4af" stroke-width="10"/>
+  <circle cx="410" cy="615" r="22" fill="#9aa4af"/>
+  <line x1="410" y1="547" x2="410" y2="683" stroke="#9aa4af" stroke-width="6"/>
+  <line x1="342" y1="615" x2="478" y2="615" stroke="#9aa4af" stroke-width="6"/>
+</svg>
