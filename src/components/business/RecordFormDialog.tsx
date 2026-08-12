@@ -236,7 +236,16 @@ export function RecordFormDialog({
   const [saving, setSaving] = useState(false);
 
   const setValue = (name: string, value: unknown) =>
-    setValues((prev) => ({ ...prev, [name]: value }));
+    setValues((prev) => {
+      const next = { ...prev, [name]: value };
+      if (resource.key === "customers" && name === "phone" && value) {
+        const raw = String(value).replace(/\D/g, "");
+        if (raw) {
+          next.customer_code = `CUST-${raw}`;
+        }
+      }
+      return next;
+    });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

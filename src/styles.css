@@ -404,3 +404,21 @@
 @media (min-width: 640px) and (max-width: 1023px) {
   .home-hero { aspect-ratio: 16 / 10; }
 }
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  header, footer, nav, .print\:hidden {
+    display: none !important;
+  }
+  .statement-printable-sheet {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+

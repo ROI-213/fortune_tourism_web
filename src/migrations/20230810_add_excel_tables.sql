@@ -29,11 +29,15 @@ CREATE TABLE IF NOT EXISTS customers (
 CREATE TABLE IF NOT EXISTS drivers (
     id SERIAL PRIMARY KEY,
     driver_name TEXT NOT NULL,
+    email TEXT,
+    password TEXT,
+    phone TEXT,
+    access_pin TEXT,
+    allowed_sections TEXT,
     company_name TEXT,
     state TEXT,
     city TEXT,
     area TEXT,
-    phone TEXT,
     alternate_phone TEXT,
     vehicle_type TEXT,
     vehicle_id UUID REFERENCES vehicles(id) ON DELETE SET NULL,
@@ -493,12 +497,19 @@ CREATE TABLE IF NOT EXISTS outstanding_entries (
     deleted_at TIMESTAMP WITH TIME ZONE
 );
 
+-- Ensure columns exist on drivers table if created earlier
+ALTER TABLE drivers ADD COLUMN IF NOT EXISTS email TEXT;
+ALTER TABLE drivers ADD COLUMN IF NOT EXISTS password TEXT;
+ALTER TABLE drivers ADD COLUMN IF NOT EXISTS access_pin TEXT;
+ALTER TABLE drivers ADD COLUMN IF NOT EXISTS allowed_sections TEXT;
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone);
 CREATE INDEX IF NOT EXISTS idx_day_book_date ON day_book_entries(booking_date);
 CREATE INDEX IF NOT EXISTS idx_cab_booking_date ON cab_bookings(booking_date);
 CREATE INDEX IF NOT EXISTS idx_vehicle_number ON vehicles(vehicle_number);
 CREATE INDEX IF NOT EXISTS idx_driver_phone ON drivers(phone);
+CREATE INDEX IF NOT EXISTS idx_driver_email ON drivers(email);
 CREATE INDEX IF NOT EXISTS idx_payment_date ON payments(payment_date);
 
 COMMIT;

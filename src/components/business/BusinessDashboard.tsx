@@ -19,18 +19,24 @@ import {
   Bus,
   Calculator,
   Building2,
+  PieChart,
+  FileSpreadsheet,
 } from "lucide-react";
 import { ResourceManager } from "@/components/business/ResourceManager";
+import { DailyExpenseReport } from "@/components/business/DailyExpenseReport";
+import { ClientStatementsManager } from "@/components/business/ClientStatementsManager";
 import { BUSINESS_RESOURCES, type ResourceConfig } from "@/lib/business-schema";
 
 type TabKey =
   | "overview"
+  | "client_statements"
   | "customers"
   | "day_book_entries"
   | "cab_bookings"
   | "package_trips"
   | "hourly_bookings"
   | "expenses"
+  | "daily_expense_report"
   | "accounts"
   | "account_transactions"
   | "payments"
@@ -53,12 +59,14 @@ const TABS: {
   countKey?: string;
 }[] = [
   { key: "overview", label: "Overview", icon: LayoutDashboard },
+  { key: "client_statements", label: "Client Statements", icon: FileSpreadsheet },
   { key: "customers", label: "Customers", icon: Users, countKey: "customers" },
   { key: "day_book_entries", label: "Day Book", icon: BookOpen, countKey: "day_book_entries" },
   { key: "cab_bookings", label: "Cab Bookings", icon: Car, countKey: "cab_bookings" },
   { key: "package_trips", label: "Package Trips", icon: Route, countKey: "package_trips" },
   { key: "hourly_bookings", label: "Hourly", icon: Timer, countKey: "hourly_bookings" },
   { key: "expenses", label: "Expenses", icon: Wallet, countKey: "expenses" },
+  { key: "daily_expense_report", label: "Daily Expense Report", icon: PieChart },
   { key: "accounts", label: "Accounts", icon: Landmark, countKey: "accounts" },
   {
     key: "account_transactions",
@@ -90,13 +98,13 @@ const TABS: {
   { key: "rto_agents", label: "RTO Agents", icon: Building2, countKey: "rto_agents" },
 ];
 
-const MONEY_CARDS: { label: string; color: string }[] = [
-  { label: "Total Outstanding", color: "text-red-600 bg-red-50" },
-  { label: "Day Book Due", color: "text-amber-600 bg-amber-50" },
-  { label: "Cab Bookings Due", color: "text-orange-600 bg-orange-50" },
-  { label: "Package Trips Remaining", color: "text-blue-600 bg-blue-50" },
-  { label: "Total Expenses", color: "text-purple-600 bg-purple-50" },
-  { label: "Payments Received", color: "text-emerald-600 bg-emerald-50" },
+const MONEY_CARDS: { label: string; color: string; border: string; textColor: string }[] = [
+  { label: "Total Outstanding", color: "bg-red-50", border: "border-red-200", textColor: "text-red-600" },
+  { label: "Day Book Due", color: "bg-red-50/80", border: "border-red-200", textColor: "text-red-600" },
+  { label: "Cab Bookings Due", color: "bg-red-50/60", border: "border-red-200", textColor: "text-red-600" },
+  { label: "Package Trips Remaining", color: "bg-blue-50", border: "border-blue-200", textColor: "text-blue-600" },
+  { label: "Total Expenses", color: "bg-purple-50", border: "border-purple-200", textColor: "text-purple-600" },
+  { label: "Payments Received", color: "bg-emerald-50", border: "border-emerald-200", textColor: "text-emerald-600" },
 ];
 
 const inr = (n: number) =>
@@ -318,12 +326,12 @@ export function BusinessDashboard() {
             {MONEY_CARDS.map((m) => (
               <div
                 key={m.label}
-                className="rounded-2xl border border-border bg-white p-5 shadow-sm"
+                className={`rounded-2xl border ${m.border} ${m.color} p-5 shadow-sm`}
               >
-                <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                <p className="text-xs uppercase tracking-wider text-slate-600 font-bold">
                   {m.label}
                 </p>
-                <p className="mt-1 font-heading text-2xl text-[color:var(--color-navy)] font-bold">
+                <p className={`mt-1 font-heading text-2xl font-bold ${m.textColor}`}>
                   {inr(money[m.label] ?? 0)}
                 </p>
               </div>
@@ -358,6 +366,10 @@ export function BusinessDashboard() {
               })}
           </div>
         </div>
+      ) : activeTab === "daily_expense_report" ? (
+        <DailyExpenseReport />
+      ) : activeTab === "client_statements" ? (
+        <ClientStatementsManager />
       ) : (
         <ResourceManager
           key={activeTab}

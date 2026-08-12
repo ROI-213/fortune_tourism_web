@@ -25,6 +25,8 @@ import { Route as CarRentalsVehicleIdRouteImport } from './routes/car-rentals.$v
 import { Route as DriverDashboardRouteImport } from './routes/driver/dashboard'
 import { Route as TourPackagesPackageIdRouteImport } from './routes/tour-packages.$packageId'
 import { Route as ApiBusinessResourceRouteImport } from './routes/api/business/$resource'
+import { Route as ApiBusinessHistoryRouteImport } from './routes/api/business/history'
+import { Route as ApiBusinessSettleRouteImport } from './routes/api/business/settle'
 import { Route as ApiBusinessStatsRouteImport } from './routes/api/business/stats'
 import { Route as ApiDriverLoginRouteImport } from './routes/api/driver/login'
 import { Route as ApiStorageUploadRouteImport } from './routes/api/storage/upload'
@@ -110,6 +112,16 @@ const ApiBusinessResourceRoute = ApiBusinessResourceRouteImport.update({
   path: '/api/business/$resource',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBusinessHistoryRoute = ApiBusinessHistoryRouteImport.update({
+  id: '/api/business/history',
+  path: '/api/business/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBusinessSettleRoute = ApiBusinessSettleRouteImport.update({
+  id: '/api/business/settle',
+  path: '/api/business/settle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiBusinessStatsRoute = ApiBusinessStatsRouteImport.update({
   id: '/api/business/stats',
   path: '/api/business/stats',
@@ -148,6 +160,8 @@ export interface FileRoutesByFullPath {
   '/driver/dashboard': typeof DriverDashboardRoute
   '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
   '/api/business/$resource': typeof ApiBusinessResourceRoute
+  '/api/business/history': typeof ApiBusinessHistoryRoute
+  '/api/business/settle': typeof ApiBusinessSettleRoute
   '/api/business/stats': typeof ApiBusinessStatsRoute
   '/api/driver/login': typeof ApiDriverLoginRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
@@ -170,6 +184,8 @@ export interface FileRoutesByTo {
   '/driver/dashboard': typeof DriverDashboardRoute
   '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
   '/api/business/$resource': typeof ApiBusinessResourceRoute
+  '/api/business/history': typeof ApiBusinessHistoryRoute
+  '/api/business/settle': typeof ApiBusinessSettleRoute
   '/api/business/stats': typeof ApiBusinessStatsRoute
   '/api/driver/login': typeof ApiDriverLoginRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
@@ -193,6 +209,8 @@ export interface FileRoutesById {
   '/driver/dashboard': typeof DriverDashboardRoute
   '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
   '/api/business/$resource': typeof ApiBusinessResourceRoute
+  '/api/business/history': typeof ApiBusinessHistoryRoute
+  '/api/business/settle': typeof ApiBusinessSettleRoute
   '/api/business/stats': typeof ApiBusinessStatsRoute
   '/api/driver/login': typeof ApiDriverLoginRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
@@ -217,6 +235,8 @@ export interface FileRouteTypes {
     | '/driver/dashboard'
     | '/tour-packages/$packageId'
     | '/api/business/$resource'
+    | '/api/business/history'
+    | '/api/business/settle'
     | '/api/business/stats'
     | '/api/driver/login'
     | '/api/storage/upload'
@@ -239,6 +259,8 @@ export interface FileRouteTypes {
     | '/driver/dashboard'
     | '/tour-packages/$packageId'
     | '/api/business/$resource'
+    | '/api/business/history'
+    | '/api/business/settle'
     | '/api/business/stats'
     | '/api/driver/login'
     | '/api/storage/upload'
@@ -261,6 +283,8 @@ export interface FileRouteTypes {
     | '/driver/dashboard'
     | '/tour-packages/$packageId'
     | '/api/business/$resource'
+    | '/api/business/history'
+    | '/api/business/settle'
     | '/api/business/stats'
     | '/api/driver/login'
     | '/api/storage/upload'
@@ -282,6 +306,8 @@ export interface RootRouteChildren {
   ApiVehiclesRoute: typeof ApiVehiclesRoute
   DriverDashboardRoute: typeof DriverDashboardRoute
   ApiBusinessResourceRoute: typeof ApiBusinessResourceRoute
+  ApiBusinessHistoryRoute: typeof ApiBusinessHistoryRoute
+  ApiBusinessSettleRoute: typeof ApiBusinessSettleRoute
   ApiBusinessStatsRoute: typeof ApiBusinessStatsRoute
   ApiDriverLoginRoute: typeof ApiDriverLoginRoute
   ApiStorageUploadRoute: typeof ApiStorageUploadRoute
@@ -402,6 +428,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBusinessResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/business/history': {
+      id: '/api/business/history'
+      path: '/api/business/history'
+      fullPath: '/api/business/history'
+      preLoaderRoute: typeof ApiBusinessHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/business/settle': {
+      id: '/api/business/settle'
+      path: '/api/business/settle'
+      fullPath: '/api/business/settle'
+      preLoaderRoute: typeof ApiBusinessSettleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/business/stats': {
       id: '/api/business/stats'
       path: '/api/business/stats'
@@ -472,6 +512,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiVehiclesRoute: ApiVehiclesRoute,
   DriverDashboardRoute: DriverDashboardRoute,
   ApiBusinessResourceRoute: ApiBusinessResourceRoute,
+  ApiBusinessHistoryRoute: ApiBusinessHistoryRoute,
+  ApiBusinessSettleRoute: ApiBusinessSettleRoute,
   ApiBusinessStatsRoute: ApiBusinessStatsRoute,
   ApiDriverLoginRoute: ApiDriverLoginRoute,
   ApiStorageUploadRoute: ApiStorageUploadRoute,

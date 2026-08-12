@@ -5,6 +5,8 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { PageHero } from "@/components/site/PageHero";
 import { BusinessDashboard } from "@/components/business/BusinessDashboard";
 import { ResourceManager } from "@/components/business/ResourceManager";
+import { ClientStatementsManager } from "@/components/business/ClientStatementsManager";
+import { DailyExpenseReport } from "@/components/business/DailyExpenseReport";
 import { BUSINESS_RESOURCES } from "@/lib/business-schema";
 import {
   Users,
@@ -22,6 +24,8 @@ import {
   ClipboardList,
   UserCog,
   Pencil,
+  FileSpreadsheet,
+  TrendingDown,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -78,7 +82,7 @@ interface VehicleItem {
 
 function AdminPage() {
   const [activeTab, setActiveTab] = useState<
-    "business" | "drivers" | "enquiries" | "packages" | "vehicles" | "storage"
+    "business" | "statements" | "daily_expenses" | "drivers" | "enquiries" | "packages" | "vehicles" | "storage"
   >("business");
 
   // Data states
@@ -470,6 +474,26 @@ function AdminPage() {
               <ClipboardList className="h-4 w-4" /> Business Records
             </button>
             <button
+              onClick={() => setActiveTab("statements")}
+              className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
+                activeTab === "statements"
+                  ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)]"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <FileSpreadsheet className="h-4 w-4 text-amber-600" /> Client Statements
+            </button>
+            <button
+              onClick={() => setActiveTab("daily_expenses")}
+              className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
+                activeTab === "daily_expenses"
+                  ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)]"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <TrendingDown className="h-4 w-4 text-red-600" /> Daily Expense Report
+            </button>
+            <button
               onClick={() => setActiveTab("drivers")}
               className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
                 activeTab === "drivers"
@@ -523,6 +547,12 @@ function AdminPage() {
 
           {/* TAB 0: BUSINESS RECORDS */}
           {activeTab === "business" && <BusinessDashboard />}
+
+          {/* TAB 0.2: CLIENT STATEMENTS */}
+          {activeTab === "statements" && <ClientStatementsManager />}
+
+          {/* TAB 0.3: DAILY EXPENSE REPORT */}
+          {activeTab === "daily_expenses" && <DailyExpenseReport />}
 
           {/* TAB 0.5: DRIVER ACCOUNTS */}
           {activeTab === "drivers" && (

@@ -27,6 +27,7 @@ import {
   Palmtree,
   Car,
   ShieldCheck,
+  CheckCircle2,
 } from "lucide-react";
 
 type StateSlug = TourPackage["states"][number] | "all";

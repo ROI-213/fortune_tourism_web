@@ -1,5 +1,91 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { query } from "@/lib/db";
+import sharp from "sharp";
+
+async function compressImage(
+  buffer: Buffer,
+  originalMimeType: string,
+  filename: string
+): Promise<{
+  buffer: Buffer;
+  mimeType: string;
+  filename: string;
+  compressed: boolean;
+  originalSize: number;
+  compressedSize: number;
+}> {
+  const originalSize = buffer.length;
+
+  // Only compress raster image types (JPEG, PNG, WebP, AVIF, TIFF) and skip vector formats like SVG
+  const isRasterImage =
+    originalMimeType.startsWith("image/") && !originalMimeType.includes("svg");
+
+  if (!isRasterImage) {
+    return {
+      buffer,
+      mimeType: originalMimeType,
+      filename,
+      compressed: false,
+      originalSize,
+      compressedSize: originalSize,
+    };
+  }
+
+  try {
+    const pipeline = sharp(buffer, { failOn: "none" });
+    const metadata = await pipeline.metadata();
+
+    // Resize if dimensions exceed 1920px
+    const MAX_DIMENSION = 1920;
+    if (
+      (metadata.width && metadata.width > MAX_DIMENSION) ||
+      (metadata.height && metadata.height > MAX_DIMENSION)
+    ) {
+      pipeline.resize({
+        width: MAX_DIMENSION,
+        height: MAX_DIMENSION,
+        fit: "inside",
+        withoutEnlargement: true,
+      });
+    }
+
+    // Convert/compress to webp with quality 80
+    const compressedBuffer = await pipeline
+      .webp({ quality: 80, effort: 4 })
+      .toBuffer();
+
+    // Keep compressed version only if size was reduced
+    if (compressedBuffer.length < originalSize) {
+      const nameParts = filename.split(".");
+      if (nameParts.length > 1) {
+        nameParts[nameParts.length - 1] = "webp";
+      } else {
+        nameParts.push("webp");
+      }
+      const newFilename = nameParts.join(".");
+
+      return {
+        buffer: compressedBuffer,
+        mimeType: "image/webp",
+        filename: newFilename,
+        compressed: true,
+        originalSize,
+        compressedSize: compressedBuffer.length,
+      };
+    }
+  } catch (err) {
+    console.warn("Sharp image compression warning, falling back to original file:", err);
+  }
+
+  return {
+    buffer,
+    mimeType: originalMimeType,
+    filename,
+    compressed: false,
+    originalSize,
+    compressedSize: originalSize,
+  };
+}
 
 export const Route = createFileRoute("/api/storage/upload")({
   server: {
@@ -46,6 +132,12 @@ export const Route = createFileRoute("/api/storage/upload")({
             buffer = Buffer.from(cleanBase64, "base64");
           }
 
+          // Automatically compress images before saving to storage
+          const compressionResult = await compressImage(buffer, mimeType, filename);
+          buffer = compressionResult.buffer;
+          mimeType = compressionResult.mimeType;
+          filename = compressionResult.filename;
+
           // Verify bucket exists or insert default
           await query(
             `INSERT INTO storage_buckets (id, name, is_public) VALUES ($1, $2, TRUE) ON CONFLICT (id) DO NOTHING`,
@@ -69,6 +161,12 @@ export const Route = createFileRoute("/api/storage/upload")({
               file: {
                 ...savedFile,
                 url: fileUrl,
+              },
+              compression: {
+                compressed: compressionResult.compressed,
+                originalSize: compressionResult.originalSize,
+                compressedSize: compressionResult.compressedSize,
+                savedBytes: compressionResult.originalSize - compressionResult.compressedSize,
               },
             }),
             { status: 201, headers: { "Content-Type": "application/json" } }

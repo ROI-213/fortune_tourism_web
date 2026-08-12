@@ -34,22 +34,17 @@ export const Route = createFileRoute("/api/business/$resource")({
           const limit = Math.min(Number(url.searchParams.get("limit")) || 500, 1000);
           const offset = Number(url.searchParams.get("offset")) || 0;
           const q = url.searchParams.get("q")?.trim();
+          const startDate = url.searchParams.get("startDate")?.trim();
+          const endDate = url.searchParams.get("endDate")?.trim();
 
-          const { sql, whereParams } = buildListQuery(cfg, q);
+          const { sql, countSql, whereParams } = buildListQuery(cfg, q, startDate, endDate);
 
           const sqlFinal = `${sql} ORDER BY r.${cfg.orderBy} ${cfg.orderDir || "DESC"} LIMIT ${limit} OFFSET ${offset}`;
-
-          let countSql = `SELECT COUNT(*)::int AS n FROM ${cfg.table} r`;
-          const countParams: unknown[] = [];
-          if (q && cfg.searchCols.length > 0) {
-            countSql += ` WHERE ${cfg.searchCols.map((c, i) => `r."${c}"::text ILIKE $${i + 1}`).join(" OR ")}`;
-            countParams.push(...Array.from({ length: cfg.searchCols.length }, () => `%${q}%`));
-          }
 
           // Execute data query and count query concurrently
           const [res, countRes] = await Promise.all([
             query(sqlFinal, whereParams),
-            query(countSql, countParams),
+            query(countSql, whereParams),
           ]);
 
           return new Response(
@@ -81,6 +76,21 @@ export const Route = createFileRoute("/api/business/$resource")({
           }
           const cfg = getResourceConfig(resource)!;
           const body = await request.json();
+
+          // Auto generation logic for serial_number, customer_code, booking_number, trip_number
+          if (cfg.key === "customers" && !body.customer_code) {
+            const rawPhone = String(body.phone || "").replace(/\D/g, "");
+            body.customer_code = rawPhone ? `CUST-${rawPhone}` : `CUST-${Math.floor(100000 + Math.random() * 900000)}`;
+          }
+          if (cfg.key === "day_book_entries" && !body.serial_number) {
+            body.serial_number = `SB-${Math.floor(1000 + Math.random() * 9000)}`;
+          }
+          if ((cfg.key === "cab_bookings" || cfg.key === "hourly_bookings") && !body.booking_number) {
+            body.booking_number = `BK-${Math.floor(10000 + Math.random() * 90000)}`;
+          }
+          if (cfg.key === "package_trips" && !body.trip_number) {
+            body.trip_number = `TRIP-${Math.floor(10000 + Math.random() * 90000)}`;
+          }
 
           const columns: string[] = [];
           const placeholders: string[] = [];
@@ -236,11 +246,31 @@ function buildColumns(cfg: ResourceConfig): string[] {
   return cols;
 }
 
-function buildSearchParams(cfg: ResourceConfig, q: string): unknown[] {
-  return Array.from({ length: cfg.searchCols.length }, () => `%${q}%`);
+function getDateColumn(cfg: ResourceConfig): string {
+  // Check common date fields in priority order
+  const candidates = [
+    "booking_date",
+    "expense_date",
+    "journey_date",
+    "transaction_date",
+    "payment_date",
+    "travel_date",
+    "created_at",
+  ];
+  for (const c of candidates) {
+    if (cfg.fields.some((f) => f.name === c) || cfg.tableColumns.includes(c)) {
+      return c;
+    }
+  }
+  return "created_at";
 }
 
-function buildListQuery(cfg: ResourceConfig, q?: string): { sql: string; whereParams: unknown[] } {
+function buildListQuery(
+  cfg: ResourceConfig,
+  q?: string,
+  startDate?: string,
+  endDate?: string,
+): { sql: string; countSql: string; whereParams: unknown[] } {
   // LEFT JOIN every reference field so the UI can display friendly labels.
   const joins: string[] = [];
   const selectCols = [`r.*`];
@@ -255,15 +285,34 @@ function buildListQuery(cfg: ResourceConfig, q?: string): { sql: string; wherePa
     }
   }
 
-  let where = "";
+  const whereConditions: string[] = [];
   const whereParams: unknown[] = [];
+
   if (q && cfg.searchCols.length > 0) {
-    where = ` WHERE ${cfg.searchCols.map((c, i) => `r."${c}"::text ILIKE $${i + 1}`).join(" OR ")}`;
-    whereParams.push(...Array.from({ length: cfg.searchCols.length }, () => `%${q}%`));
+    const searchConds = cfg.searchCols.map((c) => {
+      whereParams.push(`%${q}%`);
+      return `r."${c}"::text ILIKE $${whereParams.length}`;
+    });
+    whereConditions.push(`(${searchConds.join(" OR ")})`);
   }
 
+  if (startDate || endDate) {
+    const dateCol = getDateColumn(cfg);
+    if (startDate) {
+      whereParams.push(startDate);
+      whereConditions.push(`r."${dateCol}"::date >= $${whereParams.length}::date`);
+    }
+    if (endDate) {
+      whereParams.push(endDate);
+      whereConditions.push(`r."${dateCol}"::date <= $${whereParams.length}::date`);
+    }
+  }
+
+  const whereClause = whereConditions.length > 0 ? ` WHERE ${whereConditions.join(" AND ")}` : "";
+
   return {
-    sql: `SELECT ${selectCols.join(", ")} FROM ${cfg.table} r${joins.length ? " " + joins.join(" ") : ""}${where}`,
+    sql: `SELECT ${selectCols.join(", ")} FROM ${cfg.table} r${joins.length ? " " + joins.join(" ") : ""}${whereClause}`,
+    countSql: `SELECT COUNT(*)::int AS n FROM ${cfg.table} r${whereClause}`,
     whereParams,
   };
 }
