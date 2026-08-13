@@ -40,6 +40,7 @@ export function DailyExpenseReport() {
   const [expenses, setExpenses] = useState<ExpenseRow[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>("");
+  const [showCalendarView, setShowCalendarView] = useState<boolean>(true);
 
   // New Quick Expense Form
   const [showAddForm, setShowAddForm] = useState<boolean>(false);
@@ -210,6 +211,18 @@ export function DailyExpenseReport() {
           </div>
 
           <button
+            onClick={() => setShowCalendarView((prev) => !prev)}
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition shadow-sm ${
+              showCalendarView
+                ? "bg-red-600 text-white border-red-600"
+                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+            }`}
+          >
+            <Calendar className="h-3.5 w-3.5" />
+            {showCalendarView ? "Hide Calendar" : "Daily Calendar"}
+          </button>
+
+          <button
             onClick={() => window.print()}
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
           >
@@ -224,6 +237,66 @@ export function DailyExpenseReport() {
           </button>
         </div>
       </div>
+
+      {/* Interactive Daily Calendar View Section */}
+      {showCalendarView && (
+        <div className="bg-white p-5 rounded-2xl border border-red-200 shadow-md space-y-4 animate-fadeIn print:hidden">
+          <div className="flex items-center justify-between border-b pb-3">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-red-600" />
+              <h3 className="font-bold text-slate-900 text-base">
+                Daily Expense Calendar Selector — {new Date(selectedDate).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+              </h3>
+            </div>
+            <span className="text-xs text-slate-500 font-medium">Click any date to switch report view</span>
+          </div>
+
+          <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
+            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+              <div key={day} className="py-1 bg-slate-50 rounded-lg">{day}</div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7 gap-2">
+            {(() => {
+              const curDate = new Date(selectedDate);
+              const year = curDate.getFullYear();
+              const month = curDate.getMonth();
+              const firstDay = new Date(year, month, 1).getDay();
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              const cells = [];
+
+              for (let i = 0; i < firstDay; i++) {
+                cells.push(<div key={`blank-${i}`} className="h-12 rounded-xl bg-slate-50/50" />);
+              }
+
+              for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+                const isSelected = dateStr === selectedDate;
+                const isToday = dateStr === new Date().toISOString().slice(0, 10);
+
+                cells.push(
+                  <button
+                    key={d}
+                    onClick={() => setSelectedDate(dateStr)}
+                    className={`h-12 rounded-xl flex flex-col items-center justify-center font-bold text-xs transition border ${
+                      isSelected
+                        ? "bg-red-600 text-white border-red-700 shadow-md ring-2 ring-red-400/40"
+                        : isToday
+                        ? "bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100"
+                        : "bg-white text-slate-800 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
+                    }`}
+                  >
+                    <span>{d}</span>
+                    {isSelected && <span className="text-[9px] font-normal opacity-90">Selected</span>}
+                  </button>
+                );
+              }
+              return cells;
+            })()}
+          </div>
+        </div>
+      )}
 
       {/* Everyday Financial Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

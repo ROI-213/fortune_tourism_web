@@ -30,6 +30,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
+import { TourPackageTicketCopySection } from "@/components/packages/TourPackageTicketCopySection";
+
 type StateSlug = TourPackage["states"][number] | "all";
 
 export const Route = createFileRoute("/tour-packages")({
@@ -227,6 +229,8 @@ function TourPackagesPage() {
           </div>
         </div>
       </div>
+
+
 
       {/* Section 3 — Featured editorial */}
       <section className="py-14">
@@ -655,6 +659,9 @@ function PackageCard({
           loading="lazy"
           width={800}
           height={600}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/assets/pkg-mysuru-palace.jpg";
+          }}
         />
         <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-[10px] font-semibold text-[color:var(--color-navy)]">
           {stateNames}

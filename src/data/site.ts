@@ -98,6 +98,7 @@ export const faqs = [
 
 export const NAV = [
   { to: "/", label: "Home" },
+  { to: "/booking", label: "Booking" },
   { to: "/car-rentals", label: "Car Rentals" },
   { to: "/tour-packages", label: "Tour Packages" },
   { to: "/airport-transfer", label: "Airport Transfer" },

@@ -474,6 +474,37 @@ export function ClientStatementsManager() {
 
   return (
     <div className="space-y-6">
+      <style>{`
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 8mm;
+          }
+          body * {
+            visibility: hidden;
+          }
+          .statement-printable-sheet, .statement-printable-sheet * {
+            visibility: visible;
+          }
+          .statement-printable-sheet {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            transform: scale(0.92);
+            transform-origin: top left;
+          }
+          .print\\:hidden {
+            display: none !important;
+          }
+        }
+      `}</style>
       {/* Header section */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b pb-5">
         <div>

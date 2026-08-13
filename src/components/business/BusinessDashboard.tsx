@@ -25,10 +25,12 @@ import {
 import { ResourceManager } from "@/components/business/ResourceManager";
 import { DailyExpenseReport } from "@/components/business/DailyExpenseReport";
 import { ClientStatementsManager } from "@/components/business/ClientStatementsManager";
+import { OfflineSectorBookingHub } from "@/components/business/OfflineSectorBookingHub";
 import { BUSINESS_RESOURCES, type ResourceConfig } from "@/lib/business-schema";
 
 type TabKey =
   | "overview"
+  | "offline_hub"
   | "client_statements"
   | "customers"
   | "day_book_entries"
@@ -59,6 +61,7 @@ const TABS: {
   countKey?: string;
 }[] = [
   { key: "overview", label: "Overview", icon: LayoutDashboard },
+  { key: "offline_hub", label: "Offline Sector Bookings", icon: ClipboardList },
   { key: "client_statements", label: "Client Statements", icon: FileSpreadsheet },
   { key: "customers", label: "Customers", icon: Users, countKey: "customers" },
   { key: "day_book_entries", label: "Day Book", icon: BookOpen, countKey: "day_book_entries" },
@@ -366,6 +369,8 @@ export function BusinessDashboard() {
               })}
           </div>
         </div>
+      ) : activeTab === "offline_hub" ? (
+        <OfflineSectorBookingHub />
       ) : activeTab === "daily_expense_report" ? (
         <DailyExpenseReport />
       ) : activeTab === "client_statements" ? (

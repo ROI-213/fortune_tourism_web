@@ -16,6 +16,7 @@ import { TravelServicesSection } from "@/components/home/TravelServicesSection";
 import { FleetBanner } from "@/components/home/FleetBanner";
 import { FleetShowcase } from "@/components/home/FleetShowcase";
 import { PremiumQuickEnquiry } from "@/components/home/PremiumQuickEnquiry";
+import { FrontEndTravelBookingSection } from "@/components/home/FrontEndTravelBookingSection";
 import karnatakaHeroAsset from "@/assets/karnataka-hero.jpg";
 const karnatakaHero = karnatakaHeroAsset;
 import andhraHeroAsset from "@/assets/andhra-hero.jpg";
@@ -75,6 +76,7 @@ function HomePage() {
   return (
     <SiteLayout>
       <KarnatakaHero />
+      <FrontEndTravelBookingSection />
       <PremiumQuickEnquiry />
       <TrustStatistics />
       <TravelServicesSection />

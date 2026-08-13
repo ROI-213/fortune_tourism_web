@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AirportTransferRouteImport } from './routes/airport-transfer'
+import { Route as BookingRouteImport } from './routes/booking'
 import { Route as CarRentalsRouteImport } from './routes/car-rentals'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DriverLoginRouteImport } from './routes/driver-login'
@@ -45,6 +46,11 @@ const AdminRoute = AdminRouteImport.update({
 const AirportTransferRoute = AirportTransferRouteImport.update({
   id: '/airport-transfer',
   path: '/airport-transfer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingRoute = BookingRouteImport.update({
+  id: '/booking',
+  path: '/booking',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CarRentalsRoute = CarRentalsRouteImport.update({
@@ -147,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/airport-transfer': typeof AirportTransferRoute
+  '/booking': typeof BookingRoute
   '/car-rentals': typeof CarRentalsRouteWithChildren
   '/contact': typeof ContactRoute
   '/driver-login': typeof DriverLoginRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/airport-transfer': typeof AirportTransferRoute
+  '/booking': typeof BookingRoute
   '/car-rentals': typeof CarRentalsRouteWithChildren
   '/contact': typeof ContactRoute
   '/driver-login': typeof DriverLoginRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/airport-transfer': typeof AirportTransferRoute
+  '/booking': typeof BookingRoute
   '/car-rentals': typeof CarRentalsRouteWithChildren
   '/contact': typeof ContactRoute
   '/driver-login': typeof DriverLoginRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/airport-transfer'
+    | '/booking'
     | '/car-rentals'
     | '/contact'
     | '/driver-login'
@@ -246,6 +256,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/airport-transfer'
+    | '/booking'
     | '/car-rentals'
     | '/contact'
     | '/driver-login'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/airport-transfer'
+    | '/booking'
     | '/car-rentals'
     | '/contact'
     | '/driver-login'
@@ -295,6 +307,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AirportTransferRoute: typeof AirportTransferRoute
+  BookingRoute: typeof BookingRoute
   CarRentalsRoute: typeof CarRentalsRouteWithChildren
   ContactRoute: typeof ContactRoute
   DriverLoginRoute: typeof DriverLoginRoute
@@ -335,6 +348,13 @@ declare module '@tanstack/react-router' {
       path: '/airport-transfer'
       fullPath: '/airport-transfer'
       preLoaderRoute: typeof AirportTransferRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking': {
+      id: '/booking'
+      path: '/booking'
+      fullPath: '/booking'
+      preLoaderRoute: typeof BookingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/car-rentals': {
@@ -501,6 +521,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AirportTransferRoute: AirportTransferRoute,
+  BookingRoute: BookingRoute,
   CarRentalsRoute: CarRentalsRouteWithChildren,
   ContactRoute: ContactRoute,
   DriverLoginRoute: DriverLoginRoute,

@@ -503,6 +503,37 @@ ALTER TABLE drivers ADD COLUMN IF NOT EXISTS password TEXT;
 ALTER TABLE drivers ADD COLUMN IF NOT EXISTS access_pin TEXT;
 ALTER TABLE drivers ADD COLUMN IF NOT EXISTS allowed_sections TEXT;
 
+-- Ensure passenger columns exist on flight_bookings, train_bookings, bus_bookings
+ALTER TABLE flight_bookings ADD COLUMN IF NOT EXISTS passenger_name TEXT;
+ALTER TABLE flight_bookings ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE flight_bookings ADD COLUMN IF NOT EXISTS date_of_birth DATE;
+ALTER TABLE flight_bookings ADD COLUMN IF NOT EXISTS passenger_age INTEGER;
+ALTER TABLE flight_bookings ADD COLUMN IF NOT EXISTS passenger_gender TEXT;
+ALTER TABLE flight_bookings ADD COLUMN IF NOT EXISTS infant TEXT;
+ALTER TABLE flight_bookings ADD COLUMN IF NOT EXISTS passport_id TEXT;
+ALTER TABLE flight_bookings ADD COLUMN IF NOT EXISTS ticket_number TEXT;
+ALTER TABLE flight_bookings ADD COLUMN IF NOT EXISTS seat_number TEXT;
+ALTER TABLE flight_bookings ADD COLUMN IF NOT EXISTS customer_id INTEGER;
+
+ALTER TABLE train_bookings ADD COLUMN IF NOT EXISTS passenger_name TEXT;
+ALTER TABLE train_bookings ADD COLUMN IF NOT EXISTS passenger_phone TEXT;
+ALTER TABLE train_bookings ADD COLUMN IF NOT EXISTS date_of_birth DATE;
+ALTER TABLE train_bookings ADD COLUMN IF NOT EXISTS passenger_age INTEGER;
+ALTER TABLE train_bookings ADD COLUMN IF NOT EXISTS infant TEXT;
+ALTER TABLE train_bookings ADD COLUMN IF NOT EXISTS seat_berth TEXT;
+ALTER TABLE train_bookings ADD COLUMN IF NOT EXISTS amount NUMERIC(12,2);
+ALTER TABLE train_bookings ADD COLUMN IF NOT EXISTS ticket_status TEXT;
+ALTER TABLE train_bookings ADD COLUMN IF NOT EXISTS customer_id INTEGER;
+
+ALTER TABLE bus_bookings ADD COLUMN IF NOT EXISTS passenger_name TEXT;
+ALTER TABLE bus_bookings ADD COLUMN IF NOT EXISTS passenger_phone TEXT;
+ALTER TABLE bus_bookings ADD COLUMN IF NOT EXISTS date_of_birth DATE;
+ALTER TABLE bus_bookings ADD COLUMN IF NOT EXISTS passenger_age INTEGER;
+ALTER TABLE bus_bookings ADD COLUMN IF NOT EXISTS infant TEXT;
+ALTER TABLE bus_bookings ADD COLUMN IF NOT EXISTS seat_number TEXT;
+ALTER TABLE bus_bookings ADD COLUMN IF NOT EXISTS amount NUMERIC(12,2);
+ALTER TABLE bus_bookings ADD COLUMN IF NOT EXISTS customer_id INTEGER;
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone);
 CREATE INDEX IF NOT EXISTS idx_day_book_date ON day_book_entries(booking_date);

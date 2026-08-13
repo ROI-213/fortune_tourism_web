@@ -146,6 +146,9 @@ function PackageCard({
           alt={pkg.title}
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/assets/pkg-mysuru-palace.jpg";
+          }}
         />
         <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#0D3B2A] px-3 py-1 text-xs font-medium text-white shadow">
           <Clock className="h-3.5 w-3.5" /> {pkg.duration}
