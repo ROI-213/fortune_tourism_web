@@ -7,7 +7,7 @@ interface LocationSearchInputProps {
   placeholder?: string;
   value: string;
   onChange: (val: string, loc?: LocationItem) => void;
-  filterType?: "flight" | "bus" | "train";
+  filterType?: "flight" | "bus" | "train" | "taxi";
   icon?: React.ComponentType<{ className?: string }>;
   error?: string;
   className?: string;
@@ -117,7 +117,7 @@ export function LocationSearchInput({
             </span>
           ) : (
             part
-          )
+          ),
         )}
       </span>
     );
@@ -134,8 +134,8 @@ export function LocationSearchInput({
           error
             ? "border-red-500 ring-2 ring-red-100"
             : isOpen
-            ? "border-amber-500 ring-2 ring-amber-100 shadow-md"
-            : "border-slate-300 hover:border-slate-400"
+              ? "border-amber-500 ring-2 ring-amber-100 shadow-md"
+              : "border-slate-300 hover:border-slate-400"
         }`}
       >
         <div className="pl-3.5 pr-2 text-slate-400">

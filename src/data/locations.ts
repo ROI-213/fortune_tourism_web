@@ -163,7 +163,7 @@ export const LOCATIONS: LocationItem[] = [
     code: "DEL",
     type: "airport",
     aliases: ["del", "delhi", "new delhi", "igi", "indira gandhi"],
-    coords: { lat: 28.5562, lng: 77.1, },
+    coords: { lat: 28.5562, lng: 77.1 },
   },
   {
     id: "new-delhi-station",
@@ -336,7 +336,7 @@ export const LOCATIONS: LocationItem[] = [
  */
 export function searchLocations(
   query: string,
-  filterType?: "flight" | "bus" | "train"
+  filterType?: "flight" | "bus" | "train" | "taxi",
 ): LocationItem[] {
   const q = query.trim().toLowerCase().replace(/\s+/g, "");
   if (!q) return LOCATIONS.slice(0, 8);
@@ -350,8 +350,10 @@ export function searchLocations(
     const nameMatch = loc.name.toLowerCase().replace(/\s+/g, "").includes(q);
     const cityMatch = loc.city.toLowerCase().replace(/\s+/g, "").includes(q);
     const codeMatch = loc.code ? loc.code.toLowerCase().includes(q) : false;
-    const aliasMatch = loc.aliases.some((alias) =>
-      alias.toLowerCase().replace(/\s+/g, "").includes(q) || q.includes(alias.toLowerCase().replace(/\s+/g, ""))
+    const aliasMatch = loc.aliases.some(
+      (alias) =>
+        alias.toLowerCase().replace(/\s+/g, "").includes(q) ||
+        q.includes(alias.toLowerCase().replace(/\s+/g, "")),
     );
 
     return nameMatch || cityMatch || codeMatch || aliasMatch;
@@ -386,10 +388,7 @@ export async function detectUserLocation(): Promise<{
 
         for (const loc of LOCATIONS) {
           if (loc.coords) {
-            const dist = Math.hypot(
-              loc.coords.lat - latitude,
-              loc.coords.lng - longitude
-            );
+            const dist = Math.hypot(loc.coords.lat - latitude, loc.coords.lng - longitude);
             if (dist < minDistance) {
               minDistance = dist;
               closestLocation = loc;
@@ -410,7 +409,7 @@ export async function detectUserLocation(): Promise<{
         }
         resolve({ success: false, error: msg });
       },
-      { timeout: 10000, enableHighAccuracy: true }
+      { timeout: 10000, enableHighAccuracy: true },
     );
   });
 }

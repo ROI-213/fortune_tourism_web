@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { Printer, Calendar, MapPin, Phone, User, CheckCircle2, Ticket, Sparkles, ChevronDown } from "lucide-react";
+import {
+  Printer,
+  Calendar,
+  MapPin,
+  Phone,
+  User,
+  CheckCircle2,
+  Ticket,
+  Sparkles,
+  ChevronDown,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface TourPackageOption {
@@ -20,26 +30,30 @@ export function TourPackageTicketCopySection() {
   const [passengerCount, setPassengerCount] = useState<number>(1);
   const [showBookingForm, setShowBookingForm] = useState<boolean>(true);
 
-  // Ticket Copy form state matching image 3
-  const [customer, setCustomer] = useState("FORTUNE GROUP");
-  const [customerPhone, setCustomerPhone] = useState("9845003000");
+  // Ticket Copy form state matching attached format
+  const [travellingType, setTravellingType] = useState("CAR");
+  const [passengerName, setPassengerName] = useState("FORTUNE GROUP");
+  const [passengerPhoneNo, setPassengerPhoneNo] = useState("9845003000");
   const [tourType, setTourType] = useState("LOCAL TRIP");
   const [ticketNumber, setTicketNumber] = useState("FT3423CZ");
   const [pnrNumber, setPnrNumber] = useState("FC17G3423");
-  const [departureOn, setDepartureOn] = useState("14-07-2026 10:45 AM");
+  const [departureOn, setDepartureOn] = useState("14-07-2017.10.45");
   const [tripType, setTripType] = useState("PACKAGE");
   const [typeOfCar, setTypeOfCar] = useState("MARUTI SUZUKI CIAZ");
   const [boardingPoint, setBoardingPoint] = useState("BANGALORE AIRPORT");
-  const [busName, setBusName] = useState("VRL");
+  const [fromPoint, setFromPoint] = useState("BANGALORE");
+  const [toPoint, setToPoint] = useState("BANGALORE");
+  const [driverName, setDriverName] = useState("ZAMEER");
   const [phoneNo, setPhoneNo] = useState("9740463404");
   const [taxiNumber, setTaxiNumber] = useState("KA 51 AA 598");
   const [packageName, setPackageName] = useState("BANGALORE SIGHT SEEING ONE DAY");
-  const [exactBoardingPoint, setExactBoardingPoint] = useState("AKASH GUEST HOUSE BOMMASANDRA BANGALORE");
+  const [exactBoardingPoint, setExactBoardingPoint] = useState(
+    "AKASH GUEST HOUSE BOMMASANDRA BANGALORE",
+  );
   const [amount, setAmount] = useState<number>(1000);
-  const [balanceAmount, setBalanceAmount] = useState<number>(8000);
+  const [balanceAmount, setBalanceAmount] = useState<number>(9000);
+  const [totalAmount, setTotalAmount] = useState<number>(9000);
   const [payBy, setPayBy] = useState("G PAY");
-
-  const totalAmount = amount + balanceAmount;
 
   const handleSelectPackage = (pkg: TourPackageOption) => {
     setSelectedPkg(pkg);
@@ -111,7 +125,9 @@ export function TourPackageTicketCopySection() {
                       key={idx}
                       className={`transition ${isSelected ? "bg-emerald-50/70" : "hover:bg-slate-50"}`}
                     >
-                      <td className="py-3 px-3 text-slate-700 whitespace-nowrap font-bold">{pkg.duration}</td>
+                      <td className="py-3 px-3 text-slate-700 whitespace-nowrap font-bold">
+                        {pkg.duration}
+                      </td>
                       <td className="py-3 px-3 text-slate-900 font-extrabold">{pkg.name}</td>
                       <td className="py-3 px-3 text-center whitespace-nowrap">
                         <button
@@ -139,7 +155,8 @@ export function TourPackageTicketCopySection() {
               Package Customization Note:
             </p>
             <p className="text-[11px] text-amber-800">
-              Same Type For 2 Days Tour And More Schedule Follow The Samething Day 3 Night 4 Days or As Our Itinerary Shows.
+              Same Type For 2 Days Tour And More Schedule Follow The Samething Day 3 Night 4 Days or
+              As Our Itinerary Shows.
             </p>
             <p className="text-[11px] text-amber-800 font-semibold">
               Same Type Follow As Train, Bus, Flight Columns.
@@ -154,9 +171,7 @@ export function TourPackageTicketCopySection() {
               <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 block">
                 Official Ticket Voucher Generator
               </span>
-              <h3 className="font-heading text-xl font-bold text-slate-900">
-                Ticket Booking Form
-              </h3>
+              <h3 className="font-heading text-xl font-bold text-slate-900">Ticket Booking Form</h3>
             </div>
             <button
               type="button"
@@ -188,89 +203,48 @@ export function TourPackageTicketCopySection() {
 
           {/* TICKET COPY FOR YOUR JOURNEY (Table Layout matching attached Image 3) */}
           <div className="ticket-copy-print-area border-2 border-slate-900 rounded-2xl overflow-hidden bg-white p-4 space-y-4">
-            <div className="bg-slate-900 text-white text-center py-2 font-extrabold text-sm uppercase tracking-widest rounded-xl">
-              Ticket Copy For Your Journey — Fortune Tourism
+            <div className="space-y-2">
+              <div className="bg-slate-900 text-white text-center py-2 font-extrabold text-sm uppercase tracking-widest rounded-xl">
+                Ticket Copy For Your Journey
+              </div>
+              <p className="text-center text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">
+                This Copy For After Confirming The Driver &amp; Cab/Bus/Flight Details
+              </p>
+              <div className="text-center text-[11px] font-bold text-slate-900 leading-relaxed">
+                <p>
+                  Address: No.256/A Next To Narayana Hospital, Health City, Bommasandra, Bangalore.
+                  560099
+                </p>
+                <p>Phone No: +91 9740463404</p>
+              </div>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse border border-slate-900 font-semibold">
                 <tbody>
                   <tr className="border-b border-slate-900 divide-x divide-slate-900">
-                    <td className="p-2 bg-slate-100 font-bold w-28">Customer:</td>
-                    <td className="p-2">
-                      <input
-                        type="text"
-                        value={customer}
-                        onChange={(e) => setCustomer(e.target.value)}
-                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
-                      />
-                    </td>
-                    <td className="p-2 bg-slate-100 font-bold w-36">Customer Phone No.:</td>
-                    <td className="p-2">
-                      <input
-                        type="text"
-                        value={customerPhone}
-                        onChange={(e) => setCustomerPhone(e.target.value)}
-                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
-                      />
-                    </td>
-                    <td className="p-2 bg-slate-100 font-bold w-24">Tour Type</td>
-                    <td className="p-2">
-                      <input
-                        type="text"
-                        value={tourType}
-                        onChange={(e) => setTourType(e.target.value)}
-                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
-                      />
+                    <td className="p-2 bg-slate-100 font-bold w-40">Type of Travelling</td>
+                    <td colSpan={5} className="p-2">
+                      <select
+                        value={travellingType}
+                        onChange={(e) => setTravellingType(e.target.value)}
+                        className="w-full font-extrabold text-slate-900 bg-amber-50 p-1.5 rounded-lg border border-amber-300 focus:outline-none cursor-pointer"
+                      >
+                        <option value="CAR">CAR</option>
+                        <option value="BUS">BUS</option>
+                        <option value="FLIGHT">FLIGHT</option>
+                        <option value="TRAIN">TRAIN</option>
+                      </select>
                     </td>
                   </tr>
 
                   <tr className="border-b border-slate-900 divide-x divide-slate-900">
-                    <td className="p-2 bg-slate-100 font-bold">Ticket Number:</td>
-                    <td className="p-2 font-mono font-bold">{ticketNumber}</td>
-                    <td className="p-2 bg-slate-100 font-bold">PNR Number:</td>
-                    <td className="p-2 font-mono font-bold">{pnrNumber}</td>
-                    <td className="p-2 bg-slate-100 font-bold">Departure On:</td>
+                    <td className="p-2 bg-slate-100 font-bold">Driver Name:</td>
                     <td className="p-2">
                       <input
                         type="text"
-                        value={departureOn}
-                        onChange={(e) => setDepartureOn(e.target.value)}
-                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
-                      />
-                    </td>
-                  </tr>
-
-                  <tr className="border-b border-slate-900 divide-x divide-slate-900">
-                    <td className="p-2 bg-slate-100 font-bold">Trip Type:</td>
-                    <td className="p-2">{tripType}</td>
-                    <td className="p-2 bg-slate-100 font-bold">Type Of Car:</td>
-                    <td className="p-2">
-                      <input
-                        type="text"
-                        value={typeOfCar}
-                        onChange={(e) => setTypeOfCar(e.target.value)}
-                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
-                      />
-                    </td>
-                    <td className="p-2 bg-slate-100 font-bold">Boarding point:</td>
-                    <td className="p-2">
-                      <input
-                        type="text"
-                        value={boardingPoint}
-                        onChange={(e) => setBoardingPoint(e.target.value)}
-                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
-                      />
-                    </td>
-                  </tr>
-
-                  <tr className="border-b border-slate-900 divide-x divide-slate-900">
-                    <td className="p-2 bg-slate-100 font-bold">BUS NAME</td>
-                    <td className="p-2">
-                      <input
-                        type="text"
-                        value={busName}
-                        onChange={(e) => setBusName(e.target.value)}
+                        value={driverName}
+                        onChange={(e) => setDriverName(e.target.value)}
                         className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
                       />
                     </td>
@@ -311,12 +285,126 @@ export function TourPackageTicketCopySection() {
                   </tr>
 
                   <tr className="border-b border-slate-900 divide-x divide-slate-900">
-                    <td className="p-2 bg-slate-100 font-bold">Amount</td>
-                    <td className="p-2 font-bold">Rs: {amount}</td>
+                    <td className="p-2 bg-slate-100 font-bold w-28">Passenger Name:</td>
+                    <td className="p-2">
+                      <input
+                        type="text"
+                        value={passengerName}
+                        onChange={(e) => setPassengerName(e.target.value)}
+                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
+                      />
+                    </td>
+                    <td className="p-2 bg-slate-100 font-bold w-36">Passenger Phone No.:</td>
+                    <td className="p-2">
+                      <input
+                        type="text"
+                        value={passengerPhoneNo}
+                        onChange={(e) => setPassengerPhoneNo(e.target.value)}
+                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
+                      />
+                    </td>
+                    <td className="p-2 bg-slate-100 font-bold w-24">Tour Type</td>
+                    <td className="p-2">
+                      <input
+                        type="text"
+                        value={tourType}
+                        onChange={(e) => setTourType(e.target.value)}
+                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
+                      />
+                    </td>
+                  </tr>
+
+                  <tr className="border-b border-slate-900 divide-x divide-slate-900">
+                    <td className="p-2 bg-slate-100 font-bold w-28">FROM</td>
+                    <td colSpan={2} className="p-2">
+                      <input
+                        type="text"
+                        value={fromPoint}
+                        onChange={(e) => setFromPoint(e.target.value)}
+                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
+                      />
+                    </td>
+                    <td className="p-2 bg-slate-100 font-bold w-28">TO:</td>
+                    <td colSpan={2} className="p-2">
+                      <input
+                        type="text"
+                        value={toPoint}
+                        onChange={(e) => setToPoint(e.target.value)}
+                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
+                      />
+                    </td>
+                  </tr>
+
+                  <tr className="border-b border-slate-900 divide-x divide-slate-900">
+                    <td className="p-2 bg-slate-100 font-bold">Ticket Number:</td>
+                    <td className="p-2 font-mono font-bold">{ticketNumber}</td>
+                    <td className="p-2 bg-slate-100 font-bold">PNR Number:</td>
+                    <td className="p-2 font-mono font-bold">{pnrNumber}</td>
+                    <td className="p-2 bg-slate-100 font-bold">Departure On:</td>
+                    <td className="p-2">
+                      <input
+                        type="text"
+                        value={departureOn}
+                        onChange={(e) => setDepartureOn(e.target.value)}
+                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
+                      />
+                    </td>
+                  </tr>
+
+                  <tr className="border-b border-slate-900 divide-x divide-slate-900">
+                    <td className="p-2 bg-slate-100 font-bold">Trip Type:</td>
+                    <td className="p-2">{tripType}</td>
+                    <td className="p-2 bg-slate-100 font-bold">Type Of Car:/bus/Flight</td>
+                    <td className="p-2">
+                      <input
+                        type="text"
+                        value={typeOfCar}
+                        onChange={(e) => setTypeOfCar(e.target.value)}
+                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
+                      />
+                    </td>
+                    <td className="p-2 bg-slate-100 font-bold">Boarding point:</td>
+                    <td className="p-2">
+                      <input
+                        type="text"
+                        value={boardingPoint}
+                        onChange={(e) => setBoardingPoint(e.target.value)}
+                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
+                      />
+                    </td>
+                  </tr>
+
+                  <tr className="border-b border-slate-900 divide-x divide-slate-900">
+                    <td className="p-2 bg-slate-100 font-bold">Advance Amount</td>
+                    <td className="p-2 flex items-center gap-0.5">
+                      <span className="text-slate-700">Rs.</span>
+                      <input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(Number(e.target.value))}
+                        className="w-full font-bold text-slate-900 focus:outline-none bg-transparent"
+                      />
+                    </td>
                     <td className="p-2 bg-slate-100 font-bold">Balance Amount:</td>
-                    <td className="p-2 font-bold text-red-600">Rs: {balanceAmount}</td>
+                    <td className="p-2 flex items-center gap-0.5">
+                      <span className="text-red-600">Rs.</span>
+                      <input
+                        type="number"
+                        value={balanceAmount}
+                        onChange={(e) => setBalanceAmount(Number(e.target.value))}
+                        className="w-full font-bold text-red-600 focus:outline-none bg-transparent"
+                      />
+                    </td>
                     <td className="p-2 bg-slate-100 font-bold">Total Amount:</td>
-                    <td className="p-2 font-extrabold text-emerald-700">Rs: {totalAmount}.00</td>
+                    <td className="p-2 flex items-center gap-0.5">
+                      <span className="text-emerald-700">Rs.</span>
+                      <input
+                        type="number"
+                        value={totalAmount}
+                        onChange={(e) => setTotalAmount(Number(e.target.value))}
+                        className="w-full font-extrabold text-emerald-700 focus:outline-none bg-transparent"
+                      />
+                    </td>
                   </tr>
 
                   <tr className="divide-x divide-slate-900">
@@ -342,8 +430,23 @@ export function TourPackageTicketCopySection() {
               </table>
             </div>
 
+            {/* Terms And Conditions */}
+            <div className="border border-slate-900 rounded-xl p-3 space-y-1">
+              <p className="font-extrabold text-xs text-slate-900 uppercase tracking-wider">
+                Terms And Conditions
+              </p>
+              <p className="text-[10px] text-slate-700 leading-relaxed">
+                1. This ticket is valid for particular journey, which service is Issued.
+              </p>
+              <p className="text-[10px] text-slate-700 leading-relaxed">
+                2. Subject To Bangalore Juridictions Only.
+              </p>
+            </div>
+
             <div className="text-[10px] text-slate-500 text-center font-medium border-t pt-2">
-              Fortune Tourism & Travels · Contact: +91 9740463404 / 9845003000 · Wish you a Happy & Safe Journey!
+              Fortune Tourism & Travels · No.256/A Next To Narayana Hospital, Health City,
+              Bommasandra, Bangalore. 560099 · Phone: +91 9740463404 · Wish you a Happy & Safe
+              Journey!
             </div>
           </div>
         </div>
