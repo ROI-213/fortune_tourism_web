@@ -25,13 +25,19 @@ import { Route as ApiVehiclesRouteImport } from './routes/api/vehicles'
 import { Route as CarRentalsVehicleIdRouteImport } from './routes/car-rentals.$vehicleId'
 import { Route as DriverDashboardRouteImport } from './routes/driver/dashboard'
 import { Route as TourPackagesPackageIdRouteImport } from './routes/tour-packages.$packageId'
+import { Route as ApiBookingsIndexRouteImport } from './routes/api/bookings/index'
 import { Route as ApiBusinessResourceRouteImport } from './routes/api/business/$resource'
 import { Route as ApiBusinessHistoryRouteImport } from './routes/api/business/history'
 import { Route as ApiBusinessSettleRouteImport } from './routes/api/business/settle'
 import { Route as ApiBusinessStatsRouteImport } from './routes/api/business/stats'
 import { Route as ApiDriverLoginRouteImport } from './routes/api/driver/login'
 import { Route as ApiStorageUploadRouteImport } from './routes/api/storage/upload'
+import { Route as ApiBookingsIdIndexRouteImport } from './routes/api/bookings/$id/index'
+import { Route as ApiBookingsStatsIndexRouteImport } from './routes/api/bookings/stats/index'
 import { Route as ApiStorageFilesIdRouteImport } from './routes/api/storage/files.$id'
+import { Route as ApiBookingsIdDocumentsIndexRouteImport } from './routes/api/bookings/$id/documents/index'
+import { Route as ApiBookingsIdPaymentsIndexRouteImport } from './routes/api/bookings/$id/payments/index'
+import { Route as ApiBookingsIdRefundsIndexRouteImport } from './routes/api/bookings/$id/refunds/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -113,6 +119,11 @@ const TourPackagesPackageIdRoute = TourPackagesPackageIdRouteImport.update({
   path: '/$packageId',
   getParentRoute: () => TourPackagesRoute,
 } as any)
+const ApiBookingsIndexRoute = ApiBookingsIndexRouteImport.update({
+  id: '/api/bookings/',
+  path: '/api/bookings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiBusinessResourceRoute = ApiBusinessResourceRouteImport.update({
   id: '/api/business/$resource',
   path: '/api/business/$resource',
@@ -143,11 +154,39 @@ const ApiStorageUploadRoute = ApiStorageUploadRouteImport.update({
   path: '/api/storage/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBookingsIdIndexRoute = ApiBookingsIdIndexRouteImport.update({
+  id: '/api/bookings/$id/',
+  path: '/api/bookings/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBookingsStatsIndexRoute = ApiBookingsStatsIndexRouteImport.update({
+  id: '/api/bookings/stats/',
+  path: '/api/bookings/stats/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStorageFilesIdRoute = ApiStorageFilesIdRouteImport.update({
   id: '/api/storage/files/$id',
   path: '/api/storage/files/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBookingsIdDocumentsIndexRoute =
+  ApiBookingsIdDocumentsIndexRouteImport.update({
+    id: '/api/bookings/$id/documents/',
+    path: '/api/bookings/$id/documents/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiBookingsIdPaymentsIndexRoute =
+  ApiBookingsIdPaymentsIndexRouteImport.update({
+    id: '/api/bookings/$id/payments/',
+    path: '/api/bookings/$id/payments/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiBookingsIdRefundsIndexRoute =
+  ApiBookingsIdRefundsIndexRouteImport.update({
+    id: '/api/bookings/$id/refunds/',
+    path: '/api/bookings/$id/refunds/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -172,7 +211,13 @@ export interface FileRoutesByFullPath {
   '/api/business/stats': typeof ApiBusinessStatsRoute
   '/api/driver/login': typeof ApiDriverLoginRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
+  '/api/bookings/': typeof ApiBookingsIndexRoute
   '/api/storage/files/$id': typeof ApiStorageFilesIdRoute
+  '/api/bookings/$id/': typeof ApiBookingsIdIndexRoute
+  '/api/bookings/stats/': typeof ApiBookingsStatsIndexRoute
+  '/api/bookings/$id/documents/': typeof ApiBookingsIdDocumentsIndexRoute
+  '/api/bookings/$id/payments/': typeof ApiBookingsIdPaymentsIndexRoute
+  '/api/bookings/$id/refunds/': typeof ApiBookingsIdRefundsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -197,7 +242,13 @@ export interface FileRoutesByTo {
   '/api/business/stats': typeof ApiBusinessStatsRoute
   '/api/driver/login': typeof ApiDriverLoginRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
+  '/api/bookings': typeof ApiBookingsIndexRoute
   '/api/storage/files/$id': typeof ApiStorageFilesIdRoute
+  '/api/bookings/$id': typeof ApiBookingsIdIndexRoute
+  '/api/bookings/stats': typeof ApiBookingsStatsIndexRoute
+  '/api/bookings/$id/documents': typeof ApiBookingsIdDocumentsIndexRoute
+  '/api/bookings/$id/payments': typeof ApiBookingsIdPaymentsIndexRoute
+  '/api/bookings/$id/refunds': typeof ApiBookingsIdRefundsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -223,7 +274,13 @@ export interface FileRoutesById {
   '/api/business/stats': typeof ApiBusinessStatsRoute
   '/api/driver/login': typeof ApiDriverLoginRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
+  '/api/bookings/': typeof ApiBookingsIndexRoute
   '/api/storage/files/$id': typeof ApiStorageFilesIdRoute
+  '/api/bookings/$id/': typeof ApiBookingsIdIndexRoute
+  '/api/bookings/stats/': typeof ApiBookingsStatsIndexRoute
+  '/api/bookings/$id/documents/': typeof ApiBookingsIdDocumentsIndexRoute
+  '/api/bookings/$id/payments/': typeof ApiBookingsIdPaymentsIndexRoute
+  '/api/bookings/$id/refunds/': typeof ApiBookingsIdRefundsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -250,7 +307,13 @@ export interface FileRouteTypes {
     | '/api/business/stats'
     | '/api/driver/login'
     | '/api/storage/upload'
+    | '/api/bookings/'
     | '/api/storage/files/$id'
+    | '/api/bookings/$id/'
+    | '/api/bookings/stats/'
+    | '/api/bookings/$id/documents/'
+    | '/api/bookings/$id/payments/'
+    | '/api/bookings/$id/refunds/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -275,7 +338,13 @@ export interface FileRouteTypes {
     | '/api/business/stats'
     | '/api/driver/login'
     | '/api/storage/upload'
+    | '/api/bookings'
     | '/api/storage/files/$id'
+    | '/api/bookings/$id'
+    | '/api/bookings/stats'
+    | '/api/bookings/$id/documents'
+    | '/api/bookings/$id/payments'
+    | '/api/bookings/$id/refunds'
   id:
     | '__root__'
     | '/'
@@ -300,7 +369,13 @@ export interface FileRouteTypes {
     | '/api/business/stats'
     | '/api/driver/login'
     | '/api/storage/upload'
+    | '/api/bookings/'
     | '/api/storage/files/$id'
+    | '/api/bookings/$id/'
+    | '/api/bookings/stats/'
+    | '/api/bookings/$id/documents/'
+    | '/api/bookings/$id/payments/'
+    | '/api/bookings/$id/refunds/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -324,7 +399,13 @@ export interface RootRouteChildren {
   ApiBusinessStatsRoute: typeof ApiBusinessStatsRoute
   ApiDriverLoginRoute: typeof ApiDriverLoginRoute
   ApiStorageUploadRoute: typeof ApiStorageUploadRoute
+  ApiBookingsIndexRoute: typeof ApiBookingsIndexRoute
   ApiStorageFilesIdRoute: typeof ApiStorageFilesIdRoute
+  ApiBookingsIdIndexRoute: typeof ApiBookingsIdIndexRoute
+  ApiBookingsStatsIndexRoute: typeof ApiBookingsStatsIndexRoute
+  ApiBookingsIdDocumentsIndexRoute: typeof ApiBookingsIdDocumentsIndexRoute
+  ApiBookingsIdPaymentsIndexRoute: typeof ApiBookingsIdPaymentsIndexRoute
+  ApiBookingsIdRefundsIndexRoute: typeof ApiBookingsIdRefundsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -441,6 +522,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TourPackagesPackageIdRouteImport
       parentRoute: typeof TourPackagesRoute
     }
+    '/api/bookings/': {
+      id: '/api/bookings/'
+      path: '/api/bookings'
+      fullPath: '/api/bookings/'
+      preLoaderRoute: typeof ApiBookingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/business/$resource': {
       id: '/api/business/$resource'
       path: '/api/business/$resource'
@@ -483,11 +571,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStorageUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/bookings/$id/': {
+      id: '/api/bookings/$id/'
+      path: '/api/bookings/$id'
+      fullPath: '/api/bookings/$id/'
+      preLoaderRoute: typeof ApiBookingsIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bookings/stats/': {
+      id: '/api/bookings/stats/'
+      path: '/api/bookings/stats'
+      fullPath: '/api/bookings/stats/'
+      preLoaderRoute: typeof ApiBookingsStatsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/storage/files/$id': {
       id: '/api/storage/files/$id'
       path: '/api/storage/files/$id'
       fullPath: '/api/storage/files/$id'
       preLoaderRoute: typeof ApiStorageFilesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bookings/$id/documents/': {
+      id: '/api/bookings/$id/documents/'
+      path: '/api/bookings/$id/documents'
+      fullPath: '/api/bookings/$id/documents/'
+      preLoaderRoute: typeof ApiBookingsIdDocumentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bookings/$id/payments/': {
+      id: '/api/bookings/$id/payments/'
+      path: '/api/bookings/$id/payments'
+      fullPath: '/api/bookings/$id/payments/'
+      preLoaderRoute: typeof ApiBookingsIdPaymentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/bookings/$id/refunds/': {
+      id: '/api/bookings/$id/refunds/'
+      path: '/api/bookings/$id/refunds'
+      fullPath: '/api/bookings/$id/refunds/'
+      preLoaderRoute: typeof ApiBookingsIdRefundsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -538,7 +661,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBusinessStatsRoute: ApiBusinessStatsRoute,
   ApiDriverLoginRoute: ApiDriverLoginRoute,
   ApiStorageUploadRoute: ApiStorageUploadRoute,
+  ApiBookingsIndexRoute: ApiBookingsIndexRoute,
   ApiStorageFilesIdRoute: ApiStorageFilesIdRoute,
+  ApiBookingsIdIndexRoute: ApiBookingsIdIndexRoute,
+  ApiBookingsStatsIndexRoute: ApiBookingsStatsIndexRoute,
+  ApiBookingsIdDocumentsIndexRoute: ApiBookingsIdDocumentsIndexRoute,
+  ApiBookingsIdPaymentsIndexRoute: ApiBookingsIdPaymentsIndexRoute,
+  ApiBookingsIdRefundsIndexRoute: ApiBookingsIdRefundsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

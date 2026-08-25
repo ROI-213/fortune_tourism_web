@@ -7,6 +7,9 @@ import { BusinessDashboard } from "@/components/business/BusinessDashboard";
 import { ResourceManager } from "@/components/business/ResourceManager";
 import { ClientStatementsManager } from "@/components/business/ClientStatementsManager";
 import { DailyExpenseReport } from "@/components/business/DailyExpenseReport";
+import { DayBookingsManager, BookingListManager, PendingPaymentsManager } from "@/components/admin/BookingManager";
+import { BookingsManager } from "@/components/admin/BookingsManager";
+import { PaymentHistoryManager } from "@/components/admin/PaymentHistoryManager";
 import { BUSINESS_RESOURCES } from "@/lib/business-schema";
 import {
   Users,
@@ -26,6 +29,15 @@ import {
   Pencil,
   FileSpreadsheet,
   TrendingDown,
+  CalendarDays,
+  List,
+  IndianRupee,
+  Bus,
+  TrainFront,
+  Plane,
+  Ticket,
+  AlertCircle,
+  History,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -82,7 +94,7 @@ interface VehicleItem {
 
 function AdminPage() {
   const [activeTab, setActiveTab] = useState<
-    "business" | "statements" | "daily_expenses" | "drivers" | "enquiries" | "packages" | "vehicles" | "storage"
+    "bookings" | "business" | "statements" | "daily_expenses" | "drivers" | "enquiries" | "packages" | "vehicles" | "storage" | "day_bookings" | "all_bookings" | "pending_payments" | "payment_history"
   >("business");
 
   // Data states
@@ -125,13 +137,33 @@ function AdminPage() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Booking Stats state
+  const [bookingStats, setBookingStats] = useState({
+    todayBookings: 0,
+    upcomingBookings: 0,
+    pendingPayments: 0,
+    fullyPaid: 0,
+    partiallyPaid: 0,
+    cancelled: 0,
+    totalBookings: 0,
+    totalRevenue: 0,
+    pendingAmount: 0,
+    taxiBookings: 0,
+    busBookings: 0,
+    trainBookings: 0,
+    flightBookings: 0,
+    ticketsPending: 0,
+    pendingEnquiries: 0,
+  });
+
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [enqRes, pkgRes, vehRes] = await Promise.all([
+      const [enqRes, pkgRes, vehRes, statsRes] = await Promise.all([
         fetch("/api/enquiries"),
         fetch("/api/packages"),
         fetch("/api/vehicles"),
+        fetch("/api/bookings/stats"),
       ]);
 
       if (enqRes.ok) {
@@ -145,6 +177,10 @@ function AdminPage() {
       if (vehRes.ok) {
         const d = await vehRes.json();
         if (d.success) setVehiclesList(d.vehicles || []);
+      }
+      if (statsRes.ok) {
+        const d = await statsRes.json();
+        if (d.success) setBookingStats(d.stats);
       }
     } catch (err) {
       console.error(err);
@@ -384,28 +420,88 @@ function AdminPage() {
 
   const stats = [
     {
-      label: "Total Enquiries",
-      value: enquiries.length.toString(),
-      icon: Users,
-      color: "text-blue-600 bg-blue-50",
+      label: "Today's Bookings",
+      value: bookingStats.todayBookings.toString(),
+      icon: CalendarDays,
+      color: "text-sky-600 bg-sky-50",
+      onClick: () => setActiveTab("day_bookings"),
     },
     {
-      label: "New Leads",
-      value: enquiries.filter((e) => e.status === "New").length.toString(),
-      icon: Clock,
-      color: "text-amber-600 bg-amber-50",
-    },
-    {
-      label: "Active Tour Packages",
-      value: packagesList.length.toString(),
-      icon: Package,
-      color: "text-emerald-600 bg-emerald-50",
-    },
-    {
-      label: "Fleet Vehicles",
-      value: vehiclesList.length.toString(),
+      label: "Taxi Bookings",
+      value: bookingStats.taxiBookings.toString(),
       icon: Car,
+      color: "text-amber-600 bg-amber-50",
+      onClick: () => setActiveTab("bookings"),
+    },
+    {
+      label: "Bus Bookings",
+      value: bookingStats.busBookings.toString(),
+      icon: Bus,
+      color: "text-orange-600 bg-orange-50",
+      onClick: () => setActiveTab("bookings"),
+    },
+    {
+      label: "Train Bookings",
+      value: bookingStats.trainBookings.toString(),
+      icon: TrainFront,
+      color: "text-indigo-600 bg-indigo-50",
+      onClick: () => setActiveTab("bookings"),
+    },
+    {
+      label: "Flight Bookings",
+      value: bookingStats.flightBookings.toString(),
+      icon: Plane,
+      color: "text-blue-600 bg-blue-50",
+      onClick: () => setActiveTab("bookings"),
+    },
+    {
+      label: "Pending Enquiries",
+      value: bookingStats.pendingEnquiries.toString(),
+      icon: AlertCircle,
+      color: "text-red-600 bg-red-50",
+      onClick: () => setActiveTab("bookings"),
+    },
+    {
+      label: "Tickets Pending",
+      value: bookingStats.ticketsPending.toString(),
+      icon: Ticket,
+      color: "text-yellow-600 bg-yellow-50",
+      onClick: () => setActiveTab("bookings"),
+    },
+    {
+      label: "Remaining Payments",
+      value: bookingStats.pendingPayments.toString(),
+      icon: IndianRupee,
+      color: "text-rose-600 bg-rose-50",
+      onClick: () => setActiveTab("pending_payments"),
+    },
+    {
+      label: "Fully Paid",
+      value: bookingStats.fullyPaid.toString(),
+      icon: CheckCircle,
+      color: "text-emerald-600 bg-emerald-50",
+      onClick: () => setActiveTab("all_bookings"),
+    },
+    {
+      label: "Total Revenue",
+      value: `₹${(bookingStats.totalRevenue / 1000).toFixed(0)}K`,
+      icon: TrendingDown,
+      color: "text-green-600 bg-green-50",
+      onClick: () => setActiveTab("payment_history"),
+    },
+    {
+      label: "Total Bookings",
+      value: bookingStats.totalBookings.toString(),
+      icon: ClipboardList,
       color: "text-purple-600 bg-purple-50",
+      onClick: () => setActiveTab("all_bookings"),
+    },
+    {
+      label: "New Enquiries",
+      value: enquiries.filter((e) => e.status === "New").length.toString(),
+      icon: Users,
+      color: "text-teal-600 bg-teal-50",
+      onClick: () => setActiveTab("enquiries"),
     },
   ];
 
@@ -441,9 +537,10 @@ function AdminPage() {
             {stats.map((s) => {
               const Icon = s.icon;
               return (
-                <div
+                <button
                   key={s.label}
-                  className="rounded-2xl border border-border bg-white p-5 shadow-sm flex items-center justify-between"
+                  onClick={s.onClick}
+                  className="rounded-2xl border border-border bg-white p-5 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md hover:border-slate-300 transition text-left"
                 >
                   <div>
                     <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
@@ -456,13 +553,63 @@ function AdminPage() {
                   <div className={`p-3 rounded-xl ${s.color}`}>
                     <Icon className="h-6 w-6" />
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
 
           {/* Tab Navigation */}
           <div className="flex border-b border-border mb-6 gap-2 overflow-x-auto">
+            <button
+              onClick={() => setActiveTab("bookings")}
+              className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
+                activeTab === "bookings"
+                  ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)]"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <CalendarDays className="h-4 w-4" /> Bookings
+            </button>
+            <button
+              onClick={() => setActiveTab("day_bookings")}
+              className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
+                activeTab === "day_bookings"
+                  ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)]"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <CalendarDays className="h-4 w-4" /> Day Booking
+            </button>
+            <button
+              onClick={() => setActiveTab("all_bookings")}
+              className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
+                activeTab === "all_bookings"
+                  ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)]"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <List className="h-4 w-4" /> Bookings ({bookingStats.totalBookings})
+            </button>
+            <button
+              onClick={() => setActiveTab("pending_payments")}
+              className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
+                activeTab === "pending_payments"
+                  ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)]"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <IndianRupee className="h-4 w-4 text-rose-600" /> Remaining Payments ({bookingStats.pendingPayments})
+            </button>
+            <button
+              onClick={() => setActiveTab("payment_history")}
+              className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
+                activeTab === "payment_history"
+                  ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)]"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <History className="h-4 w-4 text-emerald-600" /> Payment History
+            </button>
             <button
               onClick={() => setActiveTab("business")}
               className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap ${
@@ -545,8 +692,23 @@ function AdminPage() {
             </button>
           </div>
 
+          {/* TAB: BOOKINGS & PAYMENTS LIFECYCLE */}
+          {activeTab === "bookings" && <BookingsManager />}
+
           {/* TAB 0: BUSINESS RECORDS */}
           {activeTab === "business" && <BusinessDashboard />}
+
+          {/* TAB: DAY BOOKINGS */}
+          {activeTab === "day_bookings" && <DayBookingsManager />}
+
+          {/* TAB: ALL BOOKINGS */}
+          {activeTab === "all_bookings" && <BookingListManager />}
+
+          {/* TAB: PENDING / REMAINING PAYMENTS */}
+          {activeTab === "pending_payments" && <PendingPaymentsManager />}
+
+          {/* TAB: PAYMENT HISTORY */}
+          {activeTab === "payment_history" && <PaymentHistoryManager />}
 
           {/* TAB 0.2: CLIENT STATEMENTS */}
           {activeTab === "statements" && <ClientStatementsManager />}

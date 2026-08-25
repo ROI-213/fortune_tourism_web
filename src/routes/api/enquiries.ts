@@ -1,5 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { query } from "@/lib/db";
+import {
+  generateEnquiryNumber,
+  serviceToCategory,
+  normalizeCategory,
+  logActivity,
+  generateBookingReference,
+  generateBookingNumber,
+  bookingTypeFromCategory,
+  categoryFromBookingType,
+} from "@/lib/booking-server";
+import {
+  generateTicketNumber,
+  generatePNR,
+  generateBookingId,
+} from "@/lib/booking-utils";
+import { isAdminAuthorized, unauthorizedResponse } from "@/lib/admin-auth";
 
 export const Route = createFileRoute("/api/enquiries")({
   server: {
@@ -8,26 +24,77 @@ export const Route = createFileRoute("/api/enquiries")({
         try {
           const url = new URL(request.url);
           const status = url.searchParams.get("status");
+          const category = url.searchParams.get("category");
+          const q = url.searchParams.get("q")?.trim();
+          const startDate = url.searchParams.get("startDate")?.trim();
+          const endDate = url.searchParams.get("endDate")?.trim();
+          const limit = Math.min(Number(url.searchParams.get("limit")) || 500, 2000);
+          const offset = Number(url.searchParams.get("offset")) || 0;
 
-          let sql = "SELECT * FROM enquiries";
-          const params: any[] = [];
+          const conditions: string[] = [];
+          const params: unknown[] = [];
 
-          if (status) {
-            sql += " WHERE status = $1";
+          if (status && status !== "All") {
+            // Accept both legacy ("New", "Quoted"…) and new ("NEW", "QUOTATION SENT") values
             params.push(status);
+            conditions.push(
+              `(status = $${params.length} OR UPPER(status) = UPPER($${params.length}))`,
+            );
+          }
+          if (category) {
+            params.push(normalizeCategory(category));
+            conditions.push(`category = $${params.length}`);
+          }
+          if (q) {
+            params.push(`%${q}%`);
+            const p = `$${params.length}`;
+            conditions.push(
+              `(name ILIKE ${p} OR phone ILIKE ${p} OR COALESCE(email,'') ILIKE ${p} OR COALESCE(enquiry_number,'') ILIKE ${p} OR COALESCE(pickup,'') ILIKE ${p} OR COALESCE(destination,'') ILIKE ${p} OR COALESCE(service,'') ILIKE ${p})`,
+            );
+          }
+          if (startDate) {
+            params.push(startDate);
+            conditions.push(`COALESCE(travel_date::text,'') >= $${params.length}`);
+          }
+          if (endDate) {
+            params.push(endDate);
+            conditions.push(`COALESCE(travel_date::text,'') <= $${params.length}`);
           }
 
-          sql += " ORDER BY created_at DESC";
+          const where = conditions.length ? ` WHERE ${conditions.join(" AND ")}` : "";
+          params.push(limit);
+          const limitIdx = params.length;
+          params.push(offset);
+          const offsetIdx = params.length;
 
-          const res = await query(sql, params);
-          return new Response(JSON.stringify({ success: true, enquiries: res.rows }), {
-            headers: { "Content-Type": "application/json" },
-          });
+          const [dataRes, countRes, statusRes] = await Promise.all([
+            query(
+              `SELECT * FROM enquiries${where} ORDER BY created_at DESC LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
+              params,
+            ),
+            query(`SELECT COUNT(*)::int AS n FROM enquiries${where}`, params.slice(0, -2)),
+            query(
+              `SELECT UPPER(status) AS status, COUNT(*)::int AS n FROM enquiries GROUP BY UPPER(status)`,
+            ),
+          ]);
+
+          const statusCounts: Record<string, number> = {};
+          for (const r of statusRes.rows) statusCounts[r.status] = r.n;
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              enquiries: dataRes.rows,
+              count: countRes.rows[0]?.n ?? dataRes.rows.length,
+              statusCounts,
+            }),
+            { headers: { "Content-Type": "application/json" } },
+          );
         } catch (error: any) {
           console.error("GET /api/enquiries error:", error);
           return new Response(
             JSON.stringify({ success: false, error: error.message || "Failed to fetch enquiries" }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            { status: 500, headers: { "Content-Type": "application/json" } },
           );
         }
       },
@@ -37,6 +104,7 @@ export const Route = createFileRoute("/api/enquiries")({
           const {
             name,
             phone,
+            whatsapp,
             email,
             service,
             pickup,
@@ -62,14 +130,40 @@ export const Route = createFileRoute("/api/enquiries")({
             notes,
             package_slug,
             vehicle_slug,
+            client_token,
+            booking_type,
           } = body;
 
           if (!name || !phone || !service) {
             return new Response(
               JSON.stringify({ success: false, error: "Name, phone, and service are required." }),
-              { status: 400, headers: { "Content-Type": "application/json" } }
+              { status: 400, headers: { "Content-Type": "application/json" } },
             );
           }
+
+          // ---- Idempotency: repeated submissions return the original enquiry ----
+          const token =
+            typeof client_token === "string" && client_token.trim()
+              ? client_token.trim().slice(0, 80)
+              : null;
+          if (token) {
+            const existing = await query(
+              `SELECT * FROM enquiries WHERE idempotency_key = $1 LIMIT 1`,
+              [token],
+            ).catch(() => null);
+            if (existing && existing.rows.length > 0) {
+              return new Response(
+                JSON.stringify({ success: true, enquiry: existing.rows[0], duplicate: true }),
+                {
+                  status: 200,
+                  headers: { "Content-Type": "application/json" },
+                },
+              );
+            }
+          }
+
+          const enquiryNumber = await generateEnquiryNumber();
+          const category = normalizeCategory(serviceToCategory(service));
 
           // Build a structured notes summary containing all extra customer-facing fields
           const detailsList: string[] = [];
@@ -91,7 +185,10 @@ export const Route = createFileRoute("/api/enquiries")({
           if (bus_type) detailsList.push(`Bus Type: ${bus_type}`);
           if (Array.isArray(passengers_detail) && passengers_detail.length > 0) {
             const pStr = passengers_detail
-              .map((p: any, i: number) => `P${i + 1}: ${p.name || ""} (${p.age || ""}/${p.gender || ""})`)
+              .map(
+                (p: any, i: number) =>
+                  `P${i + 1}: ${p.name || ""} (${p.age || ""}/${p.gender || ""})`,
+              )
               .join("; ");
             detailsList.push(`Passenger Details: ${pStr}`);
           }
@@ -100,8 +197,15 @@ export const Route = createFileRoute("/api/enquiries")({
           const combinedNotes = detailsList.join(" | ");
 
           const res = await query(
-            `INSERT INTO enquiries (name, phone, service, pickup, destination, travel_date, passengers, notes, status, package_slug, vehicle_slug)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'New', $9, $10)
+            `INSERT INTO enquiries (
+               name, phone, service, pickup, destination, travel_date, passengers, notes, status,
+               package_slug, vehicle_slug,
+               enquiry_number, category, email, whatsapp, return_date, pickup_time, trip_type,
+               vehicle_name, passenger_count, source, idempotency_key
+             )
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'NEW', $9, $10,
+                     $11, $12, $13, $14, $15, $16, $17,
+                     $18, $19, 'WEBSITE', $20)
              RETURNING *`,
             [
               name,
@@ -114,15 +218,129 @@ export const Route = createFileRoute("/api/enquiries")({
               combinedNotes || null,
               package_slug || null,
               vehicle_slug || null,
+              enquiryNumber,
+              category,
+              email || null,
+              whatsapp || phone || null,
+              trip_type === "Round Trip" ? return_date || null : return_date || null,
+              time || null,
+              trip_type || null,
+              car_type || vehicle_slug || null,
+              passengers ? parseInt(String(passengers), 10) || null : null,
+              token,
+            ],
+          );
+
+          const enquiry = res.rows[0];
+
+          await logActivity({
+            enquiry_id: enquiry.id,
+            action: "ENQUIRY CREATED",
+            entity: "enquiry",
+            entity_ref: enquiryNumber,
+            new_value: "NEW",
+            details: `${service} — ${pickup || "?"} → ${destination || "?"}`,
+            actor: "Website",
+          });
+
+          // ---- Create Auto-Booking ----
+          const bType = booking_type || bookingTypeFromCategory(category);
+          const bCategory = booking_type ? categoryFromBookingType(booking_type) : category;
+          const bookingRef = await generateBookingReference();
+          const bookingNum = await generateBookingNumber();
+          const ticketNum = generateTicketNumber();
+          const pnrNum = generatePNR();
+          const bId = generateBookingId();
+          const bookingStatus = bType === 'TAXI' ? 'PENDING CONFIRMATION' : 'BOOKING REQUESTED';
+
+          const bookingRes = await query(
+            `INSERT INTO bookings (
+              booking_id, booking_reference, booking_number, ticket_number, pnr_number,
+              booking_type, category, booking_status, payment_status, booking_source,
+              enquiry_id, enquiry_number, total_amount, 
+              passenger_name, passenger_phone, customer_email, customer_whatsapp,
+              departure_datetime, return_date, pickup_time, number_of_members, 
+              from_location, to_location, trip_type, vehicle_type, notes
+            ) VALUES (
+              $1, $2, $3, $4, $5, 
+              $6, $7, $8, 'Pending', 'WEBSITE', 
+              $9, $10, 0,
+              $11, $12, $13, $14,
+              $15, $16, $17, $18,
+              $19, $20, $21, $22, $23
+            ) RETURNING *`,
+            [
+              bId, bookingRef, bookingNum, ticketNum, pnrNum,
+              bType, bCategory, bookingStatus,
+              enquiry.id, enquiryNumber,
+              name, phone, email || null, whatsapp || phone || null,
+              date || null, return_date || null, time || null, passengers ? parseInt(String(passengers), 10) || null : null,
+              pickup || null, destination || null, trip_type || null, car_type || vehicle_slug || null, combinedNotes || null
             ]
           );
 
+          const booking = bookingRes.rows[0];
+
+          // Handle Token Advance Payment (e.g. ₹100 advance)
+          const advancePaid = Number(body.advance_amount || 0);
+          if (advancePaid > 0) {
+            const payId = `PAY-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+            const payMethod = String(body.payment_method || "UPI").toUpperCase();
+            const payRef = body.payment_ref || body.transaction_id || `UPI-${Date.now().toString().slice(-6)}`;
+
+            await query(
+              `INSERT INTO booking_payments (
+                booking_id, payment_id, amount, payment_method, payment_status, reference_number, notes, paid_at
+              ) VALUES ($1, $2, $3, $4, 'Success', $5, 'Online ₹100 Token Advance Booking', NOW())`,
+              [booking.id, payId, advancePaid, payMethod, payRef]
+            );
+
+            await query(
+              `UPDATE bookings SET
+                advance_amount = $2,
+                amount_paid = $2,
+                payment_status = 'Advance Paid',
+                booking_status = CASE WHEN booking_status = 'PENDING CONFIRMATION' THEN 'ADVANCE RECEIVED' ELSE booking_status END,
+                updated_at = NOW()
+              WHERE id = $1`,
+              [booking.id, advancePaid]
+            );
+
+            await logActivity({
+              booking_id: booking.id,
+              action: "ADVANCE PAYMENT RECORDED",
+              entity: "booking",
+              entity_ref: bookingNum,
+              new_value: `₹${advancePaid}`,
+              details: `Token advance payment of ₹${advancePaid} received via ${payMethod} (Ref: ${payRef})`,
+              actor: "Customer (Online)",
+            });
+          }
+
+          await query(`UPDATE enquiries SET converted_booking_id = $1 WHERE id = $2`, [booking.id, enquiry.id]);
+
+          await logActivity({
+            booking_id: booking.id,
+            action: `Customer submitted ${bType} enquiry`,
+            entity: "booking",
+            entity_ref: bookingNum,
+            details: `Enquiry ${enquiryNumber} converted to booking${advancePaid > 0 ? ` with ₹${advancePaid} advance` : ''}`,
+            actor: "Website",
+          });
+          // ---- End Create Auto-Booking ----
+
           // Sync into corresponding Business Record tables (Day Book, Cab Bookings, Package Trips, etc.) asynchronously
           syncToBusinessRecords(body, combinedNotes).catch((err) =>
-            console.error("Background sync error:", err)
+            console.error("Background sync error:", err),
           );
 
-          return new Response(JSON.stringify({ success: true, enquiry: res.rows[0] }), {
+          return new Response(JSON.stringify({ 
+            success: true, 
+            enquiry, 
+            booking_reference: bookingRef,
+            advance_paid: advancePaid,
+            booking_id: booking.id
+          }), {
             status: 201,
             headers: { "Content-Type": "application/json" },
           });
@@ -130,32 +348,73 @@ export const Route = createFileRoute("/api/enquiries")({
           console.error("POST /api/enquiries error:", error);
           return new Response(
             JSON.stringify({ success: false, error: error.message || "Failed to create enquiry" }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            { status: 500, headers: { "Content-Type": "application/json" } },
           );
         }
       },
       PATCH: async ({ request }) => {
         try {
-          const body = await request.json();
-          const { id, status } = body;
+          if (!isAdminAuthorized(request)) return unauthorizedResponse();
 
-          if (!id || !status) {
+          const body = await request.json();
+          const { id, status, admin_notes } = body;
+
+          if (!id || (!status && admin_notes === undefined)) {
             return new Response(
-              JSON.stringify({ success: false, error: "ID and status are required." }),
-              { status: 400, headers: { "Content-Type": "application/json" } }
+              JSON.stringify({
+                success: false,
+                error: "ID and at least one of status/admin_notes are required.",
+              }),
+              { status: 400, headers: { "Content-Type": "application/json" } },
             );
           }
 
+          const currentRes = await query(`SELECT * FROM enquiries WHERE id = $1`, [id]);
+          if (currentRes.rows.length === 0) {
+            return new Response(JSON.stringify({ success: false, error: "Enquiry not found." }), {
+              status: 404,
+              headers: { "Content-Type": "application/json" },
+            });
+          }
+          const current = currentRes.rows[0];
+
+          const sets: string[] = [];
+          const params: unknown[] = [];
+
+          if (status) {
+            params.push(String(status).toUpperCase());
+            sets.push(`status = $${params.length}`);
+          }
+          if (admin_notes !== undefined) {
+            params.push(admin_notes === null ? null : String(admin_notes));
+            sets.push(`admin_notes = $${params.length}`);
+          }
+          sets.push("updated_at = NOW()");
+          params.push(id);
+
           const res = await query(
-            `UPDATE enquiries SET status = $1 WHERE id = $2 RETURNING *`,
-            [status, id]
+            `UPDATE enquiries SET ${sets.join(", ")} WHERE id = $${params.length} RETURNING *`,
+            params,
           );
 
-          if (res.rowCount === 0) {
-            return new Response(
-              JSON.stringify({ success: false, error: "Enquiry not found." }),
-              { status: 404, headers: { "Content-Type": "application/json" } }
-            );
+          if (status && String(status).toUpperCase() !== String(current.status).toUpperCase()) {
+            await logActivity({
+              enquiry_id: id,
+              action: "ENQUIRY STATUS CHANGED",
+              entity: "enquiry",
+              entity_ref: current.enquiry_number,
+              old_value: current.status,
+              new_value: String(status).toUpperCase(),
+            });
+          }
+          if (admin_notes !== undefined && admin_notes !== current.admin_notes) {
+            await logActivity({
+              enquiry_id: id,
+              action: "ENQUIRY NOTES UPDATED",
+              entity: "enquiry",
+              entity_ref: current.enquiry_number,
+              details: String(admin_notes ?? ""),
+            });
           }
 
           return new Response(JSON.stringify({ success: true, enquiry: res.rows[0] }), {
@@ -165,23 +424,34 @@ export const Route = createFileRoute("/api/enquiries")({
           console.error("PATCH /api/enquiries error:", error);
           return new Response(
             JSON.stringify({ success: false, error: error.message || "Failed to update status" }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            { status: 500, headers: { "Content-Type": "application/json" } },
           );
         }
       },
       DELETE: async ({ request }) => {
         try {
+          if (!isAdminAuthorized(request)) return unauthorizedResponse();
+
           const url = new URL(request.url);
           const id = url.searchParams.get("id");
 
           if (!id) {
-            return new Response(
-              JSON.stringify({ success: false, error: "ID is required." }),
-              { status: 400, headers: { "Content-Type": "application/json" } }
-            );
+            return new Response(JSON.stringify({ success: false, error: "ID is required." }), {
+              status: 400,
+              headers: { "Content-Type": "application/json" },
+            });
           }
 
+          const current = await query(`SELECT enquiry_number FROM enquiries WHERE id = $1`, [id]);
           await query(`DELETE FROM enquiries WHERE id = $1`, [id]);
+          if (current.rows[0]) {
+            await logActivity({
+              enquiry_id: Number(id),
+              action: "ENQUIRY DELETED",
+              entity: "enquiry",
+              entity_ref: current.rows[0].enquiry_number,
+            });
+          }
           return new Response(JSON.stringify({ success: true }), {
             headers: { "Content-Type": "application/json" },
           });
@@ -189,7 +459,7 @@ export const Route = createFileRoute("/api/enquiries")({
           console.error("DELETE /api/enquiries error:", error);
           return new Response(
             JSON.stringify({ success: false, error: error.message || "Failed to delete enquiry" }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            { status: 500, headers: { "Content-Type": "application/json" } },
           );
         }
       },
@@ -228,13 +498,15 @@ async function syncToBusinessRecords(payload: any, combinedNotes: string) {
 
   // 1. Ensure customer exists in customers table
   try {
-    const existing = await query("SELECT id FROM customers WHERE phone = $1 LIMIT 1", [phone]).catch(() => null);
+    const existing = await query("SELECT id FROM customers WHERE phone = $1 LIMIT 1", [
+      phone,
+    ]).catch(() => null);
     if (!existing || existing.rows.length === 0) {
       const custCode = `CUST-${phone.replace(/\D/g, "").slice(-4) || "001"}`;
       await query(
         `INSERT INTO customers (customer_code, name, phone, email, notes)
          VALUES ($1, $2, $3, $4, 'Registered from website enquiry')`,
-        [custCode, name, phone, email || null]
+        [custCode, name, phone, email || null],
       ).catch(() => {});
     }
   } catch (e) {}
@@ -255,7 +527,7 @@ async function syncToBusinessRecords(payload: any, combinedNotes: string) {
         pickup || "Bengaluru",
         destination || "Outstation",
         combinedNotes,
-      ]
+      ],
     ).catch(() => {});
   } catch (e) {}
 
@@ -277,7 +549,7 @@ async function syncToBusinessRecords(payload: any, combinedNotes: string) {
           destination || "Tour Destination",
           car_type || "SUV",
           combinedNotes,
-        ]
+        ],
       ).catch(() => {});
     } else if (sUpper.includes("HOURLY") || sUpper.includes("LOCAL")) {
       const bkNo = `HR-${Date.now().toString().slice(-6)}`;
@@ -295,7 +567,7 @@ async function syncToBusinessRecords(payload: any, combinedNotes: string) {
           destination || "Local City",
           hrs,
           combinedNotes,
-        ]
+        ],
       ).catch(() => {});
     } else if (sUpper.includes("BUS")) {
       const bkNo = `BUS-${Date.now().toString().slice(-6)}`;
@@ -312,7 +584,7 @@ async function syncToBusinessRecords(payload: any, combinedNotes: string) {
           name,
           phone,
           combinedNotes,
-        ]
+        ],
       ).catch(() => {});
     } else if (sUpper.includes("TRAIN")) {
       const bkNo = `TRN-${Date.now().toString().slice(-6)}`;
@@ -327,7 +599,7 @@ async function syncToBusinessRecords(payload: any, combinedNotes: string) {
           destination || "Destination Station",
           train_class || "3AC",
           `Passenger: ${name} (${phone}) | Preference: ${train_preference || "None"} | ${combinedNotes}`,
-        ]
+        ],
       ).catch(() => {});
     } else if (sUpper.includes("FLIGHT")) {
       const bkNo = `FLT-${Date.now().toString().slice(-6)}`;
@@ -344,7 +616,7 @@ async function syncToBusinessRecords(payload: any, combinedNotes: string) {
           phone,
           paxCount,
           `Passenger: ${name} | ${combinedNotes}`,
-        ]
+        ],
       ).catch(() => {});
     } else {
       // Default: Outstation / Cab / Corporate / Airport -> Insert into cab_bookings
@@ -363,7 +635,7 @@ async function syncToBusinessRecords(payload: any, combinedNotes: string) {
           phone,
           car_type || "Sedan",
           combinedNotes,
-        ]
+        ],
       ).catch(() => {});
     }
   } catch (e) {

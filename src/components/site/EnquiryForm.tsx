@@ -44,7 +44,7 @@ export function EnquiryForm({
   presetVehicle?: string;
 }) {
   const [activeService, setActiveService] = useState<ServiceType>(
-    (presetService as ServiceType) || "Outstation"
+    (presetService as ServiceType) || "Outstation",
   );
 
   // Common Fields
@@ -67,7 +67,9 @@ export function EnquiryForm({
   const [companyName, setCompanyName] = useState("");
   const [gstNumber, setGstNumber] = useState("");
 
-  const [airportTransferType, setAirportTransferType] = useState<"Airport Drop" | "Airport Pickup">("Airport Drop");
+  const [airportTransferType, setAirportTransferType] = useState<"Airport Drop" | "Airport Pickup">(
+    "Airport Drop",
+  );
   const [airportName, setAirportName] = useState("Kempegowda Intl Airport BLR");
   const [flightNumber, setFlightNumber] = useState("");
 
@@ -84,6 +86,7 @@ export function EnquiryForm({
   const [busType, setBusType] = useState("AC Sleeper");
 
   const [loading, setLoading] = useState(false);
+  const [enquiryRef, setEnquiryRef] = useState<string | null>(null);
 
   const addPassengerRow = () => {
     setPassengerList((prev) => [...prev, { name: "", age: "", gender: "Male" }]);
@@ -94,9 +97,7 @@ export function EnquiryForm({
   };
 
   const updatePassenger = (idx: number, field: keyof Passenger, val: string) => {
-    setPassengerList((prev) =>
-      prev.map((p, i) => (i === idx ? { ...p, [field]: val } : p))
-    );
+    setPassengerList((prev) => prev.map((p, i) => (i === idx ? { ...p, [field]: val } : p)));
   };
 
   const handleSubmit = async (mode: "quote" | "whatsapp") => {
@@ -139,6 +140,10 @@ export function EnquiryForm({
       notes,
       package_slug: presetPackage,
       vehicle_slug: presetVehicle,
+      client_token:
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `tok-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     };
 
     try {
@@ -159,10 +164,15 @@ export function EnquiryForm({
 
         const d = await res.json();
         if (res.ok && d.success) {
-          toast.success(`Enquiry submitted for ${activeService}! Our team will contact you shortly.`);
+          setEnquiryRef(d.enquiry?.enquiry_number || d.enquiry?.id || null);
+          toast.success(
+            `Enquiry submitted for ${activeService}! Our team will contact you shortly.`,
+          );
           setName("");
           setPhone("");
+          setEmail("");
           setNotes("");
+          setDate("");
         } else {
           toast.error(d.error || "Failed to submit enquiry.");
         }
@@ -193,6 +203,20 @@ export function EnquiryForm({
 
   return (
     <div className="w-full">
+      {enquiryRef && (
+        <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-center">
+          <p className="text-sm font-bold text-emerald-800">
+            Enquiry Received! Your Reference Number:
+          </p>
+          <p className="mt-1 font-heading text-2xl font-bold tracking-wider text-[color:var(--color-navy)]">
+            {enquiryRef}
+          </p>
+          <p className="mt-1 text-xs text-emerald-700">
+            Save this reference — our team will contact you within 30 minutes during working hours.
+          </p>
+        </div>
+      )}
+
       {/* Service Tabs Header */}
       <div className="mb-6 flex flex-wrap gap-2 border-b border-border pb-3 overflow-x-auto">
         {servicesList.map((srv) => (
@@ -222,16 +246,29 @@ export function EnquiryForm({
         {activeService === "Outstation" && (
           <>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Trip Type</label>
-              <select value={tripType} onChange={(e) => setTripType(e.target.value as any)} className={fieldClass}>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Trip Type
+              </label>
+              <select
+                value={tripType}
+                onChange={(e) => setTripType(e.target.value as any)}
+                className={fieldClass}
+              >
                 <option value="Round Trip">Round Trip</option>
                 <option value="One Way">One Way</option>
               </select>
             </div>
             {tripType === "Round Trip" && (
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Return Date</label>
-                <input type="date" value={returnDate} onChange={(e) => setReturnDate(e.target.value)} className={fieldClass} />
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Return Date
+                </label>
+                <input
+                  type="date"
+                  value={returnDate}
+                  onChange={(e) => setReturnDate(e.target.value)}
+                  className={fieldClass}
+                />
               </div>
             )}
           </>
@@ -241,15 +278,28 @@ export function EnquiryForm({
         {activeService === "Airport Transfer" && (
           <>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Transfer Direction</label>
-              <select value={airportTransferType} onChange={(e) => setAirportTransferType(e.target.value as any)} className={fieldClass}>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Transfer Direction
+              </label>
+              <select
+                value={airportTransferType}
+                onChange={(e) => setAirportTransferType(e.target.value as any)}
+                className={fieldClass}
+              >
                 <option value="Airport Drop">Airport Drop (City to Airport)</option>
                 <option value="Airport Pickup">Airport Pickup (Airport to City)</option>
               </select>
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Flight Number (Optional)</label>
-              <input value={flightNumber} onChange={(e) => setFlightNumber(e.target.value)} placeholder="e.g. 6E 503" className={fieldClass} />
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Flight Number (Optional)
+              </label>
+              <input
+                value={flightNumber}
+                onChange={(e) => setFlightNumber(e.target.value)}
+                placeholder="e.g. 6E 503"
+                className={fieldClass}
+              />
             </div>
           </>
         )}
@@ -258,12 +308,26 @@ export function EnquiryForm({
         {activeService === "Corporate Travel" && (
           <>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Company Name</label>
-              <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="e.g. Infosys / TCS" className={fieldClass} />
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Company Name
+              </label>
+              <input
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="e.g. Infosys / TCS"
+                className={fieldClass}
+              />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">GST / Tax ID (Optional)</label>
-              <input value={gstNumber} onChange={(e) => setGstNumber(e.target.value)} placeholder="GST Number" className={fieldClass} />
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                GST / Tax ID (Optional)
+              </label>
+              <input
+                value={gstNumber}
+                onChange={(e) => setGstNumber(e.target.value)}
+                placeholder="GST Number"
+                className={fieldClass}
+              />
             </div>
           </>
         )}
@@ -271,8 +335,14 @@ export function EnquiryForm({
         {/* Hourly Package Controls */}
         {activeService === "Hourly Package" && (
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Package Duration</label>
-            <select value={hoursPackage} onChange={(e) => setHoursPackage(e.target.value)} className={fieldClass}>
+            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Package Duration
+            </label>
+            <select
+              value={hoursPackage}
+              onChange={(e) => setHoursPackage(e.target.value)}
+              className={fieldClass}
+            >
               <option value="4 Hours / 40 KM">4 Hours / 40 KM</option>
               <option value="8 Hours / 80 KM">8 Hours / 80 KM</option>
               <option value="12 Hours / 120 KM">12 Hours / 120 KM</option>
@@ -285,8 +355,14 @@ export function EnquiryForm({
         {activeService === "Train" && (
           <>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Travel Class</label>
-              <select value={trainClass} onChange={(e) => setTrainClass(e.target.value)} className={fieldClass}>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Travel Class
+              </label>
+              <select
+                value={trainClass}
+                onChange={(e) => setTrainClass(e.target.value)}
+                className={fieldClass}
+              >
                 <option value="1AC">1st AC (1AC)</option>
                 <option value="2AC">2nd AC (2AC)</option>
                 <option value="3AC">3rd AC (3AC)</option>
@@ -295,8 +371,15 @@ export function EnquiryForm({
               </select>
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Train Name / No. Preference</label>
-              <input value={trainPreference} onChange={(e) => setTrainPreference(e.target.value)} placeholder="e.g. Shatabdi / Vande Bharat" className={fieldClass} />
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Train Name / No. Preference
+              </label>
+              <input
+                value={trainPreference}
+                onChange={(e) => setTrainPreference(e.target.value)}
+                placeholder="e.g. Shatabdi / Vande Bharat"
+                className={fieldClass}
+              />
             </div>
           </>
         )}
@@ -305,12 +388,25 @@ export function EnquiryForm({
         {activeService === "Bus Booking" && (
           <>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Bus Operator Preference</label>
-              <input value={busOperator} onChange={(e) => setBusOperator(e.target.value)} placeholder="e.g. KSRTC, VRL, Jabbar" className={fieldClass} />
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Bus Operator Preference
+              </label>
+              <input
+                value={busOperator}
+                onChange={(e) => setBusOperator(e.target.value)}
+                placeholder="e.g. KSRTC, VRL, Jabbar"
+                className={fieldClass}
+              />
             </div>
             <div>
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Bus Type</label>
-              <select value={busType} onChange={(e) => setBusType(e.target.value)} className={fieldClass}>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Bus Type
+              </label>
+              <select
+                value={busType}
+                onChange={(e) => setBusType(e.target.value)}
+                className={fieldClass}
+              >
                 <option value="AC Sleeper">AC Multi-Axle Sleeper</option>
                 <option value="Non-AC Sleeper">Non-AC Sleeper</option>
                 <option value="Volvo Seater">Volvo AC Seater</option>
@@ -321,59 +417,128 @@ export function EnquiryForm({
 
         {/* Locations */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Pickup Location</label>
-          <input value={pickup} onChange={(e) => setPickup(e.target.value)} placeholder="e.g. Bengaluru / Majestic / Airport" className={fieldClass} />
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Pickup Location
+          </label>
+          <input
+            value={pickup}
+            onChange={(e) => setPickup(e.target.value)}
+            placeholder="e.g. Bengaluru / Majestic / Airport"
+            className={fieldClass}
+          />
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Destination / Drop</label>
-          <input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="e.g. Mysuru / Coorg / Ooty" className={fieldClass} />
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Destination / Drop
+          </label>
+          <input
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            placeholder="e.g. Mysuru / Coorg / Ooty"
+            className={fieldClass}
+          />
         </div>
 
         {/* Dates & Time */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Travel Date</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={fieldClass} />
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Travel Date
+          </label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className={fieldClass}
+          />
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Pickup Time</label>
-          <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className={fieldClass} />
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Pickup Time
+          </label>
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className={fieldClass}
+          />
         </div>
 
         {/* Passengers & Vehicles */}
-        {activeService !== "Flight" && activeService !== "Train" && activeService !== "Bus Booking" && (
-          <div>
-            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Vehicle Preference</label>
-            <select value={carType} onChange={(e) => setCarType(e.target.value)} className={fieldClass}>
-              {VEHICLE_OPTIONS.map((v) => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        {activeService !== "Flight" &&
+          activeService !== "Train" &&
+          activeService !== "Bus Booking" && (
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Vehicle Preference
+              </label>
+              <select
+                value={carType}
+                onChange={(e) => setCarType(e.target.value)}
+                className={fieldClass}
+              >
+                {VEHICLE_OPTIONS.map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Number of Passengers</label>
-          <input type="number" min={1} max={50} value={passengers} onChange={(e) => setPassengers(e.target.value)} className={fieldClass} />
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Number of Passengers
+          </label>
+          <input
+            type="number"
+            min={1}
+            max={50}
+            value={passengers}
+            onChange={(e) => setPassengers(e.target.value)}
+            className={fieldClass}
+          />
         </div>
 
         {/* Customer Contact */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Full Name *</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your Name" className={fieldClass} required />
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Full Name *
+          </label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your Name"
+            className={fieldClass}
+            required
+          />
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Phone Number *</label>
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" className={fieldClass} required />
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Phone Number *
+          </label>
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+91 98765 43210"
+            className={fieldClass}
+            required
+          />
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email Address (Optional)</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" className={fieldClass} />
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Email Address (Optional)
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="name@example.com"
+            className={fieldClass}
+          />
         </div>
 
         {/* Train Dynamic Passengers Section */}
@@ -435,7 +600,9 @@ export function EnquiryForm({
 
         {/* Notes */}
         <div className="md:col-span-2 lg:col-span-3">
-          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Special Requirements / Admin Notes</label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Special Requirements / Admin Notes
+          </label>
           <textarea
             rows={2}
             value={notes}
