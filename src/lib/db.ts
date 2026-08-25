@@ -209,12 +209,45 @@ export async function ensureBusinessColumns() {
       ALTER TABLE bookings ADD COLUMN IF NOT EXISTS arrival_airport TEXT;
       ALTER TABLE bookings ADD COLUMN IF NOT EXISTS pnr_external TEXT;
       ALTER TABLE bookings ADD COLUMN IF NOT EXISTS ticket_confirmation TEXT;
-      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS ticket_cost NUMERIC(12,2);
-      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS service_charge_booking NUMERIC(12,2);
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS ticket_cost NUMERIC(12,2) DEFAULT 0;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS service_charge_booking NUMERIC(12,2) DEFAULT 0;
       ALTER TABLE bookings ADD COLUMN IF NOT EXISTS seat_preference TEXT;
       ALTER TABLE bookings ADD COLUMN IF NOT EXISTS preferred_operator TEXT;
       ALTER TABLE bookings ADD COLUMN IF NOT EXISTS preferred_class TEXT;
       ALTER TABLE bookings ADD COLUMN IF NOT EXISTS return_date_flight DATE;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS fare_breakdown TEXT;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS itinerary TEXT;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS hotel_preference TEXT;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS package_id TEXT;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS package_title TEXT;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS adults_count INTEGER;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS children_count INTEGER;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS infants_count INTEGER;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS quota TEXT;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS berth_preference TEXT;
+
+      -- ---- booking_passengers (for train, bus, flight, tour) ----
+      CREATE TABLE IF NOT EXISTS booking_passengers (
+        id SERIAL PRIMARY KEY,
+        booking_id INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+        name TEXT NOT NULL,
+        age INTEGER,
+        gender TEXT,
+        seat_berth TEXT,
+        ticket_number TEXT,
+        phone TEXT,
+        dob TEXT,
+        passport_number TEXT,
+        passport_expiry TEXT,
+        nationality TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+      ALTER TABLE booking_passengers ADD COLUMN IF NOT EXISTS phone TEXT;
+      ALTER TABLE booking_passengers ADD COLUMN IF NOT EXISTS dob TEXT;
+      ALTER TABLE booking_passengers ADD COLUMN IF NOT EXISTS passport_number TEXT;
+      ALTER TABLE booking_passengers ADD COLUMN IF NOT EXISTS passport_expiry TEXT;
+      ALTER TABLE booking_passengers ADD COLUMN IF NOT EXISTS nationality TEXT;
+      CREATE INDEX IF NOT EXISTS idx_booking_passengers_booking ON booking_passengers(booking_id);
 
       -- ---- enquiries: booking_type for new workflow ----
       ALTER TABLE enquiries ADD COLUMN IF NOT EXISTS booking_type VARCHAR(10);

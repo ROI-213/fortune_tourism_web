@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
@@ -7,24 +7,33 @@ import {
   Shield,
   ArrowLeft,
   ArrowRight,
-  Route as RouteIcon,
   FileText,
   Calendar,
   MessageCircle,
-  CreditCard,
-  QrCode,
+  Phone,
+  Mail,
+  Users,
+  MapPin,
+  Sparkles,
+  Download,
+  Home,
+  IndianRupee,
+  Zap,
   Copy,
   Check,
-  Sparkles,
-  ShieldCheck,
-  Zap,
-  IndianRupee,
+  QrCode,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { formatDateTime, formatCurrency } from "@/lib/booking-utils";
+import { formatCurrency, formatDate } from "@/lib/booking-utils";
 import { buildWhatsAppUrl } from "@/lib/contact";
-import { BookingTypeCards } from "@/components/booking/BookingTypeCards";
-import { BookingFormFields } from "@/components/booking/BookingFormFields";
+import { MultiServiceTypeCards, ServiceType } from "@/components/booking/MultiServiceTypeCards";
+import { CabBookingForm } from "@/components/booking/CabBookingForm";
+import { TrainBookingForm } from "@/components/booking/TrainBookingForm";
+import { BusBookingForm } from "@/components/booking/BusBookingForm";
+import { FlightBookingForm } from "@/components/booking/FlightBookingForm";
+import { TourBookingForm } from "@/components/booking/TourBookingForm";
+import { LiveFareSummaryCard } from "@/components/booking/LiveFareSummaryCard";
+import { calculateCabFare, FareCalculationResult } from "@/lib/fare-engine";
 
 export const Route = createFileRoute("/booking")({
   head: () => ({
@@ -33,7 +42,7 @@ export const Route = createFileRoute("/booking")({
       {
         name: "description",
         content:
-          "Professional travel booking with Fortune Tourism. Book car rentals, tour packages, airport transfers and more across South India.",
+          "Book cabs, trains, buses, flights or tour packages with transparent live fare calculation. Professional South India travel booking by Fortune Tourism.",
       },
     ],
   }),
@@ -41,788 +50,810 @@ export const Route = createFileRoute("/booking")({
 });
 
 const STEPS = [
-  { id: 0, label: "Booking Type", icon: RouteIcon },
-  { id: 1, label: "Details", icon: User },
-  { id: 2, label: "Review & Payment", icon: FileText },
-  { id: 3, label: "Confirmation", icon: CheckCircle2 },
+  { id: 0, label: "Service" },
+  { id: 1, label: "Customer" },
+  { id: 2, label: "Journey" },
+  { id: 3, label: "Fare & Pay" },
+  { id: 4, label: "Confirm" },
 ];
+
+const SERVICE_LABELS: Record<ServiceType, string> = {
+  CAB: "Cab Booking",
+  TRAIN: "Train Booking",
+  BUS: "Bus Booking",
+  FLIGHT: "Flight Booking",
+  TOUR: "Tour Package",
+};
+
+const STATUS_BY_SERVICE: Record<ServiceType, string> = {
+  CAB: "PENDING CONFIRMATION",
+  TRAIN: "BOOKING REQUESTED",
+  BUS: "BOOKING REQUESTED",
+  FLIGHT: "BOOKING REQUESTED",
+  TOUR: "ENQUIRY RECEIVED",
+};
 
 function BookingPage() {
   const [step, setStep] = useState(0);
+  const [serviceType, setServiceType] = useState<ServiceType>("CAB");
   const [formData, setFormData] = useState<any>({
-    booking_type: "",
     name: "",
     phone: "",
     email: "",
-    passengers: "1",
-    trip_type: "",
-    car_type: "",
+    adults: 2,
+    children: 0,
+    infants: 0,
+    passengers: "2",
     pickup: "",
     destination: "",
     date: "",
     time: "",
-    return_date: "",
-    bus_operator: "",
-    bus_type: "",
-    train_preference: "",
-    train_class: "",
-    airline: "",
-    cabin_class: "",
     notes: "",
+    trip_type: "Local",
+    vehicle_slug: "sedan",
+    local_package: "4hr_40km",
+    advance_option: 100,
+    // Cab
+    airport_type: "Airport Drop",
+    sightseeing_package: "Bangalore Sightseeing",
+    itinerary_places: ["Bangalore", "Mysore Palace", "Chamundi Hills", "Return to Bangalore"],
+    // Train
+    from_station: "",
+    to_station: "",
+    travel_class: "3A",
+    quota: "General",
+    // Bus
+    from_location: "",
+    boarding_point: "",
+    dropping_point: "",
+    bus_type: "AC Sleeper",
+    preferred_operator: "",
+    // Flight
+    flight_trip_type: "One Way",
+    cabin_class: "Economy",
+    from_airport: "",
+    to_airport: "",
+    return_date: "",
+    // Tour
+    package_slug: "",
+    package_title: "",
+    tour_trip_type: "Round Trip",
+    hotel_tier: "Standard",
+    number_of_days: 2,
   });
-  
-  // Payment states
-  const [advanceOption, setAdvanceOption] = useState<"advance_100" | "zero_advance">("advance_100");
-  const [paymentMethod, setPaymentMethod] = useState<string>("UPI_QR");
-  const [paymentRef, setPaymentRef] = useState<string>("");
-  const [copiedUpi, setCopiedUpi] = useState(false);
-  const [advancePaidAmount, setAdvancePaidAmount] = useState<number>(0);
-
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [enquiryRef, setEnquiryRef] = useState<string | null>(null);
-  const [processingPayment, setProcessingPayment] = useState(false);
-
-  const upiId = "fortunetourism@okaxis";
-
-  const copyUpiId = () => {
-    navigator.clipboard.writeText(upiId);
-    setCopiedUpi(true);
-    toast.success("UPI ID copied to clipboard!");
-    setTimeout(() => setCopiedUpi(false), 2000);
-  };
-
-  const update = useCallback(
-    (field: string, value: any) => {
-      setFormData((prev: any) => ({ ...prev, [field]: value }));
-      if (errors[field]) {
-        setErrors((prev) => {
-          const next = { ...prev };
-          delete next[field];
-          return next;
-        });
-      }
-    },
-    [errors],
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingResult, setBookingResult] = useState<any>(null);
+  const [upiCopied, setUpiCopied] = useState(false);
+  const [fareResult, setFareResult] = useState<FareCalculationResult>(() =>
+    calculateCabFare({ vehicleSlug: "sedan", tripType: "Local", localPackage: "4hr_40km", advanceAmount: 100 })
   );
 
-  const validateStep1 = (): boolean => {
-    const errs: Record<string, string> = {};
-    if (!formData.name?.trim()) errs.name = "Full name is required";
-    if (!formData.phone?.trim()) errs.phone = "Phone number is required";
-    else if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/\D/g, "").slice(-10)))
-      errs.phone = "Enter a valid 10-digit Indian mobile number";
-    
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      errs.email = "Enter a valid email address";
+  const onChange = useCallback((field: string, value: any) => {
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
+    setErrors((prev) => {
+      const n = { ...prev };
+      delete n[field];
+      return n;
+    });
+  }, []);
 
-    if (!formData.passengers) errs.passengers = "Number of passengers is required";
-    if (!formData.date) errs.date = "Travel date is required";
-    
-    if (formData.booking_type === "FLIGHT" && formData.trip_type === "Round Trip" && !formData.return_date) {
-      errs.return_date = "Return date is required";
+  const isCabOrTour = serviceType === "CAB" || serviceType === "TOUR";
+  const isEstimatedQuote = !isCabOrTour;
+
+  // Validate each step
+  const validate = (s: number): boolean => {
+    const e: Record<string, string> = {};
+
+    if (s === 0 && !serviceType) {
+      e.serviceType = "Please select a service type.";
     }
 
-    if (!formData.pickup?.trim()) {
-      if (formData.booking_type === "TRAIN") errs.pickup = "From Station is required";
-      else if (formData.booking_type === "FLIGHT") errs.pickup = "From Airport is required";
-      else errs.pickup = "Pickup location is required";
-    }
-    if (!formData.destination?.trim()) {
-      if (formData.booking_type === "TRAIN") errs.destination = "To Station is required";
-      else if (formData.booking_type === "FLIGHT") errs.destination = "To Airport is required";
-      else errs.destination = "Destination is required";
+    if (s === 1) {
+      if (!formData.name.trim()) e.name = "Full name is required.";
+      if (!formData.phone.trim() || !/^[6-9]\d{9}$/.test(formData.phone.replace(/\s+/g, ""))) {
+        e.phone = "Enter a valid 10-digit Indian mobile number.";
+      }
     }
 
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
+    if (s === 2) {
+      if (!formData.date) e.date = "Travel date is required.";
+      if (serviceType === "CAB") {
+        if (!formData.pickup?.trim()) e.pickup = "Pickup location is required.";
+        if (!formData.destination?.trim()) e.destination = "Drop location is required.";
+      }
+      if (serviceType === "TRAIN") {
+        if (!formData.from_station?.trim()) e.from_station = "Departure station is required.";
+        if (!formData.to_station?.trim()) e.to_station = "Destination station is required.";
+        if (!formData.travel_class) e.travel_class = "Select a travel class.";
+      }
+      if (serviceType === "BUS") {
+        if (!formData.from_location?.trim()) e.from_location = "Boarding city is required.";
+        if (!formData.destination?.trim()) e.destination = "Destination is required.";
+      }
+      if (serviceType === "FLIGHT") {
+        if (!formData.from_airport) e.from_airport = "Departure airport is required.";
+        if (!formData.to_airport) e.to_airport = "Destination airport is required.";
+      }
+      if (serviceType === "TOUR" && !formData.package_slug) {
+        e.package_slug = "Please select a tour package.";
+      }
+    }
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  const handleNext = () => {
-    if (step === 0 && !formData.booking_type) {
-      toast.error("Please select a booking type");
-      return;
+  const nextStep = () => {
+    if (validate(step)) {
+      setStep((s) => Math.min(s + 1, STEPS.length - 1));
     }
-    if (step === 1 && !validateStep1()) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-    setStep((s) => Math.min(3, s + 1));
   };
 
-  const handleBack = () => setStep((s) => Math.max(0, s - 1));
+  const prevStep = () => setStep((s) => Math.max(s - 1, 0));
 
-  const handleSubmitEnquiry = async () => {
-    setProcessingPayment(true);
+  const handleSubmit = async () => {
+    if (!validate(3)) return;
+    setIsSubmitting(true);
+
     try {
-      const serviceMap: Record<string, string> = {
-        TAXI: "Taxi",
-        BUS: "Bus Booking",
+      const serviceToCategory: Record<ServiceType, string> = {
+        CAB: "Taxi",
         TRAIN: "Train",
-        FLIGHT: "Flight"
+        BUS: "Bus Booking",
+        FLIGHT: "Flight",
+        TOUR: "Tour Package",
       };
 
-      const isAdvance = advanceOption === "advance_100";
-      const advanceAmount = isAdvance ? 100 : 0;
+      const passengers = formData.adult_passengers || formData.passengers || [];
+      const passengerData = Array.isArray(passengers)
+        ? passengers
+        : [{ name: formData.name, age: "", gender: "" }];
+
+      const fareSnapshot = isCabOrTour ? JSON.stringify(fareResult.snapshot) : null;
+      const itinerary =
+        formData.itinerary_places?.length
+          ? formData.itinerary_places.join(" → ")
+          : null;
+
+      const payload: Record<string, any> = {
+        name: formData.name,
+        phone: formData.phone.replace(/\s+/g, ""),
+        email: formData.email || null,
+        service: serviceToCategory[serviceType],
+        booking_type: serviceType,
+        pickup: formData.pickup || formData.from_location || formData.from_station || formData.from_airport || null,
+        destination: formData.destination || formData.to_station || formData.to_airport || null,
+        date: formData.date,
+        time: formData.time || null,
+        passengers: String(Number(formData.adults || 1) + Number(formData.children || 0) + Number(formData.infants || 0)),
+        trip_type: formData.trip_type || formData.flight_trip_type || formData.tour_trip_type || null,
+        car_type: formData.vehicle_slug || null,
+        train_class: formData.travel_class || null,
+        train_preference: formData.preferred_train || null,
+        bus_operator: formData.preferred_operator || null,
+        bus_type: formData.bus_type || null,
+        flight_number: null,
+        return_date: formData.return_date || null,
+        notes: [
+          formData.notes,
+          formData.package_title && `Package: ${formData.package_title}`,
+          formData.hotel_tier && `Hotel: ${formData.hotel_tier}`,
+          formData.cabin_class && `Cabin: ${formData.cabin_class}`,
+          formData.quota && `Quota: ${formData.quota}`,
+          formData.boarding_point && `Boarding: ${formData.boarding_point}`,
+          itinerary && `Route: ${itinerary}`,
+          fareSnapshot && `Fare Snapshot: ${fareSnapshot}`,
+        ]
+          .filter(Boolean)
+          .join(" | ") || null,
+        client_token: crypto.randomUUID(),
+        advance_amount: formData.advance_option === 100 ? 100 : 0,
+        payment_method: "UPI",
+        payment_ref: formData.utr_ref || null,
+        fare_breakdown: fareSnapshot,
+        itinerary,
+        package_title: formData.package_title || null,
+        hotel_preference: formData.hotel_tier || null,
+        adults_count: Number(formData.adults || 1),
+        children_count: Number(formData.children || 0),
+        infants_count: Number(formData.infants || 0),
+        quota: formData.quota || null,
+        berth_preference: null,
+        cabin_class: formData.cabin_class || null,
+        from_airport: formData.from_airport || null,
+        to_airport: formData.to_airport || null,
+        passenger_details: passengerData,
+      };
 
       const res = await fetch("/api/enquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          phone: `+91 ${formData.phone}`,
-          email: formData.email || null,
-          service: serviceMap[formData.booking_type] || "Taxi",
-          booking_type: formData.booking_type,
-          pickup: formData.pickup || null,
-          destination: formData.destination || null,
-          date: formData.date || null,
-          time: formData.time || null,
-          passengers: String(formData.passengers),
-          trip_type: formData.trip_type || null,
-          car_type: formData.car_type || null,
-          train_class: formData.train_class || null,
-          train_preference: formData.train_preference || null,
-          bus_operator: formData.bus_operator || null,
-          bus_type: formData.bus_type || null,
-          flight_number: formData.airline || null,
-          notes: [
-            formData.cabin_class ? `Cabin: ${formData.cabin_class}` : "",
-            isAdvance ? `Paid ₹100 Advance via ${paymentMethod} (${paymentRef || "Instant Token"})` : "Zero Advance Booking",
-            formData.notes
-          ].filter(Boolean).join(" | ") || null,
-          advance_amount: advanceAmount,
-          payment_method: isAdvance ? paymentMethod : "NONE",
-          payment_ref: isAdvance ? (paymentRef || `UPI-${Date.now().toString().slice(-6)}`) : null,
-          client_token: typeof crypto !== "undefined" && "randomUUID" in crypto
-              ? crypto.randomUUID()
-              : `tok-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-          return_date: formData.return_date || null
-        }),
+        body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || "Failed to submit enquiry");
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || "Submission failed. Please try again.");
+      }
 
-      setEnquiryRef(data.booking_reference || data.enquiry?.booking_reference || data.enquiry?.enquiry_number || String(data.enquiry?.id || ""));
-      setAdvancePaidAmount(advanceAmount);
-      setStep(3);
-      toast.success(isAdvance ? "₹100 Advance Paid & Booking Submitted!" : "Enquiry submitted successfully!");
+      const data = await res.json();
+      setBookingResult({ ...data, service: serviceType, fareResult });
+      setStep(4);
     } catch (err: any) {
       toast.error(err.message || "Submission failed. Please try again.");
     } finally {
-      setProcessingPayment(false);
+      setIsSubmitting(false);
     }
   };
 
-  /* ──────────── CONFIRMATION VIEW (STEP 3) ──────────── */
-  if (step === 3 && enquiryRef) {
-    const isTaxi = formData.booking_type === "TAXI";
-    
-    return (
-      <SiteLayout>
-        <section className="py-8 md:py-16 bg-gradient-to-br from-emerald-50 via-white to-amber-50 min-h-screen">
-          <div className="max-w-3xl mx-auto px-4">
-            <div className="text-center mb-8 animate-fade-in">
-              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-200 mb-4">
-                <CheckCircle2 className="h-10 w-10 text-white" />
-              </div>
-              <h1 className="font-heading text-3xl md:text-4xl font-bold text-[#0B1F3A] tracking-tight">
-                {advancePaidAmount > 0 ? "Booking Confirmed with Advance!" : "Enquiry Submitted!"}
-              </h1>
-              <p className="text-slate-500 mt-2">
-                {advancePaidAmount > 0 
-                  ? "Your ₹100 token advance has been recorded. Our operations team is allocating your travel details."
-                  : isTaxi 
-                    ? "We will confirm your taxi availability and booking details."
-                    : "Your travel request has been received. Our team will arrange the booking and share the confirmed ticket once available."}
-              </p>
-            </div>
+  const copyUPI = () => {
+    navigator.clipboard.writeText("fortunetourism@okaxis").catch(() => {});
+    setUpiCopied(true);
+    setTimeout(() => setUpiCopied(false), 3000);
+  };
 
-            <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
-              <div className="relative bg-gradient-to-r from-[#0B1F3A] via-[#0D3B2A] to-[#0E6B50] p-6 md:p-8 text-white overflow-hidden">
-                <div className="absolute inset-0 opacity-5">
-                  <div className="absolute top-2 right-2 w-32 h-32 border-2 border-white rounded-full" />
-                  <div className="absolute bottom-2 left-2 w-20 h-20 border-2 border-white rounded-full" />
-                </div>
-                <div className="relative flex items-center justify-between">
-                  <div>
-                    <p className="text-emerald-200/80 text-xs uppercase tracking-wider font-semibold">
-                      Fortune Tourism
-                    </p>
-                    <h2 className="font-heading text-xl md:text-2xl font-bold mt-1">
-                      {advancePaidAmount > 0 ? "Advance Booking Receipt" : "Enquiry Confirmation"}
-                    </h2>
-                  </div>
-                  <span className="inline-flex items-center gap-1 mt-1 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-100 text-xs font-bold">
-                    <CheckCircle2 className="h-3 w-3" /> {advancePaidAmount > 0 ? "Advance Paid" : "Received"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-5 md:p-8 space-y-5">
-                <div className="rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/60 p-6 text-center">
-                  <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">
-                    Your Booking Reference
-                  </p>
-                  <p className="mt-2 font-heading text-4xl font-bold tracking-[0.15em] text-[#0B1F3A]">
-                    {enquiryRef}
-                  </p>
-                  <p className="mt-2 text-xs text-slate-500">
-                    Quote this reference in any communication with our team.
-                  </p>
-                </div>
-
-                {/* Advance payment banner if paid */}
-                {advancePaidAmount > 0 && (
-                  <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-4 flex items-center justify-between shadow-md">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                        <Check className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-emerald-100 uppercase tracking-wider font-semibold">Advance Received</p>
-                        <p className="font-heading font-bold text-lg">₹100 Token Advance Paid</p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/20 backdrop-blur">
-                      Priority Dispatch
-                    </span>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100/30 border border-blue-100">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="p-1.5 rounded-lg bg-blue-100">
-                         <User className="h-3.5 w-3.5 text-blue-600" />
-                      </div>
-                      <span className="text-[10px] font-bold uppercase text-blue-600 tracking-wider">
-                        Passenger
-                      </span>
-                    </div>
-                    <p className="font-heading font-bold text-slate-900">{formData.name}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">+91 {formData.phone}</p>
-                    <p className="text-xs text-slate-500">{formData.passengers} member(s)</p>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/30 border border-emerald-100">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="p-1.5 rounded-lg bg-emerald-100">
-                        <RouteIcon className="h-3.5 w-3.5 text-emerald-600" />
-                      </div>
-                      <span className="text-[10px] font-bold uppercase text-emerald-600 tracking-wider">
-                        Route
-                      </span>
-                    </div>
-                    <p className="font-heading font-bold text-slate-900">
-                      {formData.pickup || "—"} → {formData.destination || "—"}
-                    </p>
-                    {formData.trip_type && (
-                      <p className="text-xs text-slate-500 mt-0.5">{formData.trip_type}</p>
-                    )}
-                  </div>
-                </div>
-
-                {formData.date && (
-                  <div className="flex items-center justify-center gap-3 py-3 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200">
-                    <Calendar className="h-4 w-4 text-amber-600" />
-                    <span className="text-sm font-bold text-amber-900">
-                      {formatDateTime(
-                        formData.date + (formData.time ? `T${formData.time}:00` : ""),
-                      )}
-                    </span>
-                  </div>
-                )}
-
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 text-sm text-slate-600 space-y-1.5">
-                  <p className="font-semibold text-slate-800">What happens next?</p>
-                  <p>1. Our team reviews availability and prepares your final travel voucher.</p>
-                  <p>2. Driver details / e-ticket will be shared on WhatsApp & email.</p>
-                  <p>3. Balance amount can be paid before or at the time of boarding.</p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <a
-                    href={buildWhatsAppUrl({
-                      service: `Booking ${enquiryRef} - ${formData.booking_type}`,
-                      pickup: formData.pickup,
-                      date: formData.date,
-                      name: formData.name,
-                      phone: formData.phone,
-                      notes: `Booking Ref: ${enquiryRef} | Advance: ${advancePaidAmount > 0 ? "₹100 Paid" : "Zero Advance"}`,
-                    })}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl"
-                  >
-                    <MessageCircle className="h-4 w-4" /> Continue on WhatsApp
-                  </a>
-                  <Link
-                    to="/"
-                    className="flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-white border-2 border-slate-200 text-slate-700 font-bold text-sm hover:border-[#0E6B50] transition-all"
-                  >
-                    <ArrowLeft className="h-4 w-4" /> Back to Home
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </SiteLayout>
-    );
-  }
+  const whatsappMsg = `Hello Fortune Tourism! My Booking Ref: ${bookingResult?.booking_reference || bookingResult?.enquiry?.enquiry_number || ""} | Service: ${SERVICE_LABELS[serviceType]} | Date: ${formData.date}`;
 
   return (
     <SiteLayout>
-      <section className="min-h-screen bg-gradient-to-br from-[#F8F2E7] via-white to-emerald-50/30">
-        <div className="bg-gradient-to-r from-[#0B1F3A] to-[#0E6B50] text-white py-6 md:py-8">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="p-2 rounded-xl bg-white/10 backdrop-blur">
-                <Shield className="h-5 w-5 text-amber-400" />
-              </span>
-              <div>
-                <p className="text-xs text-emerald-200/80 uppercase tracking-wider font-semibold">
-                  Fortune Tourism
-                </p>
-                <h1 className="font-heading text-xl md:text-2xl font-bold">Plan Your Journey</h1>
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-8 px-4">
+        {/* Hero Header */}
+        <div className="text-center mb-8 max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-xs font-bold mb-4">
+            <Shield className="w-3.5 h-3.5" />
+            Trusted by 10,000+ South India Travellers
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-2">
+            Plan Your Journey
+          </h1>
+          <p className="text-slate-400 text-sm">
+            Transparent pricing · Live fare calculation · Instant confirmation
+          </p>
+        </div>
+
+        {/* Step Progress */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <div className="flex items-center justify-between relative">
+            <div className="absolute top-4 left-0 right-0 h-0.5 bg-slate-800 z-0" />
+            <div
+              className="absolute top-4 left-0 h-0.5 bg-gradient-to-r from-amber-500 to-orange-500 z-0 transition-all duration-500"
+              style={{ width: `${(step / (STEPS.length - 1)) * 100}%` }}
+            />
+            {STEPS.map((s) => (
+              <div key={s.id} className="flex flex-col items-center gap-1 z-10">
+                <div
+                  className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-black transition-all ${
+                    s.id < step
+                      ? "bg-amber-500 border-amber-500 text-slate-950"
+                      : s.id === step
+                      ? "bg-slate-900 border-amber-500 text-amber-400"
+                      : "bg-slate-900 border-slate-700 text-slate-500"
+                  }`}
+                >
+                  {s.id < step ? <Check className="w-3.5 h-3.5" /> : s.id + 1}
+                </div>
+                <span className={`text-[10px] font-bold hidden sm:block ${s.id <= step ? "text-amber-400" : "text-slate-600"}`}>
+                  {s.label}
+                </span>
               </div>
-            </div>
-            <p className="text-sm text-emerald-100/70 max-w-lg">
-              Book chauffeur-driven taxis, bus tickets, train reservations, or flights with instant assistance.
-            </p>
+            ))}
           </div>
         </div>
 
-        {/* Wizard Progress Bar */}
-        <div className="bg-white border-b border-slate-200/80 sticky top-0 z-20 shadow-sm">
-          <div className="max-w-4xl mx-auto px-4 py-3.5">
-            <div className="flex items-center justify-between gap-2">
-              {STEPS.map((s, idx) => {
-                const Icon = s.icon;
-                const isActive = step === s.id;
-                const isCompleted = step > s.id;
-                return (
-                  <div key={s.id} className="flex items-center flex-1 last:flex-none">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
-                          isCompleted
-                            ? "bg-emerald-500 text-white shadow-md"
-                            : isActive
-                              ? "bg-[#0B1F3A] text-white shadow-md ring-2 ring-[#0B1F3A]/20"
-                              : "bg-slate-100 text-slate-400"
-                        }`}
-                      >
-                        {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : <Icon className="h-3.5 w-3.5" />}
-                      </div>
-                      <span className={`text-[10px] font-bold hidden sm:block ${isActive ? "text-[#0B1F3A]" : "text-slate-400"}`}>
-                        {s.label}
-                      </span>
-                    </div>
-                    {idx < STEPS.length - 1 && <div className={`flex-1 h-0.5 mx-2 ${isCompleted ? "bg-emerald-400" : "bg-slate-200"}`} />}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Form Content */}
-        <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
+        <div className="max-w-6xl mx-auto">
+          {/* STEP 0 — Service Selection */}
           {step === 0 && (
-            <div className="space-y-6 animate-fade-in">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0E6B50]">Step 1 of 3</p>
-                <h2 className="mt-1 font-heading text-2xl md:text-3xl font-bold text-[#0B1F3A]">What are you booking for?</h2>
+            <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+              <MultiServiceTypeCards selectedService={serviceType} onSelect={setServiceType} />
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                >
+                  Continue with {SERVICE_LABELS[serviceType]} <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
-              <BookingTypeCards 
-                selectedType={formData.booking_type}
-                onSelect={(type) => update("booking_type", type)}
-              />
-              <button
-                onClick={handleNext}
-                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#0B1F3A] to-[#0E6B50] text-white font-heading font-bold shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-2"
-              >
-                Continue to Details <ArrowRight className="h-5 w-5" />
-              </button>
             </div>
           )}
 
+          {/* STEP 1 — Customer Details */}
           {step === 1 && (
-            <div className="space-y-6 animate-fade-in">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0E6B50]">Step 2 of 3</p>
-                <h2 className="mt-1 font-heading text-2xl md:text-3xl font-bold text-[#0B1F3A]">Customer & Journey Details</h2>
-              </div>
-              
-              <BookingFormFields
-                bookingType={formData.booking_type}
-                formData={formData}
-                onChange={update}
-                errors={errors}
-              />
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleBack}
-                  className="flex-1 py-4 px-6 rounded-2xl border-2 border-slate-200 text-slate-700 font-bold hover:border-slate-400 transition-all flex items-center justify-center gap-2"
-                >
-                  <ArrowLeft className="h-4 w-4" /> Back
-                </button>
-                <button
-                  onClick={handleNext}
-                  className="flex-[2] py-4 px-6 rounded-2xl bg-gradient-to-r from-[#0B1F3A] to-[#0E6B50] text-white font-heading font-bold shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-2"
-                >
-                  Review & Payment Options <ArrowRight className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="space-y-6 animate-fade-in">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0E6B50]">
-                  Step 3 of 3
-                </p>
-                <h2 className="mt-1 font-heading text-2xl md:text-3xl font-bold text-[#0B1F3A]">
-                  Review & Payment Options
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Choose your advance booking option and submit your travel request.
-                </p>
-              </div>
-
-              {/* Trip Summary Card */}
-              <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-8 space-y-6">
+            <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                  <User className="w-5 h-5" />
+                </div>
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 pb-2 border-b">
-                    Personal Information
-                  </h3>
-                  <div className="grid grid-cols-2 gap-y-4">
-                    <div>
-                      <p className="text-xs text-slate-400">Name</p>
-                      <p className="font-semibold text-slate-900">{formData.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-400">Phone</p>
-                      <p className="font-semibold text-slate-900">+91 {formData.phone}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-400">Email</p>
-                      <p className="font-semibold text-slate-900">{formData.email || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-400">Passengers</p>
-                      <p className="font-semibold text-slate-900">{formData.passengers}</p>
-                    </div>
-                  </div>
+                  <h2 className="font-black text-slate-100 text-lg">Your Details</h2>
+                  <p className="text-xs text-slate-400">Contact information for booking confirmation</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-1.5">
+                    <User className="w-3.5 h-3.5 text-amber-400" /> Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Your full name"
+                    value={formData.name}
+                    onChange={(e) => onChange("name", e.target.value)}
+                    className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                  {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
                 </div>
 
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 pb-2 border-b">
-                    Travel Details
-                  </h3>
-                  <div className="grid grid-cols-2 gap-y-4">
-                    <div>
-                      <p className="text-xs text-slate-400">Service Type</p>
-                      <p className="font-semibold text-slate-900">{formData.booking_type}</p>
-                    </div>
-                    {formData.trip_type && (
-                      <div>
-                        <p className="text-xs text-slate-400">Trip Type</p>
-                        <p className="font-semibold text-slate-900">{formData.trip_type}</p>
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-xs text-slate-400">From</p>
-                      <p className="font-semibold text-slate-900">{formData.pickup}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-400">To</p>
-                      <p className="font-semibold text-slate-900">{formData.destination}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-400">Date</p>
-                      <p className="font-semibold text-slate-900">{formData.date}</p>
-                    </div>
-                    {formData.return_date && (
-                      <div>
-                        <p className="text-xs text-slate-400">Return Date</p>
-                        <p className="font-semibold text-slate-900">{formData.return_date}</p>
-                      </div>
-                    )}
-                    {formData.time && (
-                      <div>
-                        <p className="text-xs text-slate-400">Time</p>
-                        <p className="font-semibold text-slate-900">{formData.time}</p>
-                      </div>
-                    )}
-                  </div>
-                  {formData.notes && (
-                    <div className="mt-4">
-                      <p className="text-xs text-slate-400">Notes / Requests</p>
-                      <p className="font-medium text-sm text-slate-800 mt-1">{formData.notes}</p>
-                    </div>
-                  )}
+                  <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-1.5">
+                    <Phone className="w-3.5 h-3.5 text-amber-400" /> Mobile Number *
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="10-digit Indian mobile number"
+                    value={formData.phone}
+                    onChange={(e) => onChange("phone", e.target.value)}
+                    maxLength={10}
+                    className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                  {errors.phone && <p className="text-xs text-red-400 mt-1">{errors.phone}</p>}
                 </div>
-              </div>
 
-              {/* Advance Payment Options (₹100 Advance vs Zero Advance) */}
-              <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-8 space-y-6">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-amber-500" />
-                    <h3 className="font-heading text-lg font-bold text-[#0B1F3A]">
-                      Select Booking Advance Option
-                    </h3>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Choose how you would like to confirm your booking reservation.
-                  </p>
+                  <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-1.5">
+                    <Mail className="w-3.5 h-3.5 text-slate-400" /> Email Address
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Optional — for PDF confirmation"
+                    value={formData.email}
+                    onChange={(e) => onChange("email", e.target.value)}
+                    className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* OPTION 1: ₹100 Token Advance */}
-                  <div
-                    onClick={() => setAdvanceOption("advance_100")}
-                    className={`relative p-5 rounded-2xl border-2 transition-all cursor-pointer ${
-                      advanceOption === "advance_100"
-                        ? "border-[#0E6B50] bg-emerald-50/40 shadow-md ring-2 ring-[#0E6B50]/10"
-                        : "border-slate-200 hover:border-slate-300 bg-white"
-                    }`}
-                  >
-                    <div className="absolute top-3 right-3">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                        <Zap className="h-3 w-3 text-emerald-600" /> RECOMMENDED
-                      </span>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={`w-6 h-6 mt-0.5 rounded-full border-2 flex items-center justify-center ${
-                          advanceOption === "advance_100"
-                            ? "border-[#0E6B50] bg-[#0E6B50]"
-                            : "border-slate-300"
-                        }`}
-                      >
-                        {advanceOption === "advance_100" && (
-                          <div className="w-2 h-2 rounded-full bg-white" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-heading font-bold text-slate-900 text-base">
-                          Pay ₹100 Token Advance
-                        </p>
-                        <p className="text-xs text-[#0E6B50] font-semibold mt-0.5">
-                          Instant Priority Confirmation
-                        </p>
-                        <ul className="text-xs text-slate-500 mt-2 space-y-1">
-                          <li className="flex items-center gap-1.5">
-                            <Check className="h-3.5 w-3.5 text-emerald-600 flex-shrink-0" />
-                            Guaranteed cab/seat reservation lock
-                          </li>
-                          <li className="flex items-center gap-1.5">
-                            <Check className="h-3.5 w-3.5 text-emerald-600 flex-shrink-0" />
-                            Deducted from final total journey cost
-                          </li>
-                          <li className="flex items-center gap-1.5">
-                            <Check className="h-3.5 w-3.5 text-emerald-600 flex-shrink-0" />
-                            100% refundable on cancellation
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* OPTION 2: Zero Advance */}
-                  <div
-                    onClick={() => setAdvanceOption("zero_advance")}
-                    className={`p-5 rounded-2xl border-2 transition-all cursor-pointer ${
-                      advanceOption === "zero_advance"
-                        ? "border-[#0B1F3A] bg-slate-50/70 shadow-md ring-2 ring-[#0B1F3A]/10"
-                        : "border-slate-200 hover:border-slate-300 bg-white"
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={`w-6 h-6 mt-0.5 rounded-full border-2 flex items-center justify-center ${
-                          advanceOption === "zero_advance"
-                            ? "border-[#0B1F3A] bg-[#0B1F3A]"
-                            : "border-slate-300"
-                        }`}
-                      >
-                        {advanceOption === "zero_advance" && (
-                          <div className="w-2 h-2 rounded-full bg-white" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-heading font-bold text-slate-900 text-base">
-                          Zero Advance (Pay Later)
-                        </p>
-                        <p className="text-xs text-slate-600 font-semibold mt-0.5">
-                          ₹0 Due Today
-                        </p>
-                        <ul className="text-xs text-slate-500 mt-2 space-y-1">
-                          <li className="flex items-center gap-1.5">
-                            <Check className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
-                            Submit request for price quote & itinerary
-                          </li>
-                          <li className="flex items-center gap-1.5">
-                            <Check className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
-                            Pay remaining balance before trip departure
-                          </li>
-                          <li className="flex items-center gap-1.5">
-                            <Check className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
-                            Confirmation subject to final seat availability
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ₹100 Payment Gateway / UPI QR Section (shown when ₹100 selected) */}
-                {advanceOption === "advance_100" && (
-                  <div className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/40 p-5 md:p-6 space-y-4 animate-fade-in">
-                    <div className="flex items-center justify-between pb-3 border-b border-emerald-100">
-                      <div>
-                        <p className="text-xs uppercase tracking-wider font-bold text-emerald-800">
-                          Token Advance Amount
-                        </p>
-                        <p className="font-heading text-2xl font-bold text-[#0E6B50]">
-                          ₹100 <span className="text-xs font-normal text-slate-500">only</span>
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">
-                          <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> Secure Payment
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* UPI Apps / Methods */}
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
-                        Choose Payment Method
-                      </label>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        {[
-                          { id: "UPI_QR", label: "Scan UPI QR", icon: QrCode },
-                          { id: "GPAY", label: "Google Pay", icon: CreditCard },
-                          { id: "PHONEPE", label: "PhonePe", icon: CreditCard },
-                          { id: "PAYTM", label: "Paytm / UPI", icon: CreditCard },
-                        ].map((m) => {
-                          const Icon = m.icon;
-                          return (
+                {/* Passenger counts only for non-cab */}
+                {serviceType !== "CAB" ? (
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-amber-400" /> Passengers
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { key: "adults", label: "Adults" },
+                        { key: "children", label: "Children" },
+                        { key: "infants", label: "Infants" },
+                      ].map(({ key, label }) => (
+                        <div key={key} className="bg-slate-950/60 border border-slate-800 rounded-xl p-2 text-center">
+                          <div className="text-[11px] text-slate-400 mb-1">{label}</div>
+                          <div className="flex items-center justify-center gap-1.5">
                             <button
-                              key={m.id}
                               type="button"
-                              onClick={() => setPaymentMethod(m.id)}
-                              className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${
-                                paymentMethod === m.id
-                                  ? "border-[#0E6B50] bg-emerald-600 text-white shadow-sm"
-                                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                              }`}
+                              onClick={() => onChange(key, Math.max(key === "adults" ? 1 : 0, Number(formData[key] || (key === "adults" ? 2 : 0)) - 1))}
+                              className="w-6 h-6 rounded-lg bg-slate-800 text-slate-200 font-bold text-sm flex items-center justify-center"
                             >
-                              <Icon className="h-4 w-4" />
-                              {m.label}
+                              −
                             </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* QR Code & UPI Details Box */}
-                    <div className="p-4 rounded-xl bg-white border border-slate-200 flex flex-col sm:flex-row items-center gap-4">
-                      <div className="p-2 rounded-xl bg-white border border-slate-100 shadow-sm flex-shrink-0 text-center">
-                        <img
-                          src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=upi%3A%2F%2Fpay%3Fpa%3Dfortunetourism%40okaxis%26pn%3DFortune%2520Tourism%26am%3D100%26cu%3DINR%26tn%3DToken%2520Advance"
-                          alt="Scan & Pay ₹100 UPI QR"
-                          className="w-28 h-28 mx-auto"
-                        />
-                        <span className="text-[10px] text-slate-400 mt-1 block">Scan with any UPI App</span>
-                      </div>
-
-                      <div className="space-y-2 flex-1 text-center sm:text-left">
-                        <p className="text-xs font-semibold text-slate-700">
-                          Scan the QR code or pay to official Fortune Tourism UPI:
-                        </p>
-                        
-                        <div className="flex items-center gap-2 justify-center sm:justify-start">
-                          <span className="font-mono text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-100 border text-[#0B1F3A]">
-                            {upiId}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={copyUpiId}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition"
-                          >
-                            {copiedUpi ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                            {copiedUpi ? "Copied" : "Copy"}
-                          </button>
+                            <span className="w-5 text-center font-black text-slate-100 text-sm">
+                              {formData[key] || (key === "adults" ? 2 : 0)}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => onChange(key, Number(formData[key] || (key === "adults" ? 2 : 0)) + 1)}
+                              className="w-6 h-6 rounded-lg bg-slate-800 text-slate-200 font-bold text-sm flex items-center justify-center"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
-
-                        {/* Direct Pay Link for mobile devices */}
-                        <div className="pt-1">
-                          <a
-                            href={`upi://pay?pa=${upiId}&pn=Fortune%20Tourism&am=100&cu=INR&tn=Token%20Booking`}
-                            className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:underline"
-                          >
-                            <Zap className="h-3.5 w-3.5 text-emerald-600" /> Click here to open UPI App on Mobile
-                          </a>
-                        </div>
-                      </div>
+                      ))}
                     </div>
-
-                    {/* Optional UTR reference input */}
-                    <div>
-                      <label className="block text-[11px] font-bold uppercase text-slate-500 mb-1">
-                        UPI Reference / UTR Number <span className="text-slate-400 font-normal">(Optional)</span>
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. 423987654321 or GPay Transaction ID"
-                        value={paymentRef}
-                        onChange={(e) => setPaymentRef(e.target.value)}
-                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:border-[#0E6B50] bg-white"
-                      />
-                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-1.5">
+                      <Users className="w-3.5 h-3.5 text-amber-400" /> Number of Passengers
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={formData.adults || 2}
+                      onChange={(e) => onChange("adults", e.target.value)}
+                      className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:ring-2 focus:ring-amber-500"
+                    />
                   </div>
                 )}
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3">
-                <button
-                  onClick={handleBack}
-                  disabled={processingPayment}
-                  className="flex-1 py-4 px-6 rounded-2xl border-2 border-slate-200 text-slate-700 font-bold text-sm hover:border-slate-400 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  <ArrowLeft className="h-4 w-4" /> Edit Details
+              <div>
+                <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-1.5">
+                  <MessageCircle className="w-3.5 h-3.5 text-slate-400" /> Special Requirements / Notes
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Any special requirements, requests or additional information..."
+                  value={formData.notes}
+                  onChange={(e) => onChange("notes", e.target.value)}
+                  className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 resize-none"
+                />
+              </div>
+
+              <div className="flex justify-between pt-2">
+                <button type="button" onClick={prevStep} className="flex items-center gap-2 text-slate-400 hover:text-slate-200 font-semibold text-sm px-4 py-2 border border-slate-800 rounded-xl hover:border-slate-700 transition-all">
+                  <ArrowLeft className="w-4 h-4" /> Back
                 </button>
-                <button
-                  onClick={handleSubmitEnquiry}
-                  disabled={processingPayment}
-                  className="flex-[2] py-4 px-6 rounded-2xl bg-gradient-to-r from-[#0B1F3A] to-[#0E6B50] text-white font-heading font-bold text-base shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {processingPayment ? (
-                    "Processing..."
-                  ) : advanceOption === "advance_100" ? (
-                    <>
-                      <IndianRupee className="h-5 w-5" /> Pay ₹100 & Confirm Booking
-                    </>
-                  ) : (
-                    <>
-                      Submit Enquiry (₹0 Due Now) <ArrowRight className="h-5 w-5" />
-                    </>
-                  )}
+                <button type="button" onClick={nextStep} className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all">
+                  Continue to Journey Details <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
           )}
+
+          {/* STEP 2 — Journey Details (Service-Specific Forms) */}
+          {step === 2 && (
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <div className="xl:col-span-2 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+                <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
+                  <div className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full px-3 py-1">
+                    {SERVICE_LABELS[serviceType]}
+                  </div>
+                  <span className="text-slate-400 text-sm">Journey Details</span>
+                </div>
+
+                {serviceType === "CAB" && (
+                  <CabBookingForm
+                    formData={formData}
+                    onChange={onChange}
+                    onFareCalculated={setFareResult}
+                    errors={errors}
+                  />
+                )}
+                {serviceType === "TRAIN" && (
+                  <TrainBookingForm formData={formData} onChange={onChange} errors={errors} />
+                )}
+                {serviceType === "BUS" && (
+                  <BusBookingForm formData={formData} onChange={onChange} errors={errors} />
+                )}
+                {serviceType === "FLIGHT" && (
+                  <FlightBookingForm formData={formData} onChange={onChange} errors={errors} />
+                )}
+                {serviceType === "TOUR" && (
+                  <TourBookingForm
+                    formData={formData}
+                    onChange={onChange}
+                    onFareCalculated={setFareResult}
+                    errors={errors}
+                  />
+                )}
+
+                <div className="flex justify-between pt-2 border-t border-slate-800">
+                  <button type="button" onClick={prevStep} className="flex items-center gap-2 text-slate-400 hover:text-slate-200 font-semibold text-sm px-4 py-2 border border-slate-800 rounded-xl hover:border-slate-700 transition-all">
+                    <ArrowLeft className="w-4 h-4" /> Back
+                  </button>
+                  <button type="button" onClick={nextStep} className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all">
+                    Review Booking & Fare <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Live Fare Sidebar */}
+              <div className="xl:col-span-1">
+                <LiveFareSummaryCard
+                  fareResult={fareResult}
+                  serviceType={serviceType}
+                  advanceOption={formData.advance_option === 0 ? 0 : 100}
+                  onAdvanceOptionChange={(opt) => onChange("advance_option", opt)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3 — Review & Payment */}
+          {step === 3 && (
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <div className="xl:col-span-2 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+                <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
+                  <FileText className="w-5 h-5 text-amber-400" />
+                  <div>
+                    <h2 className="font-black text-slate-100 text-lg">Review Your Booking</h2>
+                    <p className="text-xs text-slate-400">Confirm details before submitting</p>
+                  </div>
+                </div>
+
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Customer */}
+                  <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 space-y-2">
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-amber-400" /> Customer
+                    </div>
+                    <div className="text-sm font-bold text-slate-100">{formData.name}</div>
+                    <div className="text-xs text-slate-400">{formData.phone}</div>
+                    {formData.email && <div className="text-xs text-slate-400">{formData.email}</div>}
+                    <div className="text-xs text-slate-400">
+                      {Number(formData.adults || 2)} Adults
+                      {Number(formData.children || 0) > 0 && `, ${formData.children} Children`}
+                      {Number(formData.infants || 0) > 0 && `, ${formData.infants} Infants`}
+                    </div>
+                  </div>
+
+                  {/* Journey */}
+                  <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 space-y-2">
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-emerald-400" /> Journey
+                    </div>
+                    <div className="text-xs font-bold text-amber-400">{SERVICE_LABELS[serviceType]}</div>
+                    {formData.date && (
+                      <div className="text-xs text-slate-300 flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-slate-500" />
+                        {formatDate(formData.date)}
+                        {formData.time && ` · ${formData.time}`}
+                      </div>
+                    )}
+                    <div className="text-xs text-slate-300">
+                      {formData.from_location || formData.from_station || formData.from_airport || formData.pickup || "—"}
+                      {(formData.destination || formData.to_station || formData.to_airport) && (
+                        <> → {formData.destination || formData.to_station || formData.to_airport}</>
+                      )}
+                    </div>
+                    {formData.trip_type && (
+                      <div className="text-xs text-slate-500">{formData.trip_type}</div>
+                    )}
+                    {formData.package_title && (
+                      <div className="text-xs font-semibold text-purple-400">📦 {formData.package_title}</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* UPI Payment Section (when advance is ₹100) */}
+                {formData.advance_option === 100 && (
+                  <div className="bg-gradient-to-b from-amber-950/30 to-slate-950 border border-amber-500/30 rounded-2xl p-5 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-amber-400" />
+                      <div>
+                        <h3 className="font-black text-amber-300">Pay ₹100 Token Advance — Instant Priority Confirmation</h3>
+                        <p className="text-[11px] text-amber-200/70">Scan UPI QR below or use any UPI app to pay ₹100 now</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center gap-5">
+                      {/* QR Code */}
+                      <div className="bg-white p-3 rounded-2xl shadow-xl shrink-0">
+                        <div className="w-32 h-32 flex items-center justify-center">
+                          <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?data=upi://pay?pa=fortunetourism@okaxis%26pn=Fortune%20Tourism%26am=100%26tn=Token%20Advance&size=128x128&format=png`}
+                            alt="UPI QR Code"
+                            className="w-full h-full"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = "none";
+                            }}
+                          />
+                        </div>
+                        <div className="text-center text-[10px] font-bold text-slate-900 mt-1">Scan · Pay ₹100</div>
+                      </div>
+
+                      {/* UPI Details */}
+                      <div className="flex-1 space-y-3">
+                        <div className="bg-slate-950/80 border border-slate-700 rounded-xl p-3 flex items-center justify-between">
+                          <div>
+                            <div className="text-[10px] text-slate-400 font-semibold">UPI ID</div>
+                            <div className="font-black text-slate-100 text-sm">fortunetourism@okaxis</div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={copyUPI}
+                            className="flex items-center gap-1.5 text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20"
+                          >
+                            {upiCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                            {upiCopied ? "Copied!" : "Copy"}
+                          </button>
+                        </div>
+
+                        {/* UPI App Links */}
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { name: "GPay", link: "tez://upi/pay?pa=fortunetourism@okaxis&pn=Fortune+Tourism&am=100&tn=Token+Advance" },
+                            { name: "PhonePe", link: "phonepe://pay?pa=fortunetourism@okaxis&pn=Fortune+Tourism&am=100" },
+                            { name: "Paytm", link: "paytmmp://upi/pay?pa=fortunetourism@okaxis&pn=Fortune+Tourism&am=100" },
+                            { name: "Any UPI App", link: `upi://pay?pa=fortunetourism@okaxis&pn=Fortune%20Tourism&am=100&tn=Token%20Advance` },
+                          ].map((app) => (
+                            <a
+                              key={app.name}
+                              href={app.link}
+                              className="text-xs font-bold text-slate-200 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg hover:border-amber-500/50 hover:bg-slate-700 transition-all"
+                            >
+                              {app.name}
+                            </a>
+                          ))}
+                        </div>
+
+                        {/* UTR Input */}
+                        <div>
+                          <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                            UTR / Transaction Reference (After payment — optional)
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Enter UPI transaction ID or UTR number"
+                            value={formData.utr_ref || ""}
+                            onChange={(e) => onChange("utr_ref", e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Payment Option Summary */}
+                <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+                  <div className="flex items-center justify-between text-sm mb-3">
+                    <span className="font-semibold text-slate-300">Payment Option:</span>
+                    <span className="font-black text-amber-400">
+                      {formData.advance_option === 100 ? "₹100 Token Advance (Priority)" : "Zero Advance (Pay Later)"}
+                    </span>
+                  </div>
+                  {!isEstimatedQuote && (
+                    <>
+                      <div className="flex items-center justify-between text-sm mb-1">
+                        <span className="text-slate-400">Total Booking Fare:</span>
+                        <span className="font-black text-slate-100 text-lg">{formatCurrency(fareResult.totalFare)}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-400">Balance Payable on Travel:</span>
+                        <span className="font-bold text-amber-300">
+                          {formatCurrency(formData.advance_option === 100
+                            ? Math.max(0, fareResult.totalFare - 100)
+                            : fareResult.totalFare)}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                  {isEstimatedQuote && (
+                    <p className="text-xs text-slate-400">Final fare will be confirmed by our team after checking availability.</p>
+                  )}
+                </div>
+
+                <div className="flex justify-between pt-2 border-t border-slate-800">
+                  <button type="button" onClick={prevStep} className="flex items-center gap-2 text-slate-400 hover:text-slate-200 font-semibold text-sm px-4 py-2 border border-slate-800 rounded-xl hover:border-slate-700 transition-all">
+                    <ArrowLeft className="w-4 h-4" /> Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-70"
+                  >
+                    {isSubmitting ? (
+                      <><span className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" /> Processing...</>
+                    ) : formData.advance_option === 100 ? (
+                      <>Confirm & Submit Booking (₹100 Paid) <ArrowRight className="w-4 h-4" /></>
+                    ) : (
+                      <>Submit Booking (₹0 Due Today) <ArrowRight className="w-4 h-4" /></>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Fare Summary Sidebar */}
+              <div className="xl:col-span-1">
+                <LiveFareSummaryCard
+                  fareResult={fareResult}
+                  serviceType={serviceType}
+                  advanceOption={formData.advance_option === 0 ? 0 : 100}
+                  onAdvanceOptionChange={(opt) => onChange("advance_option", opt)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4 — Confirmation */}
+          {step === 4 && bookingResult && (
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <div className={`w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl ${
+                    formData.advance_option === 100
+                      ? "bg-amber-500 shadow-amber-500/40"
+                      : "bg-emerald-500 shadow-emerald-500/40"
+                  }`}>
+                    <CheckCircle2 className="w-10 h-10 text-white" />
+                  </div>
+
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-100">
+                      {serviceType === "CAB" ? "Cab Booking Submitted!" :
+                       serviceType === "TOUR" ? "Tour Package Enquiry Submitted!" :
+                       "Booking Request Received!"}
+                    </h2>
+                    <p className="text-slate-400 text-sm mt-1">
+                      {serviceType === "CAB"
+                        ? "We will confirm your taxi availability and booking details shortly."
+                        : serviceType === "TOUR"
+                        ? "Our team will review your tour requirements and call you shortly."
+                        : "Your travel request is received. Our team will arrange the booking and share details."}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reference Number */}
+                <div className="bg-slate-950/80 border border-slate-700 rounded-2xl p-5 space-y-3">
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Booking Reference</div>
+                  <div className="text-3xl font-black text-amber-400 tracking-wider">
+                    {bookingResult.booking_reference ||
+                     bookingResult.enquiry?.enquiry_number ||
+                     bookingResult.enquiry?.id?.toString().slice(-6) || "—"}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-left text-xs">
+                    <div>
+                      <div className="text-slate-500">Service</div>
+                      <div className="font-bold text-slate-200">{SERVICE_LABELS[serviceType]}</div>
+                    </div>
+                    <div>
+                      <div className="text-slate-500">Status</div>
+                      <div className="font-bold text-amber-300">{STATUS_BY_SERVICE[serviceType]}</div>
+                    </div>
+                    <div>
+                      <div className="text-slate-500">Customer</div>
+                      <div className="font-bold text-slate-200">{formData.name}</div>
+                    </div>
+                    <div>
+                      <div className="text-slate-500">Travel Date</div>
+                      <div className="font-bold text-slate-200">{formatDate(formData.date)}</div>
+                    </div>
+                    {!isEstimatedQuote && (
+                      <>
+                        <div>
+                          <div className="text-slate-500">Total Fare</div>
+                          <div className="font-black text-amber-400 text-base">{formatCurrency(fareResult.totalFare)}</div>
+                        </div>
+                        <div>
+                          <div className="text-slate-500">Balance Due</div>
+                          <div className="font-black text-slate-200 text-base">
+                            {formatCurrency(formData.advance_option === 100 ? Math.max(0, fareResult.totalFare - 100) : fareResult.totalFare)}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {formData.advance_option === 100 && (
+                    <div className="flex items-center justify-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-xl py-2 px-3 text-amber-400 text-xs font-bold">
+                      <Sparkles className="w-3.5 h-3.5" /> ₹100 Token Advance Paid — Priority Dispatch Activated
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <a
+                    href={buildWhatsAppUrl(whatsappMsg)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all text-sm"
+                  >
+                    <MessageCircle className="w-4 h-4" /> WhatsApp Us
+                  </a>
+                  <Link
+                    to="/"
+                    className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold py-3 rounded-xl transition-all text-sm"
+                  >
+                    <Home className="w-4 h-4" /> Back to Home
+                  </Link>
+                </div>
+
+                <p className="text-xs text-slate-500">
+                  Save your Booking Reference for future queries. Our team will contact you on{" "}
+                  <span className="text-slate-300 font-semibold">{formData.phone}</span> within 30 minutes.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
-      </section>
+      </div>
     </SiteLayout>
   );
 }
