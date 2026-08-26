@@ -550,6 +550,39 @@ function BookingPage() {
                 </div>
               </div>
 
+              {/* PACKAGE SELECTOR BUTTONS IN ONE ROW (For LOCAL & HOURLY PACKAGE) */}
+              {(cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") && (
+                <div className="flex flex-col items-center justify-center gap-1.5 pt-2 pb-1">
+                  <div className="text-[11px] font-black uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-emerald-600" /> SELECT RENTAL PACKAGE
+                  </div>
+                  <div className="inline-flex rounded-lg border border-slate-300 overflow-hidden text-xs sm:text-sm font-bold bg-white shadow-2xs">
+                    {[
+                      { id: "4hr_40km", label: "4 hrs | 40 km" },
+                      { id: "8hr_80km", label: "8 hrs | 80 km" },
+                      { id: "12hr_120km", label: "12 hrs | 120 km" },
+                    ].map((pkg) => {
+                      const isSelected = localPackage === pkg.id;
+                      return (
+                        <button
+                          key={pkg.id}
+                          type="button"
+                          onClick={() => setLocalPackage(pkg.id as any)}
+                          style={isSelected ? { backgroundColor: "#0E6B50", color: "#ffffff" } : undefined}
+                          className={`px-3 sm:px-5 py-2 transition-all uppercase tracking-wider ${
+                            isSelected
+                              ? "bg-[#0E6B50] text-white font-extrabold shadow-inner"
+                              : "text-slate-700 hover:bg-slate-50 border-r last:border-r-0 border-slate-200"
+                          }`}
+                        >
+                          {pkg.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* INPUT FIELDS ROW */}
               <div className="pt-2">
                 {/* ONE WAY */}
@@ -697,47 +730,46 @@ function BookingPage() {
                   </div>
                 )}
 
-                {/* LOCAL & HOURLY PACKAGE (Package in row + Drop Location) */}
+                {/* LOCAL & HOURLY PACKAGE (50/50 Pickup and Drop Location) */}
                 {(cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") && (
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-                    <div className="md:col-span-3 space-y-1">
-                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                        PICKUP LOCATION
-                      </label>
-                      <LocationSearchInput
-                        value={cabFrom}
-                        onChange={setCabFrom}
-                        placeholder="Enter Pickup Location"
-                      />
+                    {/* FROM + SWAP + TO (Equal 50/50 Symmetrical Width) */}
+                    <div className="md:col-span-6 flex items-end gap-2">
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                          PICKUP LOCATION
+                        </label>
+                        <LocationSearchInput
+                          value={cabFrom}
+                          onChange={setCabFrom}
+                          placeholder="Enter Pickup Location"
+                        />
+                      </div>
+
+                      <div className="flex-shrink-0 pb-1">
+                        <button
+                          type="button"
+                          onClick={swapLocations}
+                          className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
+                          title="Swap Locations"
+                        >
+                          <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
+                        </button>
+                      </div>
+
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                          DROP LOCATION
+                        </label>
+                        <LocationSearchInput
+                          value={cabTo}
+                          onChange={setCabTo}
+                          placeholder="Enter Drop Location"
+                        />
+                      </div>
                     </div>
 
                     <div className="md:col-span-3 space-y-1">
-                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                        DROP LOCATION
-                      </label>
-                      <LocationSearchInput
-                        value={cabTo}
-                        onChange={setCabTo}
-                        placeholder="Enter Drop Location"
-                      />
-                    </div>
-
-                    <div className="md:col-span-2 space-y-1">
-                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800 flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-emerald-600" /> PACKAGE
-                      </label>
-                      <select
-                        value={localPackage}
-                        onChange={(e) => setLocalPackage(e.target.value as any)}
-                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-1 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none cursor-pointer"
-                      >
-                        <option value="4hr_40km">4 hrs | 40 km</option>
-                        <option value="8hr_80km">8 hrs | 80 km</option>
-                        <option value="12hr_120km">12 hrs | 120 km</option>
-                      </select>
-                    </div>
-
-                    <div className="md:col-span-2 space-y-1">
                       <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                         PICK UP DATE
                       </label>
@@ -750,7 +782,7 @@ function BookingPage() {
                       />
                     </div>
 
-                    <div className="md:col-span-2 space-y-1">
+                    <div className="md:col-span-3 space-y-1">
                       <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                         PICK UP TIME
                       </label>
@@ -758,7 +790,7 @@ function BookingPage() {
                         type="time"
                         value={cabTime}
                         onChange={(e) => setCabTime(e.target.value)}
-                        className="w-full min-w-[100px] bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                       />
                     </div>
                   </div>
