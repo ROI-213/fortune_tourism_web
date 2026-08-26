@@ -48,7 +48,7 @@ export const Route = createFileRoute("/booking")({
   component: BookingPage,
 });
 
-type CabTripType = "ONE WAY" | "ROUND TRIP" | "LOCAL" | "AIRPORT";
+type CabTripType = "ONE WAY" | "ROUND TRIP" | "LOCAL" | "AIRPORT" | "HOURLY PACKAGE";
 
 interface FleetOption {
   id: string;
@@ -288,7 +288,7 @@ function BookingPage() {
     let base = selectedFleet.basePriceOneWay;
     if (cabTripType === "ROUND TRIP") base = selectedFleet.basePriceRoundTrip;
     if (cabTripType === "AIRPORT") base = selectedFleet.basePriceAirport;
-    if (cabTripType === "LOCAL") {
+    if (cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") {
       if (localPackage === "4hr_40km") base = selectedFleet.basePriceLocal4hr;
       else if (localPackage === "8hr_80km") base = selectedFleet.basePriceLocal8hr;
       else base = selectedFleet.basePriceLocal12hr;
@@ -305,7 +305,7 @@ function BookingPage() {
   }, [cabTripType, airportTripType, airportName, cabFrom]);
 
   const toLocationDisplay = useMemo(() => {
-    if (cabTripType === "LOCAL") {
+    if (cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") {
       if (localPackage === "8hr_80km") return "BANGALORE LOCAL (8 HRS / 80 KM)";
       if (localPackage === "12hr_120km") return "BANGALORE LOCAL (12 HRS / 120 KM)";
       return "BANGALORE LOCAL (4 HRS / 40 KM)";
@@ -317,10 +317,10 @@ function BookingPage() {
   }, [cabTripType, localPackage, airportTripType, airportName, cabTo]);
 
   const tourTypeDisplay = useMemo(() => {
-    if (cabTripType === "LOCAL") {
-      if (localPackage === "8hr_80km") return "LOCAL (8 HRS / 80 KM)";
-      if (localPackage === "12hr_120km") return "LOCAL (12 HRS / 120 KM)";
-      return "LOCAL (4 HRS / 40 KM)";
+    if (cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") {
+      if (localPackage === "8hr_80km") return "HOURLY (8 HRS / 80 KM)";
+      if (localPackage === "12hr_120km") return "HOURLY (12 HRS / 120 KM)";
+      return "HOURLY (4 HRS / 40 KM)";
     }
     return cabTripType;
   }, [cabTripType, localPackage]);
@@ -346,7 +346,7 @@ function BookingPage() {
   // Step 1 -> Step 2 (Route validation to Fleet Selection)
   const handleGoToFleetSelection = () => {
     const e: Record<string, string> = {};
-    if (cabTripType !== "LOCAL") {
+    if (cabTripType !== "LOCAL" && cabTripType !== "HOURLY PACKAGE") {
       if (!cabFrom.trim()) e.from = "Pickup location is required.";
       if (!cabTo.trim()) e.to = "Drop location is required.";
     }
@@ -525,17 +525,17 @@ function BookingPage() {
                 </button>
               </div>
 
-              {/* Trip Type Tabs: ONE WAY | ROUND TRIP | LOCAL | AIRPORT */}
+              {/* Trip Type Tabs: ONE WAY | ROUND TRIP | LOCAL | AIRPORT | HOURLY PACKAGE */}
               <div className="flex justify-center">
                 <div className="inline-flex rounded-md border border-slate-300 overflow-hidden text-xs sm:text-sm font-bold bg-white">
-                  {(["ONE WAY", "ROUND TRIP", "LOCAL", "AIRPORT"] as CabTripType[]).map((tab) => {
+                  {(["ONE WAY", "ROUND TRIP", "LOCAL", "AIRPORT", "HOURLY PACKAGE"] as CabTripType[]).map((tab) => {
                     const isActive = cabTripType === tab;
                     return (
                       <button
                         key={tab}
                         type="button"
                         onClick={() => setCabTripType(tab)}
-                        className={`px-4 sm:px-6 py-2.5 transition-colors uppercase tracking-wider ${
+                        className={`px-3 sm:px-5 py-2.5 transition-colors uppercase tracking-wider ${
                           isActive
                             ? "bg-[#00a2d2] text-white font-extrabold shadow-inner"
                             : "text-slate-700 hover:bg-slate-50 border-r last:border-r-0 border-slate-200"
@@ -548,11 +548,11 @@ function BookingPage() {
                 </div>
               </div>
 
-              {/* LOCAL & ONE WAY HOURLY DROPDOWN (4 hrs | 40 km, 8 hrs | 80 km, 12 hrs | 120 km) */}
-              {(cabTripType === "LOCAL" || cabTripType === "ONE WAY") && (
+              {/* LOCAL, ONE WAY & HOURLY PACKAGE DROPDOWN (4 hrs | 40 km, 8 hrs | 80 km, 12 hrs | 120 km) */}
+              {(cabTripType === "LOCAL" || cabTripType === "ONE WAY" || cabTripType === "HOURLY PACKAGE") && (
                 <div className="space-y-2 max-w-md mx-auto pt-2">
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-[#00a2d2]" /> Select Local Rental Package *
+                    <Clock className="w-4 h-4 text-[#00a2d2]" /> Select Hourly Rental Package *
                   </label>
                   <select
                     value={localPackage}
@@ -646,8 +646,8 @@ function BookingPage() {
                   </div>
                 )}
 
-                {/* LOCAL */}
-                {cabTripType === "LOCAL" && (
+                {/* LOCAL & HOURLY PACKAGE */}
+                {(cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") && (
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <div className="md:col-span-4 space-y-1">
                       <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
