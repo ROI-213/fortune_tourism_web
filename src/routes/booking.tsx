@@ -12,13 +12,9 @@ import {
   Zap,
   CreditCard,
   CheckCircle2,
-  User,
-  Phone,
-  Mail,
-  Users,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { formatCurrency, formatDate, generateTicketNumber, generatePNR } from "@/lib/booking-utils";
+import { generateTicketNumber, generatePNR } from "@/lib/booking-utils";
 import { buildWhatsAppUrl } from "@/lib/contact";
 import { MultiServiceTypeCards, ServiceType } from "@/components/booking/MultiServiceTypeCards";
 import { CabBookingForm } from "@/components/booking/CabBookingForm";
@@ -68,7 +64,10 @@ const VEHICLE_NAMES: Record<string, string> = {
 };
 
 function BookingPage() {
-  // Step 0: Client & Journey Details, Step 1: Payment, Step 2: Official Ticket Copy Voucher
+  // Step 0: Choose Service (5 cards)
+  // Step 1: Journey Details Form (selected service only)
+  // Step 2: Payment Step
+  // Step 3: Official Ticket Copy Voucher & PDF Download
   const [step, setStep] = useState(0);
   const [serviceType, setServiceType] = useState<ServiceType | null>(null);
   const [ticketNumber, setTicketNumber] = useState(() => generateTicketNumber());
@@ -76,14 +75,14 @@ function BookingPage() {
   const [upiCopied, setUpiCopied] = useState(false);
 
   const [formData, setFormData] = useState<any>({
-    name: "",
-    phone: "",
+    name: "FORTUNE GROUP",
+    phone: "9845003000",
     email: "",
     adults: 2,
     children: 0,
     infants: 0,
-    pickup: "",
-    destination: "",
+    pickup: "Bangalore City",
+    destination: "Bangalore Local",
     date: "",
     time: "10:45",
     notes: "",
@@ -137,6 +136,14 @@ function BookingPage() {
     });
   }, []);
 
+  // When user clicks a service card in Step 0, advance immediately to Step 1
+  const handleSelectService = (type: ServiceType) => {
+    setServiceType(type);
+    setErrors({});
+    setStep(1);
+    window.scrollTo({ top: 80, behavior: "smooth" });
+  };
+
   // Today's date automatically in DD-MM-YYYY
   const todayFormatted = useMemo(() => {
     const d = new Date();
@@ -189,10 +196,13 @@ function BookingPage() {
 
   const tourTypeDisplay = useMemo(() => {
     if (serviceType === "CAB") {
+      if (formData.trip_type === "Local") {
+        return formData.local_package === "8hr_80km" ? "LOCAL (8 HRS / 80 KM)" : "LOCAL (4 HRS / 40 KM)";
+      }
       return (formData.trip_type || "LOCAL TRIP").toUpperCase();
     }
     return serviceType ? SERVICE_TO_TOUR_TYPE[serviceType] : "LOCAL TRIP";
-  }, [serviceType, formData.trip_type]);
+  }, [serviceType, formData.trip_type, formData.local_package]);
 
   const tripTypeDisplay = useMemo(() => {
     if (formData.trip_type) return formData.trip_type.toUpperCase();
@@ -218,10 +228,10 @@ function BookingPage() {
     setTimeout(() => setUpiCopied(false), 2000);
   };
 
-  // Validate Step 0 (Journey details)
-  const validateClientAndJourney = (): boolean => {
+  // Validate Step 1 (Journey details)
+  const validateJourney = (): boolean => {
     if (!serviceType) {
-      toast.error("Please select what you would like to book first.");
+      toast.error("Please select a service first.");
       return false;
     }
 
@@ -258,11 +268,11 @@ function BookingPage() {
   };
 
   const handleGoToPayment = () => {
-    if (validateClientAndJourney()) {
-      setStep(1);
+    if (validateJourney()) {
+      setStep(2);
       window.scrollTo({ top: 80, behavior: "smooth" });
     } else {
-      toast.error("Please fill required client and journey details.");
+      toast.error("Please fill the required details to continue.");
     }
   };
 
@@ -282,11 +292,11 @@ function BookingPage() {
         name: formData.name || "FORTUNE GROUP",
         phone: (formData.phone || "9845003000").replace(/\s+/g, ""),
         email: formData.email || null,
-        service: serviceToCategory[serviceType],
-        booking_type: serviceType,
+        service: serviceType ? serviceToCategory[serviceType] : "Taxi",
+        booking_type: serviceType || "CAB",
         pickup: fromLocation,
         destination: toLocation,
-        date: formData.date,
+        date: formData.date || new Date().toISOString().split("T")[0],
         time: formData.time || null,
         passengers: String(Number(formData.adults || 1) + Number(formData.children || 0)),
         trip_type: tripTypeDisplay,
@@ -328,7 +338,7 @@ function BookingPage() {
         pnr_number: pnrNumber,
       });
 
-      setStep(2);
+      setStep(3);
       toast.success("Booking confirmed! Your official ticket copy is generated below.");
       window.scrollTo({ top: 80, behavior: "smooth" });
     } catch (err: any) {
@@ -392,251 +402,267 @@ function BookingPage() {
       <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6">
 
-          {/* STEP 0 — Service Selection & Tailored Journey Form */}
+          {/* STEP 0 — Choose Service (5 Cards ONLY) */}
           {step === 0 && (
-            <div className="space-y-6">
-              {/* Service Selection Cards */}
-              <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-4">
-                <MultiServiceTypeCards
-                  selectedService={serviceType}
-                  onSelect={(type) => {
-                    setServiceType(type);
-                    setErrors({});
+            <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+              <MultiServiceTypeCards
+                selectedService={serviceType}
+                onSelect={handleSelectService}
+              />
+            </div>
+          )}
+
+          {/* STEP 1 — Tailored Journey Form for Selected Service */}
+          {step === 1 && serviceType && (
+            <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-in fade-in duration-300">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
+                    {SERVICE_LABELS[serviceType]}
+                  </span>
+                  <span className="text-slate-500 text-xs font-medium">Select Route & Travel Schedule</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep(0);
+                    setServiceType(null);
                   }}
-                />
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Change Service
+                </button>
               </div>
 
-              {/* Show Tailored Journey Form ONLY after clicking/selecting a service */}
-              {serviceType && (
-                <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                  <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                    <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
-                      {SERVICE_LABELS[serviceType]}
+              {/* Journey Schedule Inputs */}
+              <div className="space-y-4">
+                {serviceType === "CAB" && (
+                  <CabBookingForm
+                    formData={formData}
+                    onChange={onChange}
+                    onFareCalculated={setFareResult}
+                    errors={errors}
+                  />
+                )}
+                {serviceType === "TRAIN" && (
+                  <TrainBookingForm formData={formData} onChange={onChange} errors={errors} />
+                )}
+                {serviceType === "BUS" && (
+                  <BusBookingForm formData={formData} onChange={onChange} errors={errors} />
+                )}
+                {serviceType === "FLIGHT" && (
+                  <FlightBookingForm formData={formData} onChange={onChange} errors={errors} />
+                )}
+                {serviceType === "TOUR" && (
+                  <TourBookingForm
+                    formData={formData}
+                    onChange={onChange}
+                    onFareCalculated={setFareResult}
+                    errors={errors}
+                  />
+                )}
+              </div>
+
+              {/* Continue to Payment Button */}
+              <div className="flex justify-between pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep(0);
+                    setServiceType(null);
+                  }}
+                  className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleGoToPayment}
+                  className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black px-7 py-3.5 rounded-xl shadow-md shadow-amber-500/20 hover:shadow-lg transition-all text-sm"
+                >
+                  Continue to Payment <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2 — Payment Selection & UPI QR Screen */}
+          {step === 2 && (
+            <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-in fade-in duration-300">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 font-bold">
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="font-extrabold text-slate-900 text-lg">Choose Payment Option</h2>
+                    <p className="text-xs text-slate-500">Select advance token or pay later on travel</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Edit Route
+                </button>
+              </div>
+
+              {/* Payment Option Buttons */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => onChange("advance_option", 100)}
+                  className={`p-5 rounded-2xl border text-left transition-all relative ${
+                    formData.advance_option === 100
+                      ? "bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/40 shadow-sm"
+                      : "bg-white border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-black text-slate-900 text-base">⚡ Pay ₹100 Advance</span>
+                    <span className="bg-amber-500 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-full uppercase">
+                      Priority Confirmation
                     </span>
-                    <span className="text-slate-500 text-xs font-medium">Select Route & Travel Schedule</span>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Instant vehicle & driver lock with booking confirmation ticket.
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onChange("advance_option", 0)}
+                  className={`p-5 rounded-2xl border text-left transition-all ${
+                    formData.advance_option === 0
+                      ? "bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/40 shadow-sm"
+                      : "bg-white border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-black text-slate-900 text-base">Zero Advance</span>
+                    <span className="bg-slate-200 text-slate-700 font-bold text-[10px] px-2 py-0.5 rounded-full">
+                      Pay ₹0 Today
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Submit booking request now and pay total fare upon travel pickup.
+                  </p>
+                </button>
+              </div>
+
+              {/* UPI QR & App Links when ₹100 is selected */}
+              {formData.advance_option === 100 && (
+                <div className="bg-gradient-to-b from-amber-50/60 to-white border border-amber-200 rounded-2xl p-5 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-amber-600" />
+                    <h3 className="font-extrabold text-slate-900 text-sm">
+                      Pay ₹100 Token Advance via UPI
+                    </h3>
                   </div>
 
-                  {/* Journey Schedule Inputs */}
-                  <div className="space-y-4">
-                    {serviceType === "CAB" && (
-                      <CabBookingForm
-                        formData={formData}
-                        onChange={onChange}
-                        onFareCalculated={setFareResult}
-                        errors={errors}
-                      />
-                    )}
-                    {serviceType === "TRAIN" && (
-                      <TrainBookingForm formData={formData} onChange={onChange} errors={errors} />
-                    )}
-                    {serviceType === "BUS" && (
-                      <BusBookingForm formData={formData} onChange={onChange} errors={errors} />
-                    )}
-                    {serviceType === "FLIGHT" && (
-                      <FlightBookingForm formData={formData} onChange={onChange} errors={errors} />
-                    )}
-                    {serviceType === "TOUR" && (
-                      <TourBookingForm
-                        formData={formData}
-                        onChange={onChange}
-                        onFareCalculated={setFareResult}
-                        errors={errors}
-                      />
-                    )}
-                  </div>
+                  <div className="flex flex-col sm:flex-row items-center gap-5">
+                    {/* QR Code */}
+                    <div className="bg-white p-3 rounded-2xl shadow-md border border-slate-200 shrink-0 text-center">
+                      <div className="w-32 h-32 flex items-center justify-center mx-auto">
+                        <img
+                          src="https://api.qrserver.com/v1/create-qr-code/?data=upi://pay?pa=fortunetourism@okaxis%26pn=Fortune%20Tourism%26am=100%26tn=Token%20Advance&size=128x128&format=png"
+                          alt="UPI QR Code"
+                          className="w-full h-full"
+                        />
+                      </div>
+                      <div className="text-center text-[10px] font-bold text-slate-800 mt-1">Scan · Pay ₹100</div>
+                    </div>
 
-                  {/* Continue to Payment Button */}
-                  <div className="flex justify-end pt-4 border-t border-slate-100">
-                    <button
-                      type="button"
-                      onClick={handleGoToPayment}
-                      className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black px-7 py-3.5 rounded-xl shadow-md shadow-amber-500/20 hover:shadow-lg transition-all text-sm"
-                    >
-                      Continue to Payment <ArrowRight className="w-4 h-4" />
-                    </button>
+                    {/* UPI Details */}
+                    <div className="flex-1 space-y-3 w-full">
+                      <div className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between shadow-xs">
+                        <div>
+                          <div className="text-[10px] text-slate-500 font-bold uppercase">UPI ID</div>
+                          <div className="font-black text-slate-900 text-sm">fortunetourism@okaxis</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={copyUPI}
+                          className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 hover:bg-amber-100 transition-colors"
+                        >
+                          {upiCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                          {upiCopied ? "Copied!" : "Copy"}
+                        </button>
+                      </div>
+
+                      {/* UPI App Links */}
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { name: "GPay", link: "tez://upi/pay?pa=fortunetourism@okaxis&pn=Fortune+Tourism&am=100&tn=Token+Advance" },
+                          { name: "PhonePe", link: "phonepe://pay?pa=fortunetourism@okaxis&pn=Fortune+Tourism&am=100" },
+                          { name: "Paytm", link: "paytmmp://upi/pay?pa=fortunetourism@okaxis&pn=Fortune+Tourism&am=100" },
+                          { name: "Any UPI App", link: "upi://pay?pa=fortunetourism@okaxis&pn=Fortune%20Tourism&am=100&tn=Token%20Advance" },
+                        ].map((app) => (
+                          <a
+                            key={app.name}
+                            href={app.link}
+                            className="text-xs font-bold text-slate-700 bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:border-amber-400 hover:bg-amber-50 transition-all shadow-xs"
+                          >
+                            {app.name}
+                          </a>
+                        ))}
+                      </div>
+
+                      {/* UTR Input */}
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                          UTR / Transaction ID (Optional — enter after paying)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. 423589124012"
+                          value={formData.utr_ref || ""}
+                          onChange={(e) => onChange("utr_ref", e.target.value)}
+                          className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
-            </div>
-          )}
 
-          {/* STEP 1 — Payment Selection & UPI QR Screen */}
-          {step === 1 && (
-            <div className="space-y-6">
-              <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-                <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 font-bold">
-                      <CreditCard className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h2 className="font-extrabold text-slate-900 text-lg">Choose Payment Option</h2>
-                      <p className="text-xs text-slate-500">Select advance token or pay later on travel</p>
-                    </div>
-                  </div>
+              {/* Confirm & Generate Ticket Button */}
+              <div className="flex justify-between pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold text-xs px-4 py-2.5 border border-slate-300 rounded-xl hover:bg-slate-50 transition-all"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to Route
+                </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setStep(0)}
-                    className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50"
-                  >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Edit Route
-                  </button>
-                </div>
-
-                {/* Payment Option Buttons */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <button
-                    type="button"
-                    onClick={() => onChange("advance_option", 100)}
-                    className={`p-5 rounded-2xl border text-left transition-all relative ${
-                      formData.advance_option === 100
-                        ? "bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/40 shadow-sm"
-                        : "bg-white border-slate-200 hover:border-slate-300"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-black text-slate-900 text-base">⚡ Pay ₹100 Advance</span>
-                      <span className="bg-amber-500 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded-full uppercase">
-                        Priority Confirmation
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      Instant vehicle & driver lock with booking confirmation ticket.
-                    </p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => onChange("advance_option", 0)}
-                    className={`p-5 rounded-2xl border text-left transition-all ${
-                      formData.advance_option === 0
-                        ? "bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/40 shadow-sm"
-                        : "bg-white border-slate-200 hover:border-slate-300"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-black text-slate-900 text-base">Zero Advance</span>
-                      <span className="bg-slate-200 text-slate-700 font-bold text-[10px] px-2 py-0.5 rounded-full">
-                        Pay ₹0 Today
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      Submit booking request now and pay total fare upon travel pickup.
-                    </p>
-                  </button>
-                </div>
-
-                {/* UPI QR & App Links when ₹100 is selected */}
-                {formData.advance_option === 100 && (
-                  <div className="bg-gradient-to-b from-amber-50/60 to-white border border-amber-200 rounded-2xl p-5 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-amber-600" />
-                      <h3 className="font-extrabold text-slate-900 text-sm">
-                        Pay ₹100 Token Advance via UPI
-                      </h3>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row items-center gap-5">
-                      {/* QR Code */}
-                      <div className="bg-white p-3 rounded-2xl shadow-md border border-slate-200 shrink-0 text-center">
-                        <div className="w-32 h-32 flex items-center justify-center mx-auto">
-                          <img
-                            src="https://api.qrserver.com/v1/create-qr-code/?data=upi://pay?pa=fortunetourism@okaxis%26pn=Fortune%20Tourism%26am=100%26tn=Token%20Advance&size=128x128&format=png"
-                            alt="UPI QR Code"
-                            className="w-full h-full"
-                          />
-                        </div>
-                        <div className="text-center text-[10px] font-bold text-slate-800 mt-1">Scan · Pay ₹100</div>
-                      </div>
-
-                      {/* UPI Details */}
-                      <div className="flex-1 space-y-3 w-full">
-                        <div className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between shadow-xs">
-                          <div>
-                            <div className="text-[10px] text-slate-500 font-bold uppercase">UPI ID</div>
-                            <div className="font-black text-slate-900 text-sm">fortunetourism@okaxis</div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={copyUPI}
-                            className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 hover:bg-amber-100 transition-colors"
-                          >
-                            {upiCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                            {upiCopied ? "Copied!" : "Copy"}
-                          </button>
-                        </div>
-
-                        {/* UPI App Links */}
-                        <div className="flex flex-wrap gap-2">
-                          {[
-                            { name: "GPay", link: "tez://upi/pay?pa=fortunetourism@okaxis&pn=Fortune+Tourism&am=100&tn=Token+Advance" },
-                            { name: "PhonePe", link: "phonepe://pay?pa=fortunetourism@okaxis&pn=Fortune+Tourism&am=100" },
-                            { name: "Paytm", link: "paytmmp://upi/pay?pa=fortunetourism@okaxis&pn=Fortune+Tourism&am=100" },
-                            { name: "Any UPI App", link: "upi://pay?pa=fortunetourism@okaxis&pn=Fortune%20Tourism&am=100&tn=Token%20Advance" },
-                          ].map((app) => (
-                            <a
-                              key={app.name}
-                              href={app.link}
-                              className="text-xs font-bold text-slate-700 bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:border-amber-400 hover:bg-amber-50 transition-all shadow-xs"
-                            >
-                              {app.name}
-                            </a>
-                          ))}
-                        </div>
-
-                        {/* UTR Input */}
-                        <div>
-                          <label className="text-[11px] font-bold text-slate-600 block mb-1">
-                            UTR / Transaction ID (Optional — enter after paying)
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="e.g. 423589124012"
-                            value={formData.utr_ref || ""}
-                            onChange={(e) => onChange("utr_ref", e.target.value)}
-                            className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Confirm & Generate Ticket Button */}
-                <div className="flex justify-between pt-4 border-t border-slate-100">
-                  <button
-                    type="button"
-                    onClick={() => setStep(0)}
-                    className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold text-xs px-4 py-2.5 border border-slate-300 rounded-xl hover:bg-slate-50 transition-all"
-                  >
-                    <ArrowLeft className="w-4 h-4" /> Back to Route
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleConfirmAndGenerateTicket}
-                    disabled={isSubmitting}
-                    className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black px-7 py-3.5 rounded-xl shadow-md shadow-amber-500/20 hover:shadow-lg transition-all text-sm disabled:opacity-60"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <span className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" />
-                        Generating Ticket...
-                      </>
-                    ) : (
-                      <>
-                        Confirm Booking & Generate Ticket <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleConfirmAndGenerateTicket}
+                  disabled={isSubmitting}
+                  className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black px-7 py-3.5 rounded-xl shadow-md shadow-amber-500/20 hover:shadow-lg transition-all text-sm disabled:opacity-60"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" />
+                      Generating Ticket...
+                    </>
+                  ) : (
+                    <>
+                      Confirm Booking & Generate Ticket <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           )}
 
-          {/* STEP 2 — Official Ticket Copy Voucher & Download Format (Generated After Client Fills Details & Confirms) */}
-          {step === 2 && (
+          {/* STEP 3 — Official Ticket Copy Voucher & Download Format (Generated After Confirmation) */}
+          {step === 3 && (
             <div className="space-y-6">
               {/* Success & Actions Banner */}
               <div className="no-print bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
@@ -688,7 +714,7 @@ function BookingPage() {
 
                   <a
                     href={buildWhatsAppUrl(
-                      `Hello Fortune Tourism! I have booked my journey.\n\n*Ticket No:* ${ticketNumber}\n*PNR:* ${pnrNumber}\n*Passenger:* ${formData.name || "FORTUNE GROUP"}\n*Phone:* ${formData.phone || "9845003000"}\n*From:* ${fromLocation}\n*To:* ${toLocation}\n*Date:* ${departureFormatted}\n*Service:* ${SERVICE_LABELS[serviceType]}\n\nPlease confirm driver and vehicle assignment.`
+                      `Hello Fortune Tourism! I have booked my journey.\n\n*Ticket No:* ${ticketNumber}\n*PNR:* ${pnrNumber}\n*Passenger:* ${formData.name || "FORTUNE GROUP"}\n*Phone:* ${formData.phone || "9845003000"}\n*From:* ${fromLocation}\n*To:* ${toLocation}\n*Date:* ${departureFormatted}\n*Service:* ${serviceType ? SERVICE_LABELS[serviceType] : "Cab Booking"}\n\nPlease confirm driver and vehicle assignment.`
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -823,20 +849,22 @@ function BookingPage() {
                   type="button"
                   onClick={() => {
                     setStep(0);
+                    setServiceType(null);
                     setTicketNumber(generateTicketNumber());
                     setPnrNumber(generatePNR());
                     setFormData({
-                      name: "",
-                      phone: "",
+                      name: "FORTUNE GROUP",
+                      phone: "9845003000",
                       email: "",
                       adults: 2,
-                      pickup: "",
-                      destination: "",
+                      pickup: "Bangalore City",
+                      destination: "Bangalore Local",
                       date: "",
                       time: "10:45",
                       notes: "",
                       trip_type: "Local",
                       vehicle_slug: "sedan",
+                      local_package: "4hr_40km",
                     });
                     setBookingResult(null);
                   }}
