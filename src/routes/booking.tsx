@@ -26,6 +26,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { generateTicketNumber, generatePNR } from "@/lib/booking-utils";
 import { buildWhatsAppUrl } from "@/lib/contact";
 import { downloadTicketCopyPDF } from "@/lib/ticket-copy-pdf";
+import { MultiServiceTypeCards } from "@/components/booking/MultiServiceTypeCards";
 import { CabSearchExplore, CabSearchData, AvailableCab } from "@/components/booking/CabSearchExplore";
 import { TrainBookingForm } from "@/components/booking/TrainBookingForm";
 import { BusBookingForm } from "@/components/booking/BusBookingForm";
@@ -370,38 +371,17 @@ function BookingPage() {
       <div className="min-h-screen bg-slate-50 py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto space-y-6">
 
-          {/* Quick Category Bar (Cabs, Trains, Buses, Flights, Tours) */}
+          {/* STEP 0: Service Category Cards (What would you like to book?) */}
           {step === 0 && (
-            <div className="flex items-center justify-center gap-2 overflow-x-auto pb-1">
-              {[
-                { id: "CAB", name: "Cabs", icon: Car },
-                { id: "TRAIN", name: "Train Booking", icon: TrainFront },
-                { id: "BUS", name: "Bus Booking", icon: Bus },
-                { id: "FLIGHT", name: "Flight Booking", icon: Plane },
-                { id: "TOUR", name: "Tour Packages", icon: Palmtree },
-              ].map((c) => {
-                const Icon = c.icon;
-                const isActive = activeCategory === c.id;
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setActiveCategory(c.id as ServiceCategory)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs sm:text-sm border transition-all ${
-                      isActive
-                        ? "bg-slate-900 text-white border-slate-900 shadow-sm"
-                        : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 text-amber-500" />
-                    <span>{c.name}</span>
-                  </button>
-                );
-              })}
+            <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+              <MultiServiceTypeCards
+                selectedService={activeCategory}
+                onSelect={(cat) => setActiveCategory(cat as ServiceCategory)}
+              />
             </div>
           )}
 
-          {/* STEP 0: CAB SEARCH & CAR EXPLORE SCREEN (Exact 5 reference screenshots) */}
+          {/* STEP 0: CAB SEARCH & CAR EXPLORE SCREEN (When Cab Booking is active) */}
           {step === 0 && activeCategory === "CAB" && (
             <CabSearchExplore onSelectCar={handleSelectCar} />
           )}
