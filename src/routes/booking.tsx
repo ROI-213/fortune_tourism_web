@@ -1458,7 +1458,7 @@ function BookingPage() {
                       <div>
                         <div className="text-lg sm:text-xl font-black tracking-wider text-emerald-950 flex items-center gap-1">
                           <span>FORTUNE</span>
-                          <span className="font-serif italic font-normal text-emerald-800">Tourism™</span>
+                          <span className="font-serif italic font-normal text-emerald-800">Tourism</span>
                         </div>
                         <div className="text-[11px] sm:text-xs font-bold text-slate-800">
                           Address: No.256/A next To Narayana Hospital, Health City, Bommasandra Bangalore.560099

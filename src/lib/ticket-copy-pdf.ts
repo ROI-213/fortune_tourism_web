@@ -31,7 +31,7 @@ export function downloadTicketCopyPDF(data: TicketCopyData) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.setTextColor(14, 107, 80); // Emerald brand color
-  doc.text("FORTUNE Tourism™", 16, 17);
+  doc.text("FORTUNE Tourism", 16, 17);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7.5);
