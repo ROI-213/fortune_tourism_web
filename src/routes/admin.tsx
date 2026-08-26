@@ -49,6 +49,9 @@ import {
   PhoneCall,
   MessageSquare,
   Home,
+  CreditCard,
+  TrendingUp,
+  Wallet,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -170,6 +173,9 @@ function AdminPage() {
 
   // Booking Stats state
   const [bookingStats, setBookingStats] = useState({
+    todayRevenue: 0,
+    todayAdvanceCollected: 0,
+    todayPending: 0,
     todayBookings: 0,
     upcomingBookings: 0,
     pendingPayments: 0,
@@ -552,8 +558,36 @@ function AdminPage() {
 
   const stats = [
     {
+      label: "Total Revenue Today",
+      value: `₹${Number(bookingStats.todayRevenue || 0).toLocaleString("en-IN")}`,
+      subtext: "Today's Bookings Value",
+      icon: TrendingUp,
+      color: "text-emerald-700 bg-emerald-50",
+      highlight: true,
+      onClick: () => setActiveTab("day_bookings"),
+    },
+    {
+      label: "Advance Collected Today",
+      value: `₹${Number(bookingStats.todayAdvanceCollected || 0).toLocaleString("en-IN")}`,
+      subtext: "Received Transactions",
+      icon: CreditCard,
+      color: "text-blue-700 bg-blue-50",
+      highlight: true,
+      onClick: () => setActiveTab("payment_history"),
+    },
+    {
+      label: "Pending Today",
+      value: `₹${Number(bookingStats.todayPending || 0).toLocaleString("en-IN")}`,
+      subtext: "Remaining Unpaid Balance",
+      icon: IndianRupee,
+      color: "text-rose-700 bg-rose-50",
+      highlight: true,
+      onClick: () => setActiveTab("pending_payments"),
+    },
+    {
       label: "Today's Bookings",
       value: bookingStats.todayBookings.toString(),
+      subtext: "Trips & Day Bookings",
       icon: CalendarDays,
       color: "text-sky-600 bg-sky-50",
       onClick: () => setActiveTab("day_bookings"),
@@ -615,8 +649,9 @@ function AdminPage() {
       onClick: () => setActiveTab("all_bookings"),
     },
     {
-      label: "Total Revenue",
-      value: `₹${(bookingStats.totalRevenue / 1000).toFixed(0)}K`,
+      label: "Total Revenue (All Time)",
+      value: `₹${Number(bookingStats.totalRevenue || 0).toLocaleString("en-IN")}`,
+      subtext: "Net Lifetime Collections",
       icon: TrendingDown,
       color: "text-green-600 bg-green-50",
       onClick: () => setActiveTab("payment_history"),
@@ -630,7 +665,7 @@ function AdminPage() {
     },
     {
       label: "New Enquiries",
-      value: enquiries.filter((e) => e.status === "New").length.toString(),
+      value: enquiries.filter((e) => (e.status || "").toUpperCase() === "NEW").length.toString(),
       icon: Users,
       color: "text-teal-600 bg-teal-50",
       onClick: () => setActiveTab("enquiries"),
@@ -795,24 +830,29 @@ function AdminPage() {
           </div>
 
           {/* Stats Bar */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-8">
             {stats.map((s) => {
               const Icon = s.icon;
               return (
                 <button
                   key={s.label}
                   onClick={s.onClick}
-                  className="rounded-2xl border border-border bg-white p-5 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md hover:border-slate-300 transition text-left"
+                  className={`rounded-2xl border bg-white p-5 shadow-xs flex items-center justify-between cursor-pointer hover:shadow-md transition text-left group ${
+                    s.highlight ? "border-slate-300 ring-1 ring-slate-200" : "border-border hover:border-slate-300"
+                  }`}
                 >
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                    <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold">
                       {s.label}
                     </p>
-                    <p className="mt-1 font-heading text-3xl text-[color:var(--color-navy)] font-bold">
+                    <p className="mt-1 font-sans text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                       {s.value}
                     </p>
+                    {s.subtext && (
+                      <p className="text-[10px] text-slate-400 font-medium mt-0.5">{s.subtext}</p>
+                    )}
                   </div>
-                  <div className={`p-3 rounded-xl ${s.color}`}>
+                  <div className={`p-3.5 rounded-2xl ${s.color} shrink-0`}>
                     <Icon className="h-6 w-6" />
                   </div>
                 </button>

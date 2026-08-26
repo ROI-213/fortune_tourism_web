@@ -19,7 +19,7 @@ export const Route = createFileRoute("/api/bookings/stats/")({
             totalRes,
           ] = await Promise.all([
             query(
-              `SELECT COUNT(*)::int AS n FROM bookings WHERE created_at::date = $1::date OR departure_datetime::date = $1::date`,
+              `SELECT COUNT(*)::int AS n FROM bookings WHERE (created_at::date = $1::date OR departure_datetime::date = $1::date) AND UPPER(booking_status) NOT IN ('CANCELLED','REFUNDED')`,
               [today],
             ).catch(() => ({ rows: [{ n: 0 }] })),
             query(
@@ -47,9 +47,45 @@ export const Route = createFileRoute("/api/bookings/stats/")({
             query(`SELECT COUNT(*)::int AS n FROM bookings`).catch(() => ({ rows: [{ n: 0 }] })),
           ]);
 
-          /* Financial aggregates computed from transactions (#48) */
-          const [valueRes, collectedRes, outstandingListRes, todaysCollRes] = await Promise.all([
-            query(`SELECT COALESCE(SUM(total_amount), 0)::numeric AS value FROM bookings`),
+          /* Today-specific financial aggregates */
+          const [
+            todayRevenueRes,
+            todayAdvanceRes,
+            todayPendingRes,
+            valueRes,
+            collectedRes,
+            outstandingListRes,
+          ] = await Promise.all([
+            // Today's total booking value
+            query(
+              `SELECT COALESCE(SUM(total_amount), 0)::numeric AS value FROM bookings 
+               WHERE (created_at::date = $1::date OR departure_datetime::date = $1::date)
+                 AND UPPER(booking_status) NOT IN ('CANCELLED','REFUNDED')`,
+              [today],
+            ).catch(() => ({ rows: [{ value: 0 }] })),
+
+            // Advance / payments collected today
+            query(
+              `SELECT COALESCE(SUM(amount), 0)::numeric AS value FROM booking_payments
+                WHERE payment_status='Success' AND NOT COALESCE(is_deleted,false)
+                  AND (COALESCE(payment_date, paid_at::date) = $1::date OR created_at::date = $1::date)`,
+              [today],
+            ).catch(() => ({ rows: [{ value: 0 }] })),
+
+            // Outstanding balance on today's bookings
+            query(
+              `SELECT COALESCE(SUM(GREATEST(b.total_amount - COALESCE(p.paid_total,0) - COALESCE(r.refunded_total,0), 0)), 0)::numeric AS value
+                 FROM bookings b
+                 LEFT JOIN (SELECT booking_id, SUM(amount) AS paid_total FROM booking_payments WHERE payment_status='Success' AND NOT COALESCE(is_deleted,false) GROUP BY booking_id) p ON p.booking_id = b.id
+                 LEFT JOIN (SELECT booking_id, SUM(amount) AS refunded_total FROM refunds GROUP BY booking_id) r ON r.booking_id = b.id
+                WHERE (b.created_at::date = $1::date OR b.departure_datetime::date = $1::date)
+                  AND (b.total_amount - COALESCE(p.paid_total,0) - COALESCE(r.refunded_total,0)) > 0
+                  AND UPPER(b.booking_status) NOT IN ('CANCELLED','REFUNDED')`,
+              [today],
+            ).catch(() => ({ rows: [{ value: 0 }] })),
+
+            // Lifetime all-time totals
+            query(`SELECT COALESCE(SUM(total_amount), 0)::numeric AS value FROM bookings WHERE UPPER(booking_status) NOT IN ('CANCELLED','REFUNDED')`),
             query(
               `SELECT COALESCE((SELECT SUM(amount) FROM booking_payments WHERE payment_status='Success' AND NOT COALESCE(is_deleted,false)), 0)::numeric AS gross,
                       COALESCE((SELECT SUM(amount) FROM refunds), 0)::numeric AS refunded`,
@@ -65,12 +101,6 @@ export const Route = createFileRoute("/api/bookings/stats/")({
                   AND UPPER(b.booking_status) NOT IN ('CANCELLED','REFUNDED')
                 ORDER BY remaining DESC LIMIT 50`,
             ),
-            query(
-              `SELECT COALESCE(SUM(amount), 0)::numeric AS value FROM booking_payments
-                WHERE payment_status='Success' AND NOT COALESCE(is_deleted,false)
-                  AND COALESCE(payment_date, paid_at::date) = $1::date`,
-              [today],
-            ).catch(() => ({ rows: [{ value: 0 }] })),
           ]);
 
           const [newEnquiriesRes, upcomingTripsRes, byCategoryRes, byTypeRes, ticketsPendingRes, bookingRequestedRes] = await Promise.all([
@@ -105,11 +135,20 @@ export const Route = createFileRoute("/api/bookings/stats/")({
           const refunded = Number(collectedRes.rows[0]?.refunded ?? 0);
           const outstandingTotal = Number(pendingPayRes.rows[0]?.outstanding ?? 0);
 
+          const todayRevenue = Number(todayRevenueRes.rows[0]?.value ?? 0);
+          const todayAdvance = Number(todayAdvanceRes.rows[0]?.value ?? 0);
+          const todayPending = Number(todayPendingRes.rows[0]?.value ?? 0);
+
           return new Response(
             JSON.stringify({
               success: true,
               stats: {
-                /* Legacy keys preserved for existing admin widgets */
+                /* Today Financial Metrics (Requested by user) */
+                todayRevenue,
+                todayAdvanceCollected: todayAdvance,
+                todayPending,
+
+                /* Booking counts */
                 todayBookings: todayRes.rows[0]?.n ?? 0,
                 upcomingBookings: upcomingRes.rows[0]?.n ?? 0,
                 pendingPayments: pendingPayRes.rows[0]?.n ?? 0,
@@ -120,11 +159,11 @@ export const Route = createFileRoute("/api/bookings/stats/")({
                 totalRevenue: gross - refunded,
                 pendingAmount: outstandingTotal,
 
-                /* New dashboard keys */
+                /* Dashboard lifetime keys */
                 totalBookingValue: Number(valueRes.rows[0]?.value ?? 0),
                 totalAdvanceReceived: gross - refunded,
                 totalOutstanding: outstandingTotal,
-                todaysCollections: Number(todaysCollRes.rows[0]?.value ?? 0),
+                todaysCollections: todayAdvance,
                 newEnquiries: newEnquiriesRes.rows[0]?.n ?? 0,
                 upcomingThisWeek: Array.isArray(upcomingTripsRes.rows) ? upcomingTripsRes.rows : [],
                 byCategory: byCategoryRes.rows,
