@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { LocationSearchInput } from "./LocationSearchInput";
 
-export type CabTabType = "ONE WAY" | "ROUND TRIP" | "LOCAL" | "AIRPORT";
+export type CabTabType = "ONE WAY" | "ROUND TRIP" | "LOCAL" | "AIRPORT" | "HOURLY PACKAGE";
 
 export interface CabSearchData {
   tab: CabTabType;
@@ -504,10 +504,10 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
     <div className="space-y-6">
       {/* 1. TOP CAB SEARCH WIDGET (Exact layout from uploaded screenshots) */}
       <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-4 sm:p-6 space-y-4">
-        {/* Top Tab Bar: ONE WAY | ROUND TRIP | LOCAL | AIRPORT */}
+        {/* Trip Type Tabs */}
         <div className="flex justify-center">
           <div className="inline-flex rounded-md border border-slate-300 overflow-hidden text-xs sm:text-sm font-bold bg-white">
-            {(["ONE WAY", "ROUND TRIP", "LOCAL", "AIRPORT"] as CabTabType[]).map((tab) => {
+            {(["ONE WAY", "ROUND TRIP", "LOCAL", "AIRPORT", "HOURLY PACKAGE"] as CabTabType[]).map((tab) => {
               const isActive = searchData.tab === tab;
               return (
                 <button
@@ -528,8 +528,8 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
           </div>
         </div>
 
-        {/* PACKAGE SELECTOR BUTTONS IN ONE ROW (For LOCAL) */}
-        {searchData.tab === "LOCAL" && (
+        {/* PACKAGE SELECTOR BUTTONS IN ONE ROW (Only For HOURLY PACKAGE) */}
+        {searchData.tab === "HOURLY PACKAGE" && (
           <div className="flex flex-col items-center justify-center gap-1.5 pt-2 pb-1">
             <div className="text-[11px] font-black uppercase tracking-wider text-slate-600 flex items-center gap-1">
               <Clock className="w-3.5 h-3.5 text-emerald-600" /> SELECT RENTAL PACKAGE

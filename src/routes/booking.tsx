@@ -550,8 +550,8 @@ function BookingPage() {
                 </div>
               </div>
 
-              {/* PACKAGE SELECTOR BUTTONS IN ONE ROW (For LOCAL & HOURLY PACKAGE) */}
-              {(cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") && (
+              {/* PACKAGE SELECTOR BUTTONS IN ONE ROW (Only For HOURLY PACKAGE) */}
+              {cabTripType === "HOURLY PACKAGE" && (
                 <div className="flex flex-col items-center justify-center gap-1.5 pt-2 pb-1">
                   <div className="text-[11px] font-black uppercase tracking-wider text-slate-600 flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-emerald-600" /> SELECT RENTAL PACKAGE
