@@ -737,16 +737,7 @@ function BookingPage() {
               <div className="ticket-copy-print-area bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-md space-y-4">
                 {/* Header Lines */}
                 <div className="space-y-1 text-slate-900 font-sans text-xs">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center font-bold border-b border-slate-300 pb-2 gap-1">
-                    <div>
-                      Address: <span className="font-semibold">No.256/A next To Narayana Hospital, Health City, Bommasandra Bangalore.560099</span>
-                    </div>
-                    <div className="whitespace-nowrap font-bold text-slate-900">
-                      Phone No: <span className="font-extrabold">+91 9740463404</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 text-slate-600 font-medium text-xs">
+                  <div className="text-slate-600 font-medium text-xs">
                     This copy For Passengers Who Travelling
                   </div>
 

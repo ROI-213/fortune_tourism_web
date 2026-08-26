@@ -23,41 +23,26 @@ export function downloadTicketCopyPDF(data: TicketCopyData) {
   // Top Box Border
   doc.setDrawColor(20, 20, 20);
   doc.setLineWidth(0.8);
-  doc.roundedRect(12, 12, pageWidth - 24, 130, 2, 2, "S");
-
-  // Address and Phone
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(8.5);
-  doc.setTextColor(20, 20, 20);
-  doc.text(
-    "Address: No.256/A next To Narayana Hospital, Health City, Bommasandra Bangalore.560099",
-    16,
-    19
-  );
-  doc.text("Phone No: +91 9740463404", pageWidth - 16, 19, { align: "right" });
-
-  doc.setDrawColor(200, 200, 200);
-  doc.setLineWidth(0.2);
-  doc.line(16, 22, pageWidth - 16, 22);
+  doc.roundedRect(12, 12, pageWidth - 24, 115, 2, 2, "S");
 
   // Subheader
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
   doc.setTextColor(80, 80, 80);
-  doc.text("This copy For Passengers Who Travelling", 16, 27);
+  doc.text("This copy For Passengers Who Travelling", 16, 20);
 
   // Main Header
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.setTextColor(10, 10, 10);
-  doc.text("Ticket Copy For Your Journey", 16, 34);
+  doc.text("Ticket Copy For Your Journey", 16, 27);
 
   doc.setFontSize(9);
-  doc.text(`BOOKING DATE : ${data.bookingDate}`, pageWidth - 16, 34, { align: "right" });
+  doc.text(`BOOKING DATE : ${data.bookingDate}`, pageWidth - 16, 27, { align: "right" });
 
   // Main Grid Table
   autoTable(doc, {
-    startY: 38,
+    startY: 32,
     margin: { left: 16, right: 16 },
     theme: "grid",
     styles: {
