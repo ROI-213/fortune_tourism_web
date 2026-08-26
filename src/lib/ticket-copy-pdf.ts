@@ -25,26 +25,41 @@ export function downloadTicketCopyPDF(data: TicketCopyData) {
   // Top Box Border
   doc.setDrawColor(20, 20, 20);
   doc.setLineWidth(0.8);
-  doc.roundedRect(12, 12, pageWidth - 24, 115, 2, 2, "S");
+  doc.roundedRect(12, 10, pageWidth - 24, 125, 2, 2, "S");
+
+  // Company Brand Name & Logo Placeholder
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.setTextColor(14, 107, 80); // Emerald brand color
+  doc.text("FORTUNE Tourism™", 16, 17);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.setTextColor(50, 50, 50);
+  doc.text(
+    "Address: No.256/A next To Narayana Hospital, Health City, Bommasandra Bangalore. 560099 | Phone: +91 9740463404",
+    16,
+    22,
+  );
 
   // Subheader
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(8.5);
-  doc.setTextColor(80, 80, 80);
-  doc.text("This copy For Passengers Who Travelling", 16, 20);
+  doc.setFontSize(8);
+  doc.setTextColor(90, 90, 90);
+  doc.text("This copy For Passengers Who Travelling", 16, 28);
 
   // Main Header
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
+  doc.setFontSize(11);
   doc.setTextColor(10, 10, 10);
-  doc.text("Ticket Copy For Your Journey", 16, 27);
+  doc.text("Ticket Copy For Your Journey", 16, 34);
 
-  doc.setFontSize(9);
-  doc.text(`BOOKING DATE : ${data.bookingDate}`, pageWidth - 16, 27, { align: "right" });
+  doc.setFontSize(8.5);
+  doc.text(`BOOKING DATE : ${data.bookingDate}`, pageWidth - 16, 34, { align: "right" });
 
   // Main Grid Table
   autoTable(doc, {
-    startY: 32,
+    startY: 38,
     margin: { left: 16, right: 16 },
     theme: "grid",
     styles: {

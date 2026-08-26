@@ -1442,18 +1442,49 @@ function BookingPage() {
               </div>
 
               {/* TICKET COPY VOUCHER CONTAINER (Exact Spreadsheet Layout) */}
-              <div className="ticket-copy-print-area bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-md space-y-4">
+              <div
+                id="official-ticket-card"
+                className="ticket-copy-print-area bg-white border-2 border-slate-900 rounded-2xl p-6 shadow-md space-y-4"
+              >
+                {/* Brand Header with Logo & Official Address */}
+                <div className="border-b-2 border-slate-900 pb-3">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src="/images/packages/fortune-tourism-logo.png"
+                        alt="Fortune Tourism"
+                        className="h-10 sm:h-12 w-auto object-contain"
+                      />
+                      <div>
+                        <div className="text-lg sm:text-xl font-black tracking-wider text-emerald-950 flex items-center gap-1">
+                          <span>FORTUNE</span>
+                          <span className="font-serif italic font-normal text-emerald-800">Tourism™</span>
+                        </div>
+                        <div className="text-[11px] sm:text-xs font-bold text-slate-800">
+                          Address: No.256/A next To Narayana Hospital, Health City, Bommasandra Bangalore.560099
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right sm:self-center">
+                      <div className="text-[11px] font-bold text-slate-900">
+                        Phone No: +91 9740463404
+                      </div>
+                      <div className="text-xs font-bold text-slate-800 mt-0.5">
+                        BOOKING DATE : <span className="font-extrabold text-slate-950">{todayFormatted}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-1 text-slate-900 font-sans text-xs">
                   <div className="text-slate-600 font-medium text-xs">
                     This copy For Passengers Who Travelling
                   </div>
 
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-1 font-bold text-sm">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-0.5 font-bold text-sm">
                     <div className="text-slate-950 font-black tracking-wide text-base">
                       Ticket Copy For Your Journey
-                    </div>
-                    <div className="text-xs font-bold text-slate-800">
-                      BOOKING DATE : <span className="font-extrabold text-slate-950">{todayFormatted}</span>
                     </div>
                   </div>
                 </div>

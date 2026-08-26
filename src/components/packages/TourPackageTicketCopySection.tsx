@@ -203,6 +203,29 @@ export function TourPackageTicketCopySection() {
 
           {/* TICKET COPY FOR YOUR JOURNEY (Table Layout matching attached Image 3) */}
           <div className="ticket-copy-print-area border-2 border-slate-900 rounded-2xl overflow-hidden bg-white p-4 space-y-4">
+            {/* Header with Logo & Address */}
+            <div className="border-b-2 border-slate-900 pb-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <img
+                  src="/images/packages/fortune-tourism-logo.png"
+                  alt="Fortune Tourism"
+                  className="h-10 sm:h-12 w-auto object-contain"
+                />
+                <div>
+                  <div className="text-lg font-black tracking-wider text-emerald-950 flex items-center gap-1">
+                    <span>FORTUNE</span>
+                    <span className="font-serif italic font-normal text-emerald-800">Tourism™</span>
+                  </div>
+                  <div className="text-[11px] font-bold text-slate-800">
+                    Address: No.256/A next To Narayana Hospital, Health City, Bommasandra Bangalore.560099
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-[11px] font-bold text-slate-900">Phone No: +91 9740463404</div>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <div className="bg-slate-900 text-white text-center py-2 font-extrabold text-sm uppercase tracking-widest rounded-xl">
                 Ticket Copy For Your Journey
@@ -210,13 +233,6 @@ export function TourPackageTicketCopySection() {
               <p className="text-center text-[10px] font-extrabold text-amber-700 uppercase tracking-wide">
                 This Copy For After Confirming The Driver &amp; Cab/Bus/Flight Details
               </p>
-              <div className="text-center text-[11px] font-bold text-slate-900 leading-relaxed">
-                <p>
-                  Address: No.256/A Next To Narayana Hospital, Health City, Bommasandra, Bangalore.
-                  560099
-                </p>
-                <p>Phone No: +91 9740463404</p>
-              </div>
             </div>
 
             <div className="overflow-x-auto">
