@@ -13,21 +13,24 @@ import {
   CreditCard,
   CheckCircle2,
   Car,
-  TrainFront,
-  Bus,
-  Plane,
-  Palmtree,
+  Clock,
+  Calendar,
+  MapPin,
+  ArrowLeftRight,
   User,
   Phone,
   Mail,
-  MapPin,
+  ShieldCheck,
+  Star,
+  Luggage,
+  Users,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { generateTicketNumber, generatePNR } from "@/lib/booking-utils";
 import { buildWhatsAppUrl } from "@/lib/contact";
 import { downloadTicketCopyPDF } from "@/lib/ticket-copy-pdf";
-import { MultiServiceTypeCards } from "@/components/booking/MultiServiceTypeCards";
-import { CabSearchExplore, CabSearchData, AvailableCab } from "@/components/booking/CabSearchExplore";
+import { MultiServiceTypeCards, ServiceType } from "@/components/booking/MultiServiceTypeCards";
+import { LocationSearchInput } from "@/components/booking/LocationSearchInput";
 import { TrainBookingForm } from "@/components/booking/TrainBookingForm";
 import { BusBookingForm } from "@/components/booking/BusBookingForm";
 import { FlightBookingForm } from "@/components/booking/FlightBookingForm";
@@ -36,101 +39,181 @@ import { TourBookingForm } from "@/components/booking/TourBookingForm";
 export const Route = createFileRoute("/booking")({
   head: () => ({
     meta: [
-      { title: "Book Cabs, Trains, Buses & Flights — Fortune Tourism" },
+      { title: "Book Cabs & Tour Packages — Fortune Tourism" },
       {
         name: "description",
         content:
-          "Explore outstation, local hourly, and airport cabs with instant price comparison and official ticket copy download. South India's trusted travel partner.",
+          "Book cabs, outstation, local hourly, and airport transfers with vehicle selection, transparent fare, and instant ticket copy download.",
       },
     ],
   }),
   component: BookingPage,
 });
 
-type ServiceCategory = "CAB" | "TRAIN" | "BUS" | "FLIGHT" | "TOUR";
+type CabTripType = "ONE WAY" | "ROUND TRIP" | "LOCAL" | "AIRPORT";
+
+interface FleetOption {
+  id: string;
+  name: string;
+  category: string;
+  seats: number;
+  rating: number;
+  image: string;
+  includedKms: number;
+  postLimitRate: number;
+  basePriceOneWay: number;
+  basePriceRoundTrip: number;
+  basePriceLocal4hr: number;
+  basePriceLocal8hr: number;
+  basePriceLocal12hr: number;
+  basePriceAirport: number;
+}
+
+const FLEET_OPTIONS: FleetOption[] = [
+  {
+    id: "hatchback",
+    name: "Hatchback (Swift / WagonR)",
+    category: "4 Seater AC Cab · Economical & Compact",
+    seats: 4,
+    rating: 4.8,
+    image: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=400&q=80",
+    includedKms: 145,
+    postLimitRate: 12,
+    basePriceOneWay: 1783,
+    basePriceRoundTrip: 3222,
+    basePriceLocal4hr: 1341,
+    basePriceLocal8hr: 2200,
+    basePriceLocal12hr: 2900,
+    basePriceAirport: 1199,
+  },
+  {
+    id: "sedan",
+    name: "Prime Sedan (Dzire / Etios)",
+    category: "4 Seater AC Sedan · Extra Legroom & Large Boot",
+    seats: 4,
+    rating: 4.8,
+    image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=400&q=80",
+    includedKms: 145,
+    postLimitRate: 14,
+    basePriceOneWay: 1950,
+    basePriceRoundTrip: 3296,
+    basePriceLocal4hr: 1369,
+    basePriceLocal8hr: 2400,
+    basePriceLocal12hr: 3200,
+    basePriceAirport: 1399,
+  },
+  {
+    id: "suv",
+    name: "Ertiga / SUV (6 Seater)",
+    category: "6 Seater AC SUV · Family Trips & Luggage Space",
+    seats: 6,
+    rating: 4.9,
+    image: "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=400&q=80",
+    includedKms: 145,
+    postLimitRate: 17,
+    basePriceOneWay: 2650,
+    basePriceRoundTrip: 4450,
+    basePriceLocal4hr: 1850,
+    basePriceLocal8hr: 3200,
+    basePriceLocal12hr: 4100,
+    basePriceAirport: 1850,
+  },
+  {
+    id: "innova",
+    name: "Innova Crysta (7 Seater)",
+    category: "7 Seater Luxury Premium AC Cab · VIP Comfort",
+    seats: 7,
+    rating: 4.9,
+    image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=400&q=80",
+    includedKms: 145,
+    postLimitRate: 21,
+    basePriceOneWay: 3400,
+    basePriceRoundTrip: 5650,
+    basePriceLocal4hr: 2400,
+    basePriceLocal8hr: 4100,
+    basePriceLocal12hr: 5200,
+    basePriceAirport: 2400,
+  },
+  {
+    id: "tempo",
+    name: "Tempo Traveller (12–17 Seater)",
+    category: "12-17 Seater AC Mini Bus · Large Group Outstation",
+    seats: 15,
+    rating: 4.8,
+    image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=400&q=80",
+    includedKms: 145,
+    postLimitRate: 28,
+    basePriceOneWay: 5200,
+    basePriceRoundTrip: 8900,
+    basePriceLocal4hr: 3800,
+    basePriceLocal8hr: 6500,
+    basePriceLocal12hr: 8200,
+    basePriceAirport: 3800,
+  },
+];
 
 function BookingPage() {
-  // Step 0: Search & Explore Vehicles / Services
-  // Step 1: Passenger Details & Payment Selection
-  // Step 2: Official Ticket Copy Voucher & PDF Download
-  const [activeCategory, setActiveCategory] = useState<ServiceCategory>("CAB");
+  // Step 0: Choose Service (5 cards)
+  // Step 1: Cab Journey Route & Dropdown (One Way / Round Trip / Local / Airport)
+  // Step 2: Fleet Selection Page (Hatchback, Sedan, SUV, Innova, Tempo)
+  // Step 3: Passenger Details & Payment (₹100 or Zero advance)
+  // Step 4: Official Ticket Confirmation PDF Voucher
   const [step, setStep] = useState(0);
+  const [serviceType, setServiceType] = useState<ServiceType | null>(null);
 
-  const [selectedCab, setSelectedCab] = useState<AvailableCab | null>(null);
-  const [selectedFuelType, setSelectedFuelType] = useState<string>("Diesel");
-  const [hasLuggageCarrier, setHasLuggageCarrier] = useState<boolean>(false);
-  const [cabSearchInfo, setCabSearchInfo] = useState<CabSearchData | null>(null);
+  // Cab Journey Inputs
+  const [cabTripType, setCabTripType] = useState<CabTripType>("ONE WAY");
+  const [cabFrom, setCabFrom] = useState("Bangalore");
+  const [cabTo, setCabTo] = useState("Mysore");
+  const [cabDate, setCabDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [cabReturnDate, setCabReturnDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [cabTime, setCabTime] = useState("07:00");
+  const [localPackage, setLocalPackage] = useState<"4hr_40km" | "8hr_80km" | "12hr_120km">("4hr_40km");
+  const [airportTripType, setAirportTripType] = useState<"Drop to Airport" | "Pickup from Airport">("Drop to Airport");
+  const [airportName, setAirportName] = useState("Terminal 1, Kempegowda International Airport (BLR)");
+
+  // Selected Fleet
+  const [selectedFleetId, setSelectedFleetId] = useState<string>("sedan");
+  const [selectedFuel, setSelectedFuel] = useState<string>("Diesel");
+  const [withLuggageCarrier, setWithLuggageCarrier] = useState<boolean>(false);
+
+  // Passenger & Payment state
+  const [passengerName, setPassengerName] = useState("FORTUNE GROUP");
+  const [passengerPhone, setPassengerPhone] = useState("9845003000");
+  const [passengerEmail, setPassengerEmail] = useState("");
+  const [pickupLandmark, setPickupLandmark] = useState("");
+  const [advanceOption, setAdvanceOption] = useState<number>(100);
+  const [utrRef, setUtrRef] = useState("");
 
   const [ticketNumber, setTicketNumber] = useState(() => generateTicketNumber());
   const [pnrNumber, setPnrNumber] = useState(() => generatePNR());
   const [upiCopied, setUpiCopied] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Form State for non-cab or passenger info
-  const [formData, setFormData] = useState<any>({
-    name: "FORTUNE GROUP",
-    phone: "9845003000",
-    email: "",
-    pickup_address: "",
-    adults: 2,
-    children: 0,
-    infants: 0,
-    advance_option: 100, // 100 or 0
-    utr_ref: "",
-    notes: "",
-    // Train
-    from_station: "",
-    to_station: "",
+  // Form State for non-cab services
+  const [otherFormData, setOtherFormData] = useState<any>({
     date: "",
     time: "07:00",
+    from_station: "",
+    to_station: "",
     travel_class: "3A",
-    quota: "General",
-    // Bus
     from_location: "",
     destination: "",
-    boarding_point: "",
-    dropping_point: "",
     bus_type: "AC Sleeper",
-    preferred_operator: "",
-    // Flight
     flight_trip_type: "One Way",
     cabin_class: "Economy",
     from_airport: "",
     to_airport: "",
-    return_date: "",
-    // Tour
     package_slug: "",
     package_title: "",
-    tour_trip_type: "Round Trip",
-    hotel_tier: "Standard",
-    number_of_days: 2,
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const onChange = useCallback((field: string, value: any) => {
-    setFormData((prev: any) => ({ ...prev, [field]: value }));
-    setErrors((prev) => {
-      const n = { ...prev };
-      delete n[field];
-      return n;
-    });
+  const onOtherChange = useCallback((field: string, value: any) => {
+    setOtherFormData((prev: any) => ({ ...prev, [field]: value }));
   }, []);
 
-  // When a user selects a cab in the Explore Cabs section
-  const handleSelectCar = (
-    cab: AvailableCab,
-    search: CabSearchData,
-    fuel: string,
-    withLuggage: boolean
-  ) => {
-    setSelectedCab(cab);
-    setCabSearchInfo(search);
-    setSelectedFuelType(fuel);
-    setHasLuggageCarrier(withLuggage);
-    setStep(1);
-    window.scrollTo({ top: 80, behavior: "smooth" });
-  };
+  const today = useMemo(() => new Date().toISOString().split("T")[0], []);
 
   // Today formatted as DD-MM-YYYY
   const todayFormatted = useMemo(() => {
@@ -143,118 +226,108 @@ function BookingPage() {
 
   // Format departure date
   const departureDateFormatted = useMemo(() => {
-    const rawDate = cabSearchInfo?.pickupDate || formData.date || new Date().toISOString().split("T")[0];
+    const rawDate = cabDate || today;
     const [y, m, d] = rawDate.split("-");
-    const rawTime = (cabSearchInfo?.pickupTime || formData.time || "07:00").replace(":", ".");
+    const rawTime = (cabTime || "07:00").replace(":", ".");
     return `${d}-${m}-${y}.${rawTime}`;
-  }, [cabSearchInfo, formData.date, formData.time]);
+  }, [cabDate, cabTime, today]);
 
-  // Derived locations
-  const fromLocation = useMemo(() => {
-    if (activeCategory === "CAB" && cabSearchInfo) {
-      if (cabSearchInfo.tab === "AIRPORT" && cabSearchInfo.airportTripType === "Pickup from Airport") {
-        return cabSearchInfo.airportName.split(",")[0].toUpperCase();
-      }
-      return (cabSearchInfo.from || "BANGALORE").toUpperCase();
-    }
-    return (
-      formData.pickup ||
-      formData.from_location ||
-      formData.from_station ||
-      formData.from_airport ||
-      "BANGALORE"
-    ).toUpperCase();
-  }, [activeCategory, cabSearchInfo, formData]);
+  // Selected Fleet details
+  const selectedFleet = useMemo(() => {
+    return FLEET_OPTIONS.find((f) => f.id === selectedFleetId) || FLEET_OPTIONS[1];
+  }, [selectedFleetId]);
 
-  const toLocation = useMemo(() => {
-    if (activeCategory === "CAB" && cabSearchInfo) {
-      if (cabSearchInfo.tab === "LOCAL") {
-        return cabSearchInfo.localPackage === "8hr_80km"
-          ? "BANGALORE LOCAL (8 HRS / 80 KM)"
-          : cabSearchInfo.localPackage === "12hr_120km"
-          ? "BANGALORE LOCAL (12 HRS / 120 KM)"
-          : "BANGALORE LOCAL (4 HRS / 40 KM)";
-      }
-      if (cabSearchInfo.tab === "AIRPORT" && cabSearchInfo.airportTripType === "Drop to Airport") {
-        return cabSearchInfo.airportName.split(",")[0].toUpperCase();
-      }
-      return (cabSearchInfo.to || "MYSORE").toUpperCase();
+  // Dynamic Price calculation based on Trip Type & Package
+  const calculatedFare = useMemo(() => {
+    let base = selectedFleet.basePriceOneWay;
+    if (cabTripType === "ROUND TRIP") base = selectedFleet.basePriceRoundTrip;
+    if (cabTripType === "AIRPORT") base = selectedFleet.basePriceAirport;
+    if (cabTripType === "LOCAL") {
+      if (localPackage === "4hr_40km") base = selectedFleet.basePriceLocal4hr;
+      else if (localPackage === "8hr_80km") base = selectedFleet.basePriceLocal8hr;
+      else base = selectedFleet.basePriceLocal12hr;
     }
-    return (
-      formData.destination ||
-      formData.to_station ||
-      formData.to_airport ||
-      "MYSORE"
-    ).toUpperCase();
-  }, [activeCategory, cabSearchInfo, formData]);
+    return base + (withLuggageCarrier ? 149 : 0);
+  }, [selectedFleet, cabTripType, localPackage, withLuggageCarrier]);
+
+  // From and To locations
+  const fromLocationDisplay = useMemo(() => {
+    if (cabTripType === "AIRPORT" && airportTripType === "Pickup from Airport") {
+      return airportName.split(",")[0].toUpperCase();
+    }
+    return (cabFrom || "BANGALORE").toUpperCase();
+  }, [cabTripType, airportTripType, airportName, cabFrom]);
+
+  const toLocationDisplay = useMemo(() => {
+    if (cabTripType === "LOCAL") {
+      if (localPackage === "8hr_80km") return "BANGALORE LOCAL (8 HRS / 80 KM)";
+      if (localPackage === "12hr_120km") return "BANGALORE LOCAL (12 HRS / 120 KM)";
+      return "BANGALORE LOCAL (4 HRS / 40 KM)";
+    }
+    if (cabTripType === "AIRPORT" && airportTripType === "Drop to Airport") {
+      return airportName.split(",")[0].toUpperCase();
+    }
+    return (cabTo || "MYSORE").toUpperCase();
+  }, [cabTripType, localPackage, airportTripType, airportName, cabTo]);
 
   const tourTypeDisplay = useMemo(() => {
-    if (activeCategory === "CAB" && cabSearchInfo) {
-      if (cabSearchInfo.tab === "LOCAL") {
-        return cabSearchInfo.localPackage === "8hr_80km"
-          ? "LOCAL (8 HRS / 80 KM)"
-          : cabSearchInfo.localPackage === "12hr_120km"
-          ? "LOCAL (12 HRS / 120 KM)"
-          : "LOCAL (4 HRS / 40 KM)";
-      }
-      return cabSearchInfo.tab;
+    if (cabTripType === "LOCAL") {
+      if (localPackage === "8hr_80km") return "LOCAL (8 HRS / 80 KM)";
+      if (localPackage === "12hr_120km") return "LOCAL (12 HRS / 120 KM)";
+      return "LOCAL (4 HRS / 40 KM)";
     }
-    if (activeCategory === "TRAIN") return "TRAIN JOURNEY";
-    if (activeCategory === "BUS") return "BUS TRAVEL";
-    if (activeCategory === "FLIGHT") return "FLIGHT BOOKING";
-    if (activeCategory === "TOUR") return "HOLIDAY TOUR PACKAGE";
-    return "CAB JOURNEY";
-  }, [activeCategory, cabSearchInfo]);
+    return cabTripType;
+  }, [cabTripType, localPackage]);
 
-  const tripTypeDisplay = useMemo(() => {
-    if (activeCategory === "CAB" && cabSearchInfo) {
-      return cabSearchInfo.tab;
-    }
-    if (formData.trip_type) return formData.trip_type.toUpperCase();
-    if (formData.flight_trip_type) return formData.flight_trip_type.toUpperCase();
-    return "ONE WAY";
-  }, [activeCategory, cabSearchInfo, formData]);
+  const vehicleDisplay = useMemo(() => {
+    return `${selectedFleet.name.toUpperCase()} (${selectedFuel})${withLuggageCarrier ? " + CARRIER" : ""}`;
+  }, [selectedFleet, selectedFuel, withLuggageCarrier]);
 
-  const vehicleOrTravelMode = useMemo(() => {
-    if (activeCategory === "CAB" && selectedCab) {
-      return `${selectedCab.name.toUpperCase()} (${selectedFuelType})${hasLuggageCarrier ? " + CARRIER" : ""}`;
-    }
-    if (activeCategory === "TRAIN") return `TRAIN (${formData.travel_class || "3A"})`;
-    if (activeCategory === "BUS") return `${formData.bus_type || "AC SLEEPER"} BUS`;
-    if (activeCategory === "FLIGHT") return `FLIGHT (${formData.cabin_class || "ECONOMY"})`;
-    if (activeCategory === "TOUR") return formData.package_title || "TOUR PACKAGE";
-    return "MARUTI SUZUKI CIAZ / SEDAN";
-  }, [activeCategory, selectedCab, selectedFuelType, hasLuggageCarrier, formData]);
-
-  const boardingPointDisplay = useMemo(() => {
-    return (
-      formData.pickup_address ||
-      fromLocation ||
-      "BANGALORE"
-    ).toUpperCase();
-  }, [formData.pickup_address, fromLocation]);
-
-  const copyUPI = () => {
-    navigator.clipboard.writeText("fortunetourism@okaxis");
-    setUpiCopied(true);
-    toast.success("UPI ID copied to clipboard!");
-    setTimeout(() => setUpiCopied(false), 2000);
+  const swapLocations = () => {
+    const temp = cabFrom;
+    setCabFrom(cabTo);
+    setCabTo(temp);
   };
 
-  const validatePassengerDetails = () => {
+  // Step 0 -> Step 1
+  const handleSelectServiceCard = (type: ServiceType) => {
+    setServiceType(type);
+    setStep(1);
+    window.scrollTo({ top: 80, behavior: "smooth" });
+  };
+
+  // Step 1 -> Step 2 (Route validation)
+  const handleGoToFleetSelection = () => {
     const e: Record<string, string> = {};
-    if (!formData.name?.trim()) e.name = "Passenger name is required.";
-    if (!formData.phone?.trim() || !/^[6-9]\d{9}$/.test(formData.phone.replace(/\s+/g, ""))) {
-      e.phone = "Enter a valid 10-digit mobile number.";
+    if (cabTripType !== "LOCAL") {
+      if (!cabFrom.trim()) e.from = "Pickup location is required.";
+      if (!cabTo.trim()) e.to = "Drop location is required.";
     }
+    if (!cabDate) e.date = "Travel date is required.";
+
     setErrors(e);
-    return Object.keys(e).length === 0;
+    if (Object.keys(e).length === 0) {
+      setStep(2);
+      window.scrollTo({ top: 80, behavior: "smooth" });
+    } else {
+      toast.error("Please fill required journey details.");
+    }
   };
 
-  // Submit and Generate Ticket
+  // Step 2 -> Step 3 (Fleet Selection to Payment)
+  const handleGoToPayment = () => {
+    setStep(3);
+    window.scrollTo({ top: 80, behavior: "smooth" });
+  };
+
+  // Step 3 -> Step 4 (Confirm & Generate Ticket)
   const handleConfirmAndGenerateTicket = async () => {
-    if (!validatePassengerDetails()) {
-      toast.error("Please enter passenger name and mobile number.");
+    if (!passengerName.trim()) {
+      toast.error("Please enter passenger name.");
+      return;
+    }
+    if (!passengerPhone.trim() || !/^[6-9]\d{9}$/.test(passengerPhone.replace(/\s+/g, ""))) {
+      toast.error("Please enter a valid 10-digit mobile number.");
       return;
     }
 
@@ -262,37 +335,30 @@ function BookingPage() {
 
     try {
       const payload: Record<string, any> = {
-        name: formData.name || "FORTUNE GROUP",
-        phone: (formData.phone || "9845003000").replace(/\s+/g, ""),
-        email: formData.email || null,
-        service: activeCategory === "CAB" ? "Taxi" : activeCategory,
-        booking_type: activeCategory,
-        pickup: fromLocation,
-        destination: toLocation,
-        date: cabSearchInfo?.pickupDate || formData.date || new Date().toISOString().split("T")[0],
-        time: cabSearchInfo?.pickupTime || formData.time || "07:00",
-        passengers: String(selectedCab?.seats || 4),
-        trip_type: tripTypeDisplay,
-        car_type: vehicleOrTravelMode,
-        train_class: formData.travel_class || null,
-        train_preference: formData.preferred_train || null,
-        bus_operator: formData.preferred_operator || null,
-        bus_type: formData.bus_type || null,
-        flight_number: null,
-        return_date: cabSearchInfo?.returnDate || formData.return_date || null,
+        name: passengerName || "FORTUNE GROUP",
+        phone: passengerPhone.replace(/\s+/g, ""),
+        email: passengerEmail || null,
+        service: "Taxi",
+        booking_type: "CAB",
+        pickup: fromLocationDisplay,
+        destination: toLocationDisplay,
+        date: cabDate || today,
+        time: cabTime || "07:00",
+        passengers: String(selectedFleet.seats),
+        trip_type: cabTripType,
+        car_type: vehicleDisplay,
         notes: [
           `Ticket No: ${ticketNumber}`,
           `PNR: ${pnrNumber}`,
-          `Vehicle: ${vehicleOrTravelMode}`,
-          `Fare: ₹${(selectedCab?.discountedPrice || 1783) + (hasLuggageCarrier ? 149 : 0)}`,
-          `Payment: ${formData.advance_option === 100 ? "₹100 Advance Paid" : "Zero Advance"}`,
-          formData.pickup_address && `Landmark: ${formData.pickup_address}`,
-          formData.utr_ref && `UTR: ${formData.utr_ref}`,
-          formData.notes,
+          `Fleet: ${vehicleDisplay}`,
+          `Fare: ₹${calculatedFare}`,
+          `Payment: ${advanceOption === 100 ? "₹100 Advance Paid" : "Zero Advance"}`,
+          pickupLandmark && `Landmark: ${pickupLandmark}`,
+          utrRef && `UTR: ${utrRef}`,
         ]
           .filter(Boolean)
           .join(" | "),
-        client_token: `FT-CAB-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        client_token: `FT-BKG-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       };
 
       const res = await fetch("/api/enquiries", {
@@ -307,7 +373,7 @@ function BookingPage() {
         throw new Error(data.message || data.error || "Failed to submit booking.");
       }
 
-      setStep(2);
+      setStep(4);
       toast.success("Booking confirmed! Your official ticket copy is generated below.");
       window.scrollTo({ top: 80, behavior: "smooth" });
     } catch (err: any) {
@@ -317,20 +383,27 @@ function BookingPage() {
     }
   };
 
+  const copyUPI = () => {
+    navigator.clipboard.writeText("fortunetourism@okaxis");
+    setUpiCopied(true);
+    toast.success("UPI ID copied to clipboard!");
+    setTimeout(() => setUpiCopied(false), 2000);
+  };
+
   const handleDownloadPDF = () => {
     downloadTicketCopyPDF({
       ticketNumber,
       pnrNumber,
       bookingDate: todayFormatted,
-      passengerName: formData.name || "FORTUNE GROUP",
-      passengerPhone: formData.phone || "9845003000",
+      passengerName: passengerName || "FORTUNE GROUP",
+      passengerPhone: passengerPhone || "9845003000",
       tourType: tourTypeDisplay,
-      fromLocation,
-      toLocation,
+      fromLocation: fromLocationDisplay,
+      toLocation: toLocationDisplay,
       departureOn: departureDateFormatted,
-      tripType: tripTypeDisplay,
-      vehicleOrMode: vehicleOrTravelMode,
-      boardingPoint: boardingPointDisplay,
+      tripType: cabTripType,
+      vehicleOrMode: vehicleDisplay,
+      boardingPoint: (pickupLandmark || fromLocationDisplay).toUpperCase(),
     });
     toast.success("Ticket PDF downloaded successfully!");
   };
@@ -369,45 +442,316 @@ function BookingPage() {
       `}</style>
 
       <div className="min-h-screen bg-slate-50 py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="max-w-4xl mx-auto space-y-6">
 
-          {/* STEP 0: Service Category Cards (What would you like to book?) */}
+          {/* STEP 0: Initial Page — What would you like to book? (5 Cards ONLY) */}
           {step === 0 && (
             <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
               <MultiServiceTypeCards
-                selectedService={activeCategory}
-                onSelect={(cat) => setActiveCategory(cat as ServiceCategory)}
+                selectedService={serviceType}
+                onSelect={handleSelectServiceCard}
               />
             </div>
           )}
 
-          {/* STEP 0: CAB SEARCH & CAR EXPLORE SCREEN (When Cab Booking is active) */}
-          {step === 0 && activeCategory === "CAB" && (
-            <CabSearchExplore onSelectCar={handleSelectCar} />
+          {/* STEP 1: Cab Booking Route & Journey Form (Images 2 & 3) */}
+          {step === 1 && serviceType === "CAB" && (
+            <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-5 sm:p-7 space-y-6 animate-in fade-in duration-300">
+              {/* Top Header with Back */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
+                    🚕 Cab Booking
+                  </span>
+                  <span className="text-slate-500 text-xs font-medium">Select Journey & Schedule</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setStep(0)}
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Services
+                </button>
+              </div>
+
+              {/* Trip Type Tabs: ONE WAY | ROUND TRIP | LOCAL | AIRPORT */}
+              <div className="flex justify-center">
+                <div className="inline-flex rounded-md border border-slate-300 overflow-hidden text-xs sm:text-sm font-bold bg-white">
+                  {(["ONE WAY", "ROUND TRIP", "LOCAL", "AIRPORT"] as CabTripType[]).map((tab) => {
+                    const isActive = cabTripType === tab;
+                    return (
+                      <button
+                        key={tab}
+                        type="button"
+                        onClick={() => setCabTripType(tab)}
+                        className={`px-4 sm:px-6 py-2.5 transition-colors uppercase tracking-wider ${
+                          isActive
+                            ? "bg-[#00a2d2] text-white font-extrabold shadow-inner"
+                            : "text-slate-700 hover:bg-slate-50 border-r last:border-r-0 border-slate-200"
+                        }`}
+                      >
+                        {tab}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* LOCAL HOURLY DROPDOWN (Image 2: 4 hrs | 40 km, 8 hrs | 80 km, 12 hrs | 120 km) */}
+              {cabTripType === "LOCAL" && (
+                <div className="space-y-2 max-w-md mx-auto pt-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-[#00a2d2]" /> Select Local Rental Package *
+                  </label>
+                  <select
+                    value={localPackage}
+                    onChange={(e) => setLocalPackage(e.target.value as any)}
+                    className="w-full bg-white border-2 border-[#00a2d2] rounded-xl px-4 py-3 text-sm font-black text-slate-900 focus:ring-2 focus:ring-[#00a2d2] outline-none shadow-xs cursor-pointer"
+                  >
+                    <option value="4hr_40km">4 hrs | 40 km (Short City Errands)</option>
+                    <option value="8hr_80km">8 hrs | 80 km (Full Day City Travel & Shopping)</option>
+                    <option value="12hr_120km">12 hrs | 120 km (Extended Day Rental)</option>
+                  </select>
+                </div>
+              )}
+
+              {/* INPUT FIELDS ROW (Image 3) */}
+              <div className="pt-2">
+                {/* ONE WAY & ROUND TRIP */}
+                {(cabTripType === "ONE WAY" || cabTripType === "ROUND TRIP") && (
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                    <div className="md:col-span-3 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        FROM
+                      </label>
+                      <LocationSearchInput
+                        value={cabFrom}
+                        onChange={setCabFrom}
+                        placeholder="Enter Pickup Location"
+                      />
+                    </div>
+
+                    <div className="hidden md:flex md:col-span-1 justify-center items-center pb-1">
+                      <button
+                        type="button"
+                        onClick={swapLocations}
+                        className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
+                        title="Swap Locations"
+                      >
+                        <ArrowLeftRight className="w-4 h-4 text-[#00a2d2]" />
+                      </button>
+                    </div>
+
+                    <div className="md:col-span-3 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        TO
+                      </label>
+                      <LocationSearchInput
+                        value={cabTo}
+                        onChange={setCabTo}
+                        placeholder="Enter Drop Location"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        PICK UP DATE
+                      </label>
+                      <input
+                        type="date"
+                        min={today}
+                        value={cabDate}
+                        onChange={(e) => setCabDate(e.target.value)}
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                      />
+                    </div>
+
+                    {cabTripType === "ROUND TRIP" ? (
+                      <div className="md:col-span-2 space-y-1">
+                        <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                          RETURN DATE
+                        </label>
+                        <input
+                          type="date"
+                          min={cabDate || today}
+                          value={cabReturnDate}
+                          onChange={(e) => setCabReturnDate(e.target.value)}
+                          className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                        />
+                      </div>
+                    ) : null}
+
+                    <div className={cabTripType === "ROUND TRIP" ? "md:col-span-1 space-y-1" : "md:col-span-3 space-y-1"}>
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        PICK UP TIME
+                      </label>
+                      <input
+                        type="time"
+                        value={cabTime}
+                        onChange={(e) => setCabTime(e.target.value)}
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* LOCAL */}
+                {cabTripType === "LOCAL" && (
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                    <div className="md:col-span-4 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        CITY / PICKUP LOCATION
+                      </label>
+                      <LocationSearchInput
+                        value={cabFrom}
+                        onChange={setCabFrom}
+                        placeholder="Enter City (e.g. Bangalore, Indiranagar)"
+                      />
+                    </div>
+
+                    <div className="md:col-span-4 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        PICK UP DATE
+                      </label>
+                      <input
+                        type="date"
+                        min={today}
+                        value={cabDate}
+                        onChange={(e) => setCabDate(e.target.value)}
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                      />
+                    </div>
+
+                    <div className="md:col-span-4 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        PICK UP TIME
+                      </label>
+                      <input
+                        type="time"
+                        value={cabTime}
+                        onChange={(e) => setCabTime(e.target.value)}
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* AIRPORT */}
+                {cabTripType === "AIRPORT" && (
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        TRIP
+                      </label>
+                      <select
+                        value={airportTripType}
+                        onChange={(e) => setAirportTripType(e.target.value as any)}
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                      >
+                        <option value="Drop to Airport">Drop to Airport</option>
+                        <option value="Pickup from Airport">Pickup from Airport</option>
+                      </select>
+                    </div>
+
+                    <div className="md:col-span-3 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        PICKUP ADDRESS
+                      </label>
+                      <LocationSearchInput
+                        value={cabFrom}
+                        onChange={setCabFrom}
+                        placeholder="Enter Pickup Location"
+                      />
+                    </div>
+
+                    <div className="md:col-span-3 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        DROP AIRPORT
+                      </label>
+                      <select
+                        value={airportName}
+                        onChange={(e) => setAirportName(e.target.value)}
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                      >
+                        <option>Terminal 1, Kempegowda International Airport (BLR)</option>
+                        <option>Terminal 2, Kempegowda International Airport (BLR)</option>
+                        <option>Mysuru Airport (MYQ)</option>
+                        <option>Mangaluru Int'l Airport (IXE)</option>
+                      </select>
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        PICK UP DATE
+                      </label>
+                      <input
+                        type="date"
+                        min={today}
+                        value={cabDate}
+                        onChange={(e) => setCabDate(e.target.value)}
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        PICK UP TIME
+                      </label>
+                      <input
+                        type="time"
+                        value={cabTime}
+                        onChange={(e) => setCabTime(e.target.value)}
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* NEXT PAGE ORANGE BUTTON (Replaced Explore Cabs) */}
+              <div className="flex justify-center pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={handleGoToFleetSelection}
+                  className="bg-[#f97316] hover:bg-[#ea580c] text-white font-black px-10 py-3.5 rounded-xl uppercase tracking-wider text-sm shadow-md transition-all hover:scale-105 flex items-center gap-2"
+                >
+                  NEXT PAGE <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           )}
 
-          {/* OTHER SERVICES (Train, Bus, Flight, Tour) */}
-          {step === 0 && activeCategory !== "CAB" && (
+          {/* STEP 1 FOR OTHER SERVICES (Train, Bus, Flight, Tour) */}
+          {step === 1 && serviceType !== "CAB" && (
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-              <h2 className="font-extrabold text-slate-900 text-lg sm:text-xl">
-                {activeCategory === "TRAIN" && "IRCTC Train Ticket Booking"}
-                {activeCategory === "BUS" && "Bus Ticket Booking Assistance"}
-                {activeCategory === "FLIGHT" && "Domestic & International Flight Booking"}
-                {activeCategory === "TOUR" && "Holiday Tour Packages"}
-              </h2>
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h2 className="font-extrabold text-slate-900 text-lg">
+                  {serviceType === "TRAIN" && "IRCTC Train Ticket Booking"}
+                  {serviceType === "BUS" && "Bus Ticket Booking Assistance"}
+                  {serviceType === "FLIGHT" && "Domestic & International Flight Booking"}
+                  {serviceType === "TOUR" && "Holiday Tour Packages"}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setStep(0)}
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back
+                </button>
+              </div>
 
               <div className="space-y-4">
-                {activeCategory === "TRAIN" && (
-                  <TrainBookingForm formData={formData} onChange={onChange} errors={errors} />
+                {serviceType === "TRAIN" && (
+                  <TrainBookingForm formData={otherFormData} onChange={onOtherChange} errors={errors} />
                 )}
-                {activeCategory === "BUS" && (
-                  <BusBookingForm formData={formData} onChange={onChange} errors={errors} />
+                {serviceType === "BUS" && (
+                  <BusBookingForm formData={otherFormData} onChange={onOtherChange} errors={errors} />
                 )}
-                {activeCategory === "FLIGHT" && (
-                  <FlightBookingForm formData={formData} onChange={onChange} errors={errors} />
+                {serviceType === "FLIGHT" && (
+                  <FlightBookingForm formData={otherFormData} onChange={onOtherChange} errors={errors} />
                 )}
-                {activeCategory === "TOUR" && (
-                  <TourBookingForm formData={formData} onChange={onChange} errors={errors} />
+                {serviceType === "TOUR" && (
+                  <TourBookingForm formData={otherFormData} onChange={onOtherChange} errors={errors} />
                 )}
               </div>
 
@@ -415,7 +759,7 @@ function BookingPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    setStep(1);
+                    setStep(3);
                     window.scrollTo({ top: 80, behavior: "smooth" });
                   }}
                   className="bg-[#f97316] hover:bg-[#ea580c] text-white font-black px-8 py-3 rounded-xl uppercase text-sm shadow-md transition-all"
@@ -426,62 +770,218 @@ function BookingPage() {
             </div>
           )}
 
-          {/* STEP 1: PASSENGER DETAILS & PAYMENT (After clicking SELECT CAR) */}
-          {step === 1 && (
+          {/* STEP 2: SELECT VEHICLE FLEET PAGE */}
+          {step === 2 && (
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-in fade-in duration-300">
-              {/* Header & Back Button */}
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 font-bold">
-                    <Car className="w-5 h-5 text-[#f97316]" />
-                  </div>
-                  <div>
-                    <h2 className="font-extrabold text-slate-900 text-lg">
-                      Passenger & Booking Details
-                    </h2>
-                    <p className="text-xs text-slate-500">
-                      Enter passenger details and confirm your vehicle reservation
-                    </p>
-                  </div>
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h2 className="font-extrabold text-slate-900 text-lg sm:text-xl">
+                    Select Vehicle Fleet
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    {fromLocationDisplay} → {toLocationDisplay} · {departureDateFormatted}
+                  </p>
                 </div>
 
                 <button
                   type="button"
-                  onClick={() => setStep(0)}
-                  className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50"
+                  onClick={() => setStep(1)}
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" /> Modify Selection
+                  <ArrowLeft className="w-3.5 h-3.5" /> Modify Route
                 </button>
               </div>
 
-              {/* Selected Car & Route Summary Card */}
+              {/* Fleet Selection List */}
+              <div className="space-y-4">
+                {FLEET_OPTIONS.map((fleet) => {
+                  const isSelected = selectedFleetId === fleet.id;
+                  let price = fleet.basePriceOneWay;
+                  if (cabTripType === "ROUND TRIP") price = fleet.basePriceRoundTrip;
+                  if (cabTripType === "AIRPORT") price = fleet.basePriceAirport;
+                  if (cabTripType === "LOCAL") {
+                    if (localPackage === "4hr_40km") price = fleet.basePriceLocal4hr;
+                    else if (localPackage === "8hr_80km") price = fleet.basePriceLocal8hr;
+                    else price = fleet.basePriceLocal12hr;
+                  }
+
+                  return (
+                    <div
+                      key={fleet.id}
+                      onClick={() => setSelectedFleetId(fleet.id)}
+                      className={`p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer ${
+                        isSelected
+                          ? "border-[#f97316] bg-amber-50/40 ring-2 ring-amber-500/20 shadow-md"
+                          : "border-slate-200 hover:border-slate-300 bg-white"
+                      }`}
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                        <div className="md:col-span-3 flex justify-center">
+                          <img
+                            src={fleet.image}
+                            alt={fleet.name}
+                            className="w-36 h-24 object-cover rounded-xl shadow-xs"
+                          />
+                        </div>
+
+                        <div className="md:col-span-5 space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-extrabold text-slate-900 text-base">
+                              {fleet.name}
+                            </h3>
+                            <span className="bg-slate-900 text-white text-[11px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                              {fleet.rating} <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                            </span>
+                          </div>
+
+                          <p className="text-xs text-slate-500">{fleet.category}</p>
+
+                          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-700 pt-1 font-medium">
+                            <span className="flex items-center gap-1">
+                              <Users className="w-3.5 h-3.5 text-slate-400" /> {fleet.seats} Seater
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Driver Allowance Included
+                            </span>
+                          </div>
+
+                          {/* Fuel Selector */}
+                          {isSelected && (
+                            <div className="pt-2 flex items-center gap-4 text-xs font-bold text-slate-700">
+                              <span>Fuel:</span>
+                              {["Diesel", "CNG"].map((fuel) => (
+                                <label key={fuel} className="flex items-center gap-1 cursor-pointer">
+                                  <input
+                                    type="radio"
+                                    name="fleet_fuel"
+                                    value={fuel}
+                                    checked={selectedFuel === fuel}
+                                    onChange={() => setSelectedFuel(fuel)}
+                                    className="text-[#f97316]"
+                                  />
+                                  <span>{fuel}</span>
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="md:col-span-4 flex flex-col items-end justify-center space-y-2 border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-4 text-right">
+                          <div className="text-2xl font-black text-[#00a2d2]">
+                            ₹{price.toLocaleString()}
+                          </div>
+                          <div className="text-[11px] text-slate-400 font-medium">
+                            All-Inclusive Transparent Fare
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedFleetId(fleet.id);
+                              handleGoToPayment();
+                            }}
+                            className={`px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-sm transition-all ${
+                              isSelected
+                                ? "bg-[#f97316] text-white hover:bg-[#ea580c] shadow-md"
+                                : "bg-slate-100 hover:bg-slate-200 text-slate-800"
+                            }`}
+                          >
+                            {isSelected ? "Selected ✓" : "Select"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Luggage Carrier Add-on */}
+              <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl flex items-center justify-between text-xs">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-800">
+                  <input
+                    type="checkbox"
+                    checked={withLuggageCarrier}
+                    onChange={(e) => setWithLuggageCarrier(e.target.checked)}
+                    className="rounded text-[#00a2d2] focus:ring-[#00a2d2]"
+                  />
+                  <span>🚙 Add Roof Luggage Carrier @ ₹149</span>
+                </label>
+                <span className="text-sky-800 font-extrabold">+₹149 Extra</span>
+              </div>
+
+              {/* Bottom Continue to Payment Button */}
+              <div className="flex justify-between pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Route
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleGoToPayment}
+                  className="bg-[#f97316] hover:bg-[#ea580c] text-white font-black px-8 py-3.5 rounded-xl uppercase tracking-wider text-sm shadow-md transition-all hover:scale-105 flex items-center gap-2"
+                >
+                  Continue to Payment <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: PASSENGER DETAILS & PAYMENT */}
+          {step === 3 && (
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-in fade-in duration-300">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h2 className="font-extrabold text-slate-900 text-lg sm:text-xl">
+                    Passenger & Payment
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Review trip details and confirm your booking
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Fleet
+                </button>
+              </div>
+
+              {/* Booking Summary Box */}
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                     Selected Vehicle & Route
-                  </div>
+                  </span>
                   <div className="font-black text-slate-900 text-base sm:text-lg">
-                    {selectedCab ? selectedCab.name : vehicleOrTravelMode} ({selectedFuelType})
-                    {hasLuggageCarrier && " + Luggage Carrier"}
+                    {vehicleDisplay}
                   </div>
                   <div className="text-xs text-slate-600 font-medium">
-                    {fromLocation} → {toLocation} · {departureDateFormatted} · {tripTypeDisplay}
+                    {fromLocationDisplay} → {toLocationDisplay} · {departureDateFormatted} · {cabTripType}
                   </div>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <div className="text-xs text-slate-500 font-medium">Total Fare</div>
+                  <span className="text-[10px] font-bold text-slate-400 block">TOTAL FARE</span>
                   <div className="text-2xl font-black text-[#00a2d2]">
-                    ₹{((selectedCab?.discountedPrice || 1783) + (hasLuggageCarrier ? 149 : 0)).toLocaleString()}
+                    ₹{calculatedFare.toLocaleString()}
                   </div>
                 </div>
               </div>
 
               {/* Passenger Inputs */}
               <div className="space-y-4">
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                  <User className="w-4 h-4 text-amber-600" /> Passenger Information
-                </div>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-800 block">
+                  Passenger Contact
+                </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -491,11 +991,10 @@ function BookingPage() {
                     <input
                       type="text"
                       placeholder="e.g. Rajesh Kumar"
-                      value={formData.name}
-                      onChange={(e) => onChange("name", e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                      value={passengerName}
+                      onChange={(e) => setPassengerName(e.target.value)}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 outline-none"
                     />
-                    {errors.name && <p className="text-xs text-red-600 font-medium mt-1">{errors.name}</p>}
                   </div>
 
                   <div>
@@ -506,11 +1005,10 @@ function BookingPage() {
                       type="tel"
                       placeholder="10-digit mobile number"
                       maxLength={10}
-                      value={formData.phone}
-                      onChange={(e) => onChange("phone", e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                      value={passengerPhone}
+                      onChange={(e) => setPassengerPhone(e.target.value)}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 outline-none"
                     />
-                    {errors.phone && <p className="text-xs text-red-600 font-medium mt-1">{errors.phone}</p>}
                   </div>
                 </div>
 
@@ -521,10 +1019,10 @@ function BookingPage() {
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. Flat 302, Green Glen Layout, Bellandur"
-                      value={formData.pickup_address}
-                      onChange={(e) => onChange("pickup_address", e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                      placeholder="e.g. Indiranagar, Near Metro Station"
+                      value={pickupLandmark}
+                      onChange={(e) => setPickupLandmark(e.target.value)}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 outline-none"
                     />
                   </div>
 
@@ -535,26 +1033,26 @@ function BookingPage() {
                     <input
                       type="email"
                       placeholder="e.g. rajesh@example.com"
-                      value={formData.email}
-                      onChange={(e) => onChange("email", e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                      value={passengerEmail}
+                      onChange={(e) => setPassengerEmail(e.target.value)}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 outline-none"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Payment Section */}
+              {/* Payment Choice */}
               <div className="space-y-4 pt-4 border-t border-slate-100">
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                  <CreditCard className="w-4 h-4 text-amber-600" /> Payment Preference
-                </div>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-800 block">
+                  Payment Choice
+                </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <button
                     type="button"
-                    onClick={() => onChange("advance_option", 100)}
+                    onClick={() => setAdvanceOption(100)}
                     className={`p-4 rounded-2xl border text-left transition-all ${
-                      formData.advance_option === 100
+                      advanceOption === 100
                         ? "bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/40 shadow-sm"
                         : "bg-white border-slate-200 hover:border-slate-300"
                     }`}
@@ -562,7 +1060,7 @@ function BookingPage() {
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-black text-slate-900 text-sm sm:text-base">⚡ Pay ₹100 Advance</span>
                       <span className="bg-[#f97316] text-white font-black text-[10px] px-2 py-0.5 rounded-full uppercase">
-                        Recommended
+                        Priority Lock
                       </span>
                     </div>
                     <p className="text-xs text-slate-600">
@@ -572,9 +1070,9 @@ function BookingPage() {
 
                   <button
                     type="button"
-                    onClick={() => onChange("advance_option", 0)}
+                    onClick={() => setAdvanceOption(0)}
                     className={`p-4 rounded-2xl border text-left transition-all ${
-                      formData.advance_option === 0
+                      advanceOption === 0
                         ? "bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/40 shadow-sm"
                         : "bg-white border-slate-200 hover:border-slate-300"
                     }`}
@@ -592,7 +1090,7 @@ function BookingPage() {
                 </div>
 
                 {/* UPI QR if ₹100 Advance is selected */}
-                {formData.advance_option === 100 && (
+                {advanceOption === 100 && (
                   <div className="bg-gradient-to-b from-amber-50/60 to-white border border-amber-200 rounded-2xl p-5 space-y-4">
                     <div className="flex items-center gap-2">
                       <Zap className="w-4 h-4 text-amber-600" />
@@ -653,9 +1151,9 @@ function BookingPage() {
                           <input
                             type="text"
                             placeholder="e.g. 423589124012"
-                            value={formData.utr_ref || ""}
-                            onChange={(e) => onChange("utr_ref", e.target.value)}
-                            className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                            value={utrRef}
+                            onChange={(e) => setUtrRef(e.target.value)}
+                            className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 outline-none"
                           />
                         </div>
                       </div>
@@ -668,10 +1166,10 @@ function BookingPage() {
               <div className="flex justify-between pt-4 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setStep(0)}
-                  className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold text-xs px-4 py-2.5 border border-slate-300 rounded-xl hover:bg-slate-50 transition-all"
+                  onClick={() => setStep(2)}
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50"
                 >
-                  <ArrowLeft className="w-4 h-4" /> Back to Cars
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Fleet
                 </button>
 
                 <button
@@ -695,8 +1193,8 @@ function BookingPage() {
             </div>
           )}
 
-          {/* STEP 2: OFFICIAL TICKET COPY VOUCHER & PDF DOWNLOAD (Exact Spreadsheet Format) */}
-          {step === 2 && (
+          {/* STEP 4: OFFICIAL TICKET COPY VOUCHER & PDF DOWNLOAD (Exact 4-Row Spreadsheet) */}
+          {step === 4 && (
             <div className="space-y-6">
               {/* Success Banner */}
               <div className="no-print bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
@@ -748,7 +1246,7 @@ function BookingPage() {
 
                   <a
                     href={buildWhatsAppUrl(
-                      `Hello Fortune Tourism! I have booked my cab.\n\n*Ticket No:* ${ticketNumber}\n*PNR:* ${pnrNumber}\n*Passenger:* ${formData.name || "FORTUNE GROUP"}\n*Phone:* ${formData.phone || "9845003000"}\n*From:* ${fromLocation}\n*To:* ${toLocation}\n*Date:* ${departureDateFormatted}\n*Vehicle:* ${vehicleOrTravelMode}\n\nPlease confirm driver assignment.`
+                      `Hello Fortune Tourism! I have booked my cab.\n\n*Ticket No:* ${ticketNumber}\n*PNR:* ${pnrNumber}\n*Passenger:* ${passengerName || "FORTUNE GROUP"}\n*Phone:* ${passengerPhone || "9845003000"}\n*From:* ${fromLocationDisplay}\n*To:* ${toLocationDisplay}\n*Date:* ${departureDateFormatted}\n*Vehicle:* ${vehicleDisplay}\n\nPlease confirm driver assignment.`
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -786,13 +1284,13 @@ function BookingPage() {
                           Passenger Name:
                         </td>
                         <td className="p-2.5 font-black text-slate-900 uppercase">
-                          {formData.name || "FORTUNE GROUP"}
+                          {passengerName || "FORTUNE GROUP"}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 w-40 whitespace-nowrap">
                           Passenger Phone No.:
                         </td>
                         <td className="p-2.5 font-bold text-slate-900">
-                          {formData.phone || "9845003000"}
+                          {passengerPhone || "9845003000"}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 w-28 whitespace-nowrap">
                           Tour Type
@@ -808,13 +1306,13 @@ function BookingPage() {
                           FROM
                         </td>
                         <td colSpan={2} className="p-2.5 font-black text-slate-900 uppercase">
-                          {fromLocation}
+                          {fromLocationDisplay}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 whitespace-nowrap">
                           TO:
                         </td>
                         <td colSpan={2} className="p-2.5 font-black text-slate-900 uppercase">
-                          {toLocation}
+                          {toLocationDisplay}
                         </td>
                       </tr>
 
@@ -846,19 +1344,19 @@ function BookingPage() {
                           Trip Type:
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 uppercase">
-                          {tripTypeDisplay}
+                          {cabTripType}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 whitespace-nowrap">
                           Type Of Car:/bus/Flight
                         </td>
                         <td className="p-2.5 font-black text-slate-900 uppercase">
-                          {vehicleOrTravelMode}
+                          {vehicleDisplay}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 whitespace-nowrap">
                           Boarding point:
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 uppercase">
-                          {boardingPointDisplay}
+                          {(pickupLandmark || fromLocationDisplay).toUpperCase()}
                         </td>
                       </tr>
                     </tbody>
@@ -882,17 +1380,13 @@ function BookingPage() {
                   type="button"
                   onClick={() => {
                     setStep(0);
-                    setSelectedCab(null);
-                    setCabSearchInfo(null);
+                    setServiceType(null);
                     setTicketNumber(generateTicketNumber());
                     setPnrNumber(generatePNR());
-                    setFormData({
-                      name: "FORTUNE GROUP",
-                      phone: "9845003000",
-                      email: "",
-                      pickup_address: "",
-                      adults: 2,
-                    });
+                    setPassengerName("FORTUNE GROUP");
+                    setPassengerPhone("9845003000");
+                    setPassengerEmail("");
+                    setPickupLandmark("");
                   }}
                   className="text-xs font-bold text-slate-600 hover:text-slate-900 px-4 py-2.5 border border-slate-300 rounded-xl hover:bg-slate-50 transition-all"
                 >
