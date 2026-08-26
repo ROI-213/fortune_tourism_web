@@ -218,14 +218,10 @@ function BookingPage() {
     setTimeout(() => setUpiCopied(false), 2000);
   };
 
-  // Validate Step 0 (Client & Journey details)
+  // Validate Step 0 (Journey details)
   const validateClientAndJourney = (): boolean => {
     const e: Record<string, string> = {};
 
-    if (!formData.name?.trim()) e.name = "Please enter passenger/client name.";
-    if (!formData.phone?.trim() || !/^[6-9]\d{9}$/.test(formData.phone.replace(/\s+/g, ""))) {
-      e.phone = "Enter a valid 10-digit mobile number.";
-    }
     if (!formData.date) e.date = "Travel date is required.";
 
     if (serviceType === "CAB") {
@@ -430,47 +426,6 @@ function BookingPage() {
                       errors={errors}
                     />
                   )}
-                </div>
-
-                {/* Client Contact Inputs */}
-                <div className="space-y-4 pt-4 border-t border-slate-100">
-                  <div className="flex items-center gap-2 pb-1">
-                    <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
-                      Passenger Contact
-                    </span>
-                    <span className="text-slate-500 text-xs font-medium">Details for ticket copy</span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
-                        <User className="w-3.5 h-3.5 text-amber-600" /> Passenger Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Rajesh Kumar / Fortune Group"
-                        value={formData.name}
-                        onChange={(e) => onChange("name", e.target.value)}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
-                      />
-                      {errors.name && <p className="text-xs text-red-600 font-medium mt-1">{errors.name}</p>}
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
-                        <Phone className="w-3.5 h-3.5 text-amber-600" /> Mobile Number *
-                      </label>
-                      <input
-                        type="tel"
-                        placeholder="10-digit mobile number"
-                        value={formData.phone}
-                        onChange={(e) => onChange("phone", e.target.value)}
-                        maxLength={10}
-                        className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
-                      />
-                      {errors.phone && <p className="text-xs text-red-600 font-medium mt-1">{errors.phone}</p>}
-                    </div>
-                  </div>
                 </div>
 
                 {/* Continue to Payment Button */}
