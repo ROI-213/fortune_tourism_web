@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
@@ -15,7 +15,6 @@ import {
   Users,
   MapPin,
   Sparkles,
-  Download,
   Home,
   IndianRupee,
   Zap,
@@ -187,10 +186,14 @@ function BookingPage() {
   const nextStep = () => {
     if (validate(step)) {
       setStep((s) => Math.min(s + 1, STEPS.length - 1));
+      window.scrollTo({ top: 120, behavior: "smooth" });
     }
   };
 
-  const prevStep = () => setStep((s) => Math.max(s - 1, 0));
+  const prevStep = () => {
+    setStep((s) => Math.max(s - 1, 0));
+    window.scrollTo({ top: 120, behavior: "smooth" });
+  };
 
   const handleSubmit = async () => {
     if (!validate(3)) return;
@@ -280,6 +283,7 @@ function BookingPage() {
       const data = await res.json();
       setBookingResult({ ...data, service: serviceType, fareResult });
       setStep(4);
+      window.scrollTo({ top: 100, behavior: "smooth" });
     } catch (err: any) {
       toast.error(err.message || "Submission failed. Please try again.");
     } finally {
@@ -297,43 +301,43 @@ function BookingPage() {
 
   return (
     <SiteLayout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-8 px-4">
+      <div className="min-h-screen bg-slate-50/70 py-10 px-4">
         {/* Hero Header */}
         <div className="text-center mb-8 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-xs font-bold mb-4">
-            <Shield className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-50 border border-amber-200/80 rounded-full text-amber-800 text-xs font-bold mb-3 shadow-xs">
+            <Shield className="w-3.5 h-3.5 text-amber-600" />
             Trusted by 10,000+ South India Travellers
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-2">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
             Plan Your Journey
           </h1>
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-600 text-sm">
             Transparent pricing · Live fare calculation · Instant confirmation
           </p>
         </div>
 
-        {/* Step Progress */}
+        {/* Step Progress Bar */}
         <div className="max-w-2xl mx-auto mb-8">
           <div className="flex items-center justify-between relative">
-            <div className="absolute top-4 left-0 right-0 h-0.5 bg-slate-800 z-0" />
+            <div className="absolute top-4 left-0 right-0 h-1 bg-slate-200 z-0 rounded-full" />
             <div
-              className="absolute top-4 left-0 h-0.5 bg-gradient-to-r from-amber-500 to-orange-500 z-0 transition-all duration-500"
+              className="absolute top-4 left-0 h-1 bg-gradient-to-r from-amber-500 to-amber-600 z-0 rounded-full transition-all duration-500"
               style={{ width: `${(step / (STEPS.length - 1)) * 100}%` }}
             />
             {STEPS.map((s) => (
-              <div key={s.id} className="flex flex-col items-center gap-1 z-10">
+              <div key={s.id} className="flex flex-col items-center gap-1.5 z-10">
                 <div
-                  className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-black transition-all ${
+                  className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-black transition-all shadow-xs ${
                     s.id < step
-                      ? "bg-amber-500 border-amber-500 text-slate-950"
+                      ? "bg-amber-500 border-amber-500 text-white"
                       : s.id === step
-                      ? "bg-slate-900 border-amber-500 text-amber-400"
-                      : "bg-slate-900 border-slate-700 text-slate-500"
+                      ? "bg-white border-amber-500 text-amber-600 ring-4 ring-amber-100"
+                      : "bg-white border-slate-300 text-slate-400"
                   }`}
                 >
-                  {s.id < step ? <Check className="w-3.5 h-3.5" /> : s.id + 1}
+                  {s.id < step ? <Check className="w-4 h-4 stroke-[3]" /> : s.id + 1}
                 </div>
-                <span className={`text-[10px] font-bold hidden sm:block ${s.id <= step ? "text-amber-400" : "text-slate-600"}`}>
+                <span className={`text-[11px] font-bold hidden sm:block ${s.id <= step ? "text-slate-800" : "text-slate-400"}`}>
                   {s.label}
                 </span>
               </div>
@@ -344,13 +348,13 @@ function BookingPage() {
         <div className="max-w-6xl mx-auto">
           {/* STEP 0 — Service Selection */}
           {step === 0 && (
-            <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+            <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
               <MultiServiceTypeCards selectedService={serviceType} onSelect={setServiceType} />
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-end pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                  className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-6 py-3 rounded-xl shadow-md shadow-amber-500/20 hover:shadow-lg transition-all"
                 >
                   Continue with {SERVICE_LABELS[serviceType]} <ArrowRight className="w-4 h-4" />
                 </button>
@@ -360,35 +364,35 @@ function BookingPage() {
 
           {/* STEP 1 — Customer Details */}
           {step === 1 && (
-            <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
-                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+                <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
                   <User className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="font-black text-slate-100 text-lg">Your Details</h2>
-                  <p className="text-xs text-slate-400">Contact information for booking confirmation</p>
+                  <h2 className="font-extrabold text-slate-900 text-lg">Your Details</h2>
+                  <p className="text-xs text-slate-500">Contact information for booking confirmation</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-1.5">
-                    <User className="w-3.5 h-3.5 text-amber-400" /> Full Name *
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
+                    <User className="w-3.5 h-3.5 text-amber-600" /> Full Name *
                   </label>
                   <input
                     type="text"
                     placeholder="Your full name"
                     value={formData.name}
                     onChange={(e) => onChange("name", e.target.value)}
-                    className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
                   />
-                  {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
+                  {errors.name && <p className="text-xs text-red-600 font-medium mt-1">{errors.name}</p>}
                 </div>
 
                 <div>
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-1.5">
-                    <Phone className="w-3.5 h-3.5 text-amber-400" /> Mobile Number *
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
+                    <Phone className="w-3.5 h-3.5 text-amber-600" /> Mobile Number *
                   </label>
                   <input
                     type="tel"
@@ -396,29 +400,29 @@ function BookingPage() {
                     value={formData.phone}
                     onChange={(e) => onChange("phone", e.target.value)}
                     maxLength={10}
-                    className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
                   />
-                  {errors.phone && <p className="text-xs text-red-400 mt-1">{errors.phone}</p>}
+                  {errors.phone && <p className="text-xs text-red-600 font-medium mt-1">{errors.phone}</p>}
                 </div>
 
                 <div>
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-1.5">
-                    <Mail className="w-3.5 h-3.5 text-slate-400" /> Email Address
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
+                    <Mail className="w-3.5 h-3.5 text-slate-500" /> Email Address
                   </label>
                   <input
                     type="email"
                     placeholder="Optional — for PDF confirmation"
                     value={formData.email}
                     onChange={(e) => onChange("email", e.target.value)}
-                    className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
                   />
                 </div>
 
                 {/* Passenger counts only for non-cab */}
                 {serviceType !== "CAB" ? (
                   <div className="space-y-2">
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-amber-400" /> Passengers
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-amber-600" /> Passengers
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                       {[
@@ -426,23 +430,23 @@ function BookingPage() {
                         { key: "children", label: "Children" },
                         { key: "infants", label: "Infants" },
                       ].map(({ key, label }) => (
-                        <div key={key} className="bg-slate-950/60 border border-slate-800 rounded-xl p-2 text-center">
-                          <div className="text-[11px] text-slate-400 mb-1">{label}</div>
+                        <div key={key} className="bg-slate-50 border border-slate-200 rounded-xl p-2 text-center">
+                          <div className="text-[11px] text-slate-500 mb-1 font-medium">{label}</div>
                           <div className="flex items-center justify-center gap-1.5">
                             <button
                               type="button"
                               onClick={() => onChange(key, Math.max(key === "adults" ? 1 : 0, Number(formData[key] || (key === "adults" ? 2 : 0)) - 1))}
-                              className="w-6 h-6 rounded-lg bg-slate-800 text-slate-200 font-bold text-sm flex items-center justify-center"
+                              className="w-6 h-6 rounded-lg bg-white border border-slate-300 text-slate-700 font-bold text-sm flex items-center justify-center hover:bg-slate-100 shadow-xs"
                             >
                               −
                             </button>
-                            <span className="w-5 text-center font-black text-slate-100 text-sm">
+                            <span className="w-5 text-center font-black text-slate-900 text-sm">
                               {formData[key] || (key === "adults" ? 2 : 0)}
                             </span>
                             <button
                               type="button"
                               onClick={() => onChange(key, Number(formData[key] || (key === "adults" ? 2 : 0)) + 1)}
-                              className="w-6 h-6 rounded-lg bg-slate-800 text-slate-200 font-bold text-sm flex items-center justify-center"
+                              className="w-6 h-6 rounded-lg bg-white border border-slate-300 text-slate-700 font-bold text-sm flex items-center justify-center hover:bg-slate-100 shadow-xs"
                             >
                               +
                             </button>
@@ -453,8 +457,8 @@ function BookingPage() {
                   </div>
                 ) : (
                   <div>
-                    <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-1.5">
-                      <Users className="w-3.5 h-3.5 text-amber-400" /> Number of Passengers
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
+                      <Users className="w-3.5 h-3.5 text-amber-600" /> Number of Passengers
                     </label>
                     <input
                       type="number"
@@ -462,30 +466,30 @@ function BookingPage() {
                       max="20"
                       value={formData.adults || 2}
                       onChange={(e) => onChange("adults", e.target.value)}
-                      className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:ring-2 focus:ring-amber-500"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
                     />
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-1.5">
-                  <MessageCircle className="w-3.5 h-3.5 text-slate-400" /> Special Requirements / Notes
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
+                  <MessageCircle className="w-3.5 h-3.5 text-slate-500" /> Special Requirements / Notes
                 </label>
                 <textarea
                   rows={3}
                   placeholder="Any special requirements, requests or additional information..."
                   value={formData.notes}
                   onChange={(e) => onChange("notes", e.target.value)}
-                  className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 resize-none"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none resize-none transition-all"
                 />
               </div>
 
-              <div className="flex justify-between pt-2">
-                <button type="button" onClick={prevStep} className="flex items-center gap-2 text-slate-400 hover:text-slate-200 font-semibold text-sm px-4 py-2 border border-slate-800 rounded-xl hover:border-slate-700 transition-all">
+              <div className="flex justify-between pt-3 border-t border-slate-100">
+                <button type="button" onClick={prevStep} className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold text-sm px-4 py-2.5 border border-slate-300 rounded-xl hover:bg-slate-50 transition-all">
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>
-                <button type="button" onClick={nextStep} className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all">
+                <button type="button" onClick={nextStep} className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-6 py-3 rounded-xl shadow-md shadow-amber-500/20 hover:shadow-lg transition-all">
                   Continue to Journey Details <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -495,12 +499,12 @@ function BookingPage() {
           {/* STEP 2 — Journey Details (Service-Specific Forms) */}
           {step === 2 && (
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              <div className="xl:col-span-2 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
-                <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
-                  <div className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-full px-3 py-1">
+              <div className="xl:col-span-2 bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+                <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+                  <div className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
                     {SERVICE_LABELS[serviceType]}
                   </div>
-                  <span className="text-slate-400 text-sm">Journey Details</span>
+                  <span className="text-slate-500 text-sm font-medium">Journey Details</span>
                 </div>
 
                 {serviceType === "CAB" && (
@@ -529,11 +533,11 @@ function BookingPage() {
                   />
                 )}
 
-                <div className="flex justify-between pt-2 border-t border-slate-800">
-                  <button type="button" onClick={prevStep} className="flex items-center gap-2 text-slate-400 hover:text-slate-200 font-semibold text-sm px-4 py-2 border border-slate-800 rounded-xl hover:border-slate-700 transition-all">
+                <div className="flex justify-between pt-4 border-t border-slate-100">
+                  <button type="button" onClick={prevStep} className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold text-sm px-4 py-2.5 border border-slate-300 rounded-xl hover:bg-slate-50 transition-all">
                     <ArrowLeft className="w-4 h-4" /> Back
                   </button>
-                  <button type="button" onClick={nextStep} className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all">
+                  <button type="button" onClick={nextStep} className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-6 py-3 rounded-xl shadow-md shadow-amber-500/20 hover:shadow-lg transition-all">
                     Review Booking & Fare <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -554,26 +558,26 @@ function BookingPage() {
           {/* STEP 3 — Review & Payment */}
           {step === 3 && (
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              <div className="xl:col-span-2 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
-                <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
-                  <FileText className="w-5 h-5 text-amber-400" />
+              <div className="xl:col-span-2 bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+                <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+                  <FileText className="w-5 h-5 text-amber-600" />
                   <div>
-                    <h2 className="font-black text-slate-100 text-lg">Review Your Booking</h2>
-                    <p className="text-xs text-slate-400">Confirm details before submitting</p>
+                    <h2 className="font-extrabold text-slate-900 text-lg">Review Your Booking</h2>
+                    <p className="text-xs text-slate-500">Confirm details before submitting</p>
                   </div>
                 </div>
 
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Customer */}
-                  <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 space-y-2">
-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-amber-400" /> Customer
+                  <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-1.5">
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-amber-600" /> Customer
                     </div>
-                    <div className="text-sm font-bold text-slate-100">{formData.name}</div>
-                    <div className="text-xs text-slate-400">{formData.phone}</div>
-                    {formData.email && <div className="text-xs text-slate-400">{formData.email}</div>}
-                    <div className="text-xs text-slate-400">
+                    <div className="text-sm font-extrabold text-slate-900">{formData.name}</div>
+                    <div className="text-xs text-slate-600">{formData.phone}</div>
+                    {formData.email && <div className="text-xs text-slate-600">{formData.email}</div>}
+                    <div className="text-xs text-slate-500 pt-1">
                       {Number(formData.adults || 2)} Adults
                       {Number(formData.children || 0) > 0 && `, ${formData.children} Children`}
                       {Number(formData.infants || 0) > 0 && `, ${formData.infants} Infants`}
@@ -581,19 +585,19 @@ function BookingPage() {
                   </div>
 
                   {/* Journey */}
-                  <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 space-y-2">
-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-emerald-400" /> Journey
+                  <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-1.5">
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-emerald-600" /> Journey
                     </div>
-                    <div className="text-xs font-bold text-amber-400">{SERVICE_LABELS[serviceType]}</div>
+                    <div className="text-xs font-bold text-amber-700">{SERVICE_LABELS[serviceType]}</div>
                     {formData.date && (
-                      <div className="text-xs text-slate-300 flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-slate-500" />
+                      <div className="text-xs text-slate-700 flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-slate-400" />
                         {formatDate(formData.date)}
                         {formData.time && ` · ${formData.time}`}
                       </div>
                     )}
-                    <div className="text-xs text-slate-300">
+                    <div className="text-xs text-slate-700 font-medium">
                       {formData.from_location || formData.from_station || formData.from_airport || formData.pickup || "—"}
                       {(formData.destination || formData.to_station || formData.to_airport) && (
                         <> → {formData.destination || formData.to_station || formData.to_airport}</>
@@ -603,26 +607,28 @@ function BookingPage() {
                       <div className="text-xs text-slate-500">{formData.trip_type}</div>
                     )}
                     {formData.package_title && (
-                      <div className="text-xs font-semibold text-purple-400">📦 {formData.package_title}</div>
+                      <div className="text-xs font-bold text-purple-700">📦 {formData.package_title}</div>
                     )}
                   </div>
                 </div>
 
                 {/* UPI Payment Section (when advance is ₹100) */}
                 {formData.advance_option === 100 && (
-                  <div className="bg-gradient-to-b from-amber-950/30 to-slate-950 border border-amber-500/30 rounded-2xl p-5 space-y-4">
+                  <div className="bg-gradient-to-b from-amber-50/70 to-white border border-amber-200 rounded-2xl p-5 space-y-4 shadow-xs">
                     <div className="flex items-center gap-2">
-                      <Zap className="w-5 h-5 text-amber-400" />
+                      <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center">
+                        <Zap className="w-4 h-4" />
+                      </div>
                       <div>
-                        <h3 className="font-black text-amber-300">Pay ₹100 Token Advance — Instant Priority Confirmation</h3>
-                        <p className="text-[11px] text-amber-200/70">Scan UPI QR below or use any UPI app to pay ₹100 now</p>
+                        <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">Pay ₹100 Token Advance — Instant Priority Confirmation</h3>
+                        <p className="text-xs text-slate-600">Scan UPI QR below or use any UPI app to pay ₹100 now</p>
                       </div>
                     </div>
 
                     <div className="flex flex-col sm:flex-row items-center gap-5">
                       {/* QR Code */}
-                      <div className="bg-white p-3 rounded-2xl shadow-xl shrink-0">
-                        <div className="w-32 h-32 flex items-center justify-center">
+                      <div className="bg-white p-3 rounded-2xl shadow-md border border-slate-200 shrink-0 text-center">
+                        <div className="w-32 h-32 flex items-center justify-center mx-auto">
                           <img
                             src={`https://api.qrserver.com/v1/create-qr-code/?data=upi://pay?pa=fortunetourism@okaxis%26pn=Fortune%20Tourism%26am=100%26tn=Token%20Advance&size=128x128&format=png`}
                             alt="UPI QR Code"
@@ -632,22 +638,22 @@ function BookingPage() {
                             }}
                           />
                         </div>
-                        <div className="text-center text-[10px] font-bold text-slate-900 mt-1">Scan · Pay ₹100</div>
+                        <div className="text-center text-[10px] font-bold text-slate-800 mt-1">Scan · Pay ₹100</div>
                       </div>
 
                       {/* UPI Details */}
-                      <div className="flex-1 space-y-3">
-                        <div className="bg-slate-950/80 border border-slate-700 rounded-xl p-3 flex items-center justify-between">
+                      <div className="flex-1 space-y-3 w-full">
+                        <div className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between shadow-xs">
                           <div>
-                            <div className="text-[10px] text-slate-400 font-semibold">UPI ID</div>
-                            <div className="font-black text-slate-100 text-sm">fortunetourism@okaxis</div>
+                            <div className="text-[10px] text-slate-500 font-bold uppercase">UPI ID</div>
+                            <div className="font-black text-slate-900 text-sm">fortunetourism@okaxis</div>
                           </div>
                           <button
                             type="button"
                             onClick={copyUPI}
-                            className="flex items-center gap-1.5 text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20"
+                            className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 hover:bg-amber-100 transition-colors"
                           >
-                            {upiCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                            {upiCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                             {upiCopied ? "Copied!" : "Copy"}
                           </button>
                         </div>
@@ -663,7 +669,7 @@ function BookingPage() {
                             <a
                               key={app.name}
                               href={app.link}
-                              className="text-xs font-bold text-slate-200 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg hover:border-amber-500/50 hover:bg-slate-700 transition-all"
+                              className="text-xs font-bold text-slate-700 bg-white border border-slate-200 px-3 py-1.5 rounded-lg hover:border-amber-400 hover:bg-amber-50 transition-all shadow-xs"
                             >
                               {app.name}
                             </a>
@@ -672,7 +678,7 @@ function BookingPage() {
 
                         {/* UTR Input */}
                         <div>
-                          <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">
                             UTR / Transaction Reference (After payment — optional)
                           </label>
                           <input
@@ -680,7 +686,7 @@ function BookingPage() {
                             placeholder="Enter UPI transaction ID or UTR number"
                             value={formData.utr_ref || ""}
                             onChange={(e) => onChange("utr_ref", e.target.value)}
-                            className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+                            className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
                           />
                         </div>
                       </div>
@@ -689,22 +695,22 @@ function BookingPage() {
                 )}
 
                 {/* Payment Option Summary */}
-                <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
                   <div className="flex items-center justify-between text-sm mb-3">
-                    <span className="font-semibold text-slate-300">Payment Option:</span>
-                    <span className="font-black text-amber-400">
+                    <span className="font-bold text-slate-700">Payment Option:</span>
+                    <span className="font-extrabold text-amber-700">
                       {formData.advance_option === 100 ? "₹100 Token Advance (Priority)" : "Zero Advance (Pay Later)"}
                     </span>
                   </div>
                   {!isEstimatedQuote && (
                     <>
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-slate-400">Total Booking Fare:</span>
-                        <span className="font-black text-slate-100 text-lg">{formatCurrency(fareResult.totalFare)}</span>
+                      <div className="flex items-center justify-between text-sm mb-1.5">
+                        <span className="text-slate-600">Total Booking Fare:</span>
+                        <span className="font-black text-slate-900 text-lg">{formatCurrency(fareResult.totalFare)}</span>
                       </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-400">Balance Payable on Travel:</span>
-                        <span className="font-bold text-amber-300">
+                      <div className="flex items-center justify-between text-sm pt-2 border-t border-slate-200">
+                        <span className="text-slate-600 font-medium">Balance Payable on Travel:</span>
+                        <span className="font-black text-emerald-700 text-base">
                           {formatCurrency(formData.advance_option === 100
                             ? Math.max(0, fareResult.totalFare - 100)
                             : fareResult.totalFare)}
@@ -713,22 +719,22 @@ function BookingPage() {
                     </>
                   )}
                   {isEstimatedQuote && (
-                    <p className="text-xs text-slate-400">Final fare will be confirmed by our team after checking availability.</p>
+                    <p className="text-xs text-slate-500">Final fare will be confirmed by our team after checking availability.</p>
                   )}
                 </div>
 
-                <div className="flex justify-between pt-2 border-t border-slate-800">
-                  <button type="button" onClick={prevStep} className="flex items-center gap-2 text-slate-400 hover:text-slate-200 font-semibold text-sm px-4 py-2 border border-slate-800 rounded-xl hover:border-slate-700 transition-all">
+                <div className="flex justify-between pt-3 border-t border-slate-100">
+                  <button type="button" onClick={prevStep} className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold text-sm px-4 py-2.5 border border-slate-300 rounded-xl hover:bg-slate-50 transition-all">
                     <ArrowLeft className="w-4 h-4" /> Back
                   </button>
                   <button
                     type="button"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-70"
+                    className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-6 py-3 rounded-xl shadow-md shadow-amber-500/20 hover:shadow-lg transition-all disabled:opacity-70"
                   >
                     {isSubmitting ? (
-                      <><span className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" /> Processing...</>
+                      <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Processing...</>
                     ) : formData.advance_option === 100 ? (
                       <>Confirm & Submit Booking (₹100 Paid) <ArrowRight className="w-4 h-4" /></>
                     ) : (
@@ -753,23 +759,23 @@ function BookingPage() {
           {/* STEP 4 — Confirmation */}
           {step === 4 && bookingResult && (
             <div className="max-w-2xl mx-auto">
-              <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 text-center">
-                <div className="flex flex-col items-center gap-4">
-                  <div className={`w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl ${
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 text-center shadow-lg">
+                <div className="flex flex-col items-center gap-3">
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-md ${
                     formData.advance_option === 100
-                      ? "bg-amber-500 shadow-amber-500/40"
-                      : "bg-emerald-500 shadow-emerald-500/40"
+                      ? "bg-amber-500 text-white"
+                      : "bg-emerald-600 text-white"
                   }`}>
-                    <CheckCircle2 className="w-10 h-10 text-white" />
+                    <CheckCircle2 className="w-9 h-9" />
                   </div>
 
                   <div>
-                    <h2 className="text-2xl font-black text-slate-100">
+                    <h2 className="text-2xl font-extrabold text-slate-900">
                       {serviceType === "CAB" ? "Cab Booking Submitted!" :
                        serviceType === "TOUR" ? "Tour Package Enquiry Submitted!" :
                        "Booking Request Received!"}
                     </h2>
-                    <p className="text-slate-400 text-sm mt-1">
+                    <p className="text-slate-600 text-sm mt-1">
                       {serviceType === "CAB"
                         ? "We will confirm your taxi availability and booking details shortly."
                         : serviceType === "TOUR"
@@ -780,39 +786,42 @@ function BookingPage() {
                 </div>
 
                 {/* Reference Number */}
-                <div className="bg-slate-950/80 border border-slate-700 rounded-2xl p-5 space-y-3">
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Booking Reference</div>
-                  <div className="text-3xl font-black text-amber-400 tracking-wider">
-                    {bookingResult.booking_reference ||
-                     bookingResult.enquiry?.enquiry_number ||
-                     bookingResult.enquiry?.id?.toString().slice(-6) || "—"}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 text-left">
+                  <div className="text-center pb-3 border-b border-slate-200">
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Booking Reference</div>
+                    <div className="text-2xl sm:text-3xl font-black text-amber-600 tracking-wider mt-0.5">
+                      {bookingResult.booking_reference ||
+                       bookingResult.enquiry?.enquiry_number ||
+                       bookingResult.enquiry?.id?.toString().slice(-6) || "—"}
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3 text-left text-xs">
+
+                  <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
                       <div className="text-slate-500">Service</div>
-                      <div className="font-bold text-slate-200">{SERVICE_LABELS[serviceType]}</div>
+                      <div className="font-bold text-slate-900">{SERVICE_LABELS[serviceType]}</div>
                     </div>
                     <div>
                       <div className="text-slate-500">Status</div>
-                      <div className="font-bold text-amber-300">{STATUS_BY_SERVICE[serviceType]}</div>
+                      <div className="font-bold text-amber-700">{STATUS_BY_SERVICE[serviceType]}</div>
                     </div>
                     <div>
                       <div className="text-slate-500">Customer</div>
-                      <div className="font-bold text-slate-200">{formData.name}</div>
+                      <div className="font-bold text-slate-900">{formData.name}</div>
                     </div>
                     <div>
                       <div className="text-slate-500">Travel Date</div>
-                      <div className="font-bold text-slate-200">{formatDate(formData.date)}</div>
+                      <div className="font-bold text-slate-900">{formatDate(formData.date)}</div>
                     </div>
                     {!isEstimatedQuote && (
                       <>
                         <div>
                           <div className="text-slate-500">Total Fare</div>
-                          <div className="font-black text-amber-400 text-base">{formatCurrency(fareResult.totalFare)}</div>
+                          <div className="font-black text-slate-900 text-base">{formatCurrency(fareResult.totalFare)}</div>
                         </div>
                         <div>
                           <div className="text-slate-500">Balance Due</div>
-                          <div className="font-black text-slate-200 text-base">
+                          <div className="font-black text-emerald-700 text-base">
                             {formatCurrency(formData.advance_option === 100 ? Math.max(0, fareResult.totalFare - 100) : fareResult.totalFare)}
                           </div>
                         </div>
@@ -821,8 +830,8 @@ function BookingPage() {
                   </div>
 
                   {formData.advance_option === 100 && (
-                    <div className="flex items-center justify-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-xl py-2 px-3 text-amber-400 text-xs font-bold">
-                      <Sparkles className="w-3.5 h-3.5" /> ₹100 Token Advance Paid — Priority Dispatch Activated
+                    <div className="flex items-center justify-center gap-2 bg-amber-50 border border-amber-200 rounded-xl py-2.5 px-3 text-amber-800 text-xs font-bold">
+                      <Sparkles className="w-4 h-4 text-amber-600" /> ₹100 Token Advance Paid — Priority Dispatch Activated
                     </div>
                   )}
                 </div>
@@ -833,13 +842,13 @@ function BookingPage() {
                     href={buildWhatsAppUrl(whatsappMsg)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all text-sm"
+                    className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all text-sm shadow-sm"
                   >
                     <MessageCircle className="w-4 h-4" /> WhatsApp Us
                   </a>
                   <Link
                     to="/"
-                    className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold py-3 rounded-xl transition-all text-sm"
+                    className="flex items-center justify-center gap-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold py-3 rounded-xl transition-all text-sm shadow-xs"
                   >
                     <Home className="w-4 h-4" /> Back to Home
                   </Link>
@@ -847,7 +856,7 @@ function BookingPage() {
 
                 <p className="text-xs text-slate-500">
                   Save your Booking Reference for future queries. Our team will contact you on{" "}
-                  <span className="text-slate-300 font-semibold">{formData.phone}</span> within 30 minutes.
+                  <span className="text-slate-900 font-bold">{formData.phone}</span> within 30 minutes.
                 </p>
               </div>
             </div>

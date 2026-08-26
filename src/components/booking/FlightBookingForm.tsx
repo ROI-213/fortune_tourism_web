@@ -80,14 +80,14 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
   }) => (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+        <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
           {label} ({passengers.length}){minAge && <span className="font-normal text-slate-500 ml-1">({minAge}–{maxAge} yrs)</span>}
         </span>
         {canAddMore && (
           <button
             type="button"
             onClick={() => addPassenger(type)}
-            className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/20"
+            className="text-xs font-bold text-amber-800 hover:text-amber-900 flex items-center gap-1 bg-amber-50 px-3 py-1 rounded-lg border border-amber-200"
           >
             <Plus className="w-3 h-3" /> Add {label}
           </button>
@@ -95,11 +95,11 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
       </div>
 
       {passengers.map((p, idx) => (
-        <div key={idx} className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div key={idx} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-amber-400">{label} {idx + 1}</span>
+            <span className="text-xs font-extrabold text-amber-800">{label} {idx + 1}</span>
             {(type !== "adult" || passengers.length > 1) && (
-              <button type="button" onClick={() => removePassenger(type, idx)} className="p-1.5 text-red-400 hover:bg-red-500/10 rounded-lg">
+              <button type="button" onClick={() => removePassenger(type, idx)} className="p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             )}
@@ -107,30 +107,30 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="col-span-2">
-              <label className="text-[11px] font-semibold text-slate-400 block mb-1">Full Name *</label>
+              <label className="text-[11px] font-bold text-slate-600 block mb-1">Full Name *</label>
               <input
                 type="text"
                 placeholder="As in ID / Passport"
                 value={p.name}
                 onChange={(e) => updatePassenger(type, idx, "name", e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
               />
             </div>
             <div>
-              <label className="text-[11px] font-semibold text-slate-400 block mb-1">Date of Birth</label>
+              <label className="text-[11px] font-bold text-slate-600 block mb-1">Date of Birth</label>
               <input
                 type="date"
                 value={p.dob}
                 onChange={(e) => updatePassenger(type, idx, "dob", e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
               />
             </div>
             <div>
-              <label className="text-[11px] font-semibold text-slate-400 block mb-1">Gender *</label>
+              <label className="text-[11px] font-bold text-slate-600 block mb-1">Gender *</label>
               <select
                 value={p.gender}
                 onChange={(e) => updatePassenger(type, idx, "gender", e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
               >
                 <option>Male</option><option>Female</option><option>Other</option>
               </select>
@@ -138,34 +138,34 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
           </div>
 
           {isInternational && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-800/60">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-200">
               <div>
-                <label className="text-[11px] font-semibold text-slate-400 block mb-1">Passport Number</label>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Passport Number</label>
                 <input
                   type="text"
                   placeholder="e.g. N1234567"
                   value={p.passport_number || ""}
                   onChange={(e) => updatePassenger(type, idx, "passport_number", e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
                 />
               </div>
               <div>
-                <label className="text-[11px] font-semibold text-slate-400 block mb-1">Passport Expiry</label>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Passport Expiry</label>
                 <input
                   type="date"
                   value={p.passport_expiry || ""}
                   onChange={(e) => updatePassenger(type, idx, "passport_expiry", e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
                 />
               </div>
               <div>
-                <label className="text-[11px] font-semibold text-slate-400 block mb-1">Nationality</label>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Nationality</label>
                 <input
                   type="text"
                   placeholder="e.g. Indian"
                   value={p.nationality || ""}
                   onChange={(e) => updatePassenger(type, idx, "nationality", e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
                 />
               </div>
             </div>
@@ -177,10 +177,10 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start gap-3 bg-sky-500/10 border border-sky-500/30 rounded-2xl p-4">
-        <AlertCircle className="w-5 h-5 text-sky-400 shrink-0 mt-0.5" />
-        <div className="text-sm text-sky-200/90 leading-relaxed">
-          <strong className="text-sky-300">Flight Booking Assistance:</strong> Our team will
+      <div className="flex items-start gap-3 bg-sky-50 border border-sky-200 rounded-2xl p-4">
+        <AlertCircle className="w-5 h-5 text-sky-600 shrink-0 mt-0.5" />
+        <div className="text-sm text-sky-900 leading-relaxed">
+          <strong className="font-bold">Flight Booking Assistance:</strong> Our team will
           search the best airfares and share flight options with pricing. Final booking
           confirmed upon payment.
         </div>
@@ -189,7 +189,7 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
       {/* Trip Type & International Toggle */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="text-xs font-semibold text-slate-300 block mb-2">Trip Type *</label>
+          <label className="text-xs font-bold text-slate-700 block mb-2">Trip Type *</label>
           <div className="flex gap-2">
             {["One Way", "Round Trip", "Multi City"].map((t) => (
               <button
@@ -198,8 +198,8 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
                 onClick={() => onChange("flight_trip_type", t)}
                 className={`flex-1 py-2.5 rounded-xl font-bold text-xs border transition-all ${
                   tripType === t
-                    ? "bg-amber-500 text-slate-950 border-amber-400"
-                    : "bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700"
+                    ? "bg-amber-500 text-slate-950 border-amber-500 shadow-xs"
+                    : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300"
                 }`}
               >
                 {t}
@@ -208,7 +208,7 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
           </div>
         </div>
         <div className="flex items-end">
-          <label className="flex items-center gap-3 cursor-pointer bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-3 w-full">
+          <label className="flex items-center gap-3 cursor-pointer bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 w-full hover:bg-slate-100/60 transition">
             <input
               type="checkbox"
               checked={isInternational}
@@ -216,8 +216,8 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
               className="w-4 h-4 accent-amber-500 rounded"
             />
             <div>
-              <div className="text-sm font-bold text-slate-200">International Flight</div>
-              <div className="text-[11px] text-slate-400">Enable passport & visa fields</div>
+              <div className="text-sm font-bold text-slate-900">International Flight</div>
+              <div className="text-[11px] text-slate-500">Enable passport & visa fields</div>
             </div>
           </label>
         </div>
@@ -225,69 +225,69 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
 
       {/* Flight Details */}
       <div className="space-y-4">
-        <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
-          <Plane className="w-4 h-4 text-sky-400" /> Flight Details
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+          <Plane className="w-4 h-4 text-sky-600" /> Flight Details
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1">From Airport *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1">From Airport *</label>
             <select
               value={formData.from_airport || ""}
               onChange={(e) => onChange("from_airport", e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:ring-2 focus:ring-amber-500"
+              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
             >
               <option value="">-- Select Departure Airport --</option>
               {AIRPORTS.map((a) => <option key={a}>{a}</option>)}
             </select>
-            {errors.from_airport && <p className="text-xs text-red-400 mt-1">{errors.from_airport}</p>}
+            {errors.from_airport && <p className="text-xs text-red-600 font-medium mt-1">{errors.from_airport}</p>}
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1">To Airport *</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1">To Airport *</label>
             <select
               value={formData.to_airport || ""}
               onChange={(e) => onChange("to_airport", e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:ring-2 focus:ring-amber-500"
+              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
             >
               <option value="">-- Select Arrival Airport --</option>
               {AIRPORTS.map((a) => <option key={a}>{a}</option>)}
             </select>
-            {errors.to_airport && <p className="text-xs text-red-400 mt-1">{errors.to_airport}</p>}
+            {errors.to_airport && <p className="text-xs text-red-600 font-medium mt-1">{errors.to_airport}</p>}
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1">
-              <Calendar className="w-3.5 h-3.5 inline mr-1 text-amber-400" /> Departure Date *
+            <label className="text-xs font-bold text-slate-700 block mb-1">
+              <Calendar className="w-3.5 h-3.5 inline mr-1 text-amber-600" /> Departure Date *
             </label>
             <input
               type="date"
               min={new Date().toISOString().split("T")[0]}
               value={formData.date || ""}
               onChange={(e) => onChange("date", e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:ring-2 focus:ring-amber-500"
+              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
             />
-            {errors.date && <p className="text-xs text-red-400 mt-1">{errors.date}</p>}
+            {errors.date && <p className="text-xs text-red-600 font-medium mt-1">{errors.date}</p>}
           </div>
           {tripType === "Round Trip" && (
             <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">Return Date</label>
+              <label className="text-xs font-bold text-slate-700 block mb-1">Return Date</label>
               <input
                 type="date"
                 min={formData.date || new Date().toISOString().split("T")[0]}
                 value={formData.return_date || ""}
                 onChange={(e) => onChange("return_date", e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
               />
             </div>
           )}
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1">Preferred Departure Time</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1">Preferred Departure Time</label>
             <select
               value={formData.preferred_time || ""}
               onChange={(e) => onChange("preferred_time", e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:ring-2 focus:ring-amber-500"
+              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
             >
               <option value="">-- Any Time --</option>
               <option>Early Morning (00:00–06:00)</option>
@@ -301,7 +301,7 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
         {/* Cabin Class & Airline */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-2">Cabin Class</label>
+            <label className="text-xs font-bold text-slate-700 block mb-2">Cabin Class</label>
             <div className="grid grid-cols-2 gap-2">
               {CABIN_CLASSES.map((c) => (
                 <button
@@ -310,8 +310,8 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
                   onClick={() => onChange("cabin_class", c)}
                   className={`py-2 rounded-xl font-bold text-xs border transition-all ${
                     (formData.cabin_class || "Economy") === c
-                      ? "bg-amber-500 text-slate-950 border-amber-400"
-                      : "bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700"
+                      ? "bg-amber-500 text-slate-950 border-amber-500 shadow-xs"
+                      : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300"
                   }`}
                 >
                   {c}
@@ -320,13 +320,13 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
             </div>
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1">Preferred Airline (Optional)</label>
+            <label className="text-xs font-bold text-slate-700 block mb-1">Preferred Airline (Optional)</label>
             <input
               type="text"
               placeholder="e.g. IndiGo / Air India / Any"
               value={formData.preferred_airline || ""}
               onChange={(e) => onChange("preferred_airline", e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:ring-2 focus:ring-amber-500"
+              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
             />
           </div>
         </div>
@@ -334,7 +334,7 @@ export function FlightBookingForm({ formData, onChange, errors }: FlightBookingF
 
       {/* Passengers */}
       <div className="space-y-5">
-        <h3 className="text-xs font-black uppercase tracking-wider text-slate-300">Passenger Details</h3>
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">Passenger Details</h3>
         <PassengerBlock type="adult" passengers={adults} label="Adult" minAge="12" maxAge="100+" />
         <PassengerBlock type="child" passengers={children} label="Child" minAge="2" maxAge="11" />
         <PassengerBlock type="infant" passengers={infants} label="Infant" minAge="0" maxAge="2" canAddMore={infants.length < adults.length} />

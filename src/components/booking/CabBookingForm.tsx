@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Car,
-  Plane,
   Navigation,
   Compass,
   Plus,
@@ -9,10 +8,7 @@ import {
   Calendar,
   Clock,
   MapPin,
-  Users,
-  Shield,
   ArrowRight,
-  Sparkles,
 } from "lucide-react";
 import { LocationSearchInput } from "./LocationSearchInput";
 import { DEFAULT_CAB_RATES, calculateCabFare, FareCalculationResult } from "@/lib/fare-engine";
@@ -144,8 +140,8 @@ export function CabBookingForm({
     <div className="space-y-6">
       {/* 1. Trip Type Selector */}
       <div className="space-y-2">
-        <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-          <Navigation className="w-3.5 h-3.5 text-amber-400" /> Trip Type *
+        <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+          <Navigation className="w-3.5 h-3.5 text-amber-600" /> Trip Type *
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
           {[
@@ -162,8 +158,8 @@ export function CabBookingForm({
               onClick={() => onChange("trip_type", t.id)}
               className={`px-3 py-2.5 rounded-xl font-bold text-xs transition-all border text-center ${
                 tripType === t.id
-                  ? "bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20 font-black"
-                  : "bg-slate-900/80 text-slate-300 border-slate-800 hover:border-slate-700 hover:bg-slate-800/60"
+                  ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm font-extrabold"
+                  : "bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100"
               }`}
             >
               {t.label}
@@ -175,17 +171,17 @@ export function CabBookingForm({
       {/* 2. Trip Type-Specific Fields */}
       {/* LOCAL HOURLY PACKAGES */}
       {tripType === "Local" && (
-        <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 space-y-3">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
               Local Rental Package
             </span>
-            <span className="text-xs text-amber-400 font-semibold">
+            <span className="text-xs text-amber-700 font-semibold">
               Extra KM & Extra Hours billed at standard rates
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { id: "4hr_40km", title: "4 Hours / 40 KM", desc: "Best for short city errands & meetings" },
               { id: "8hr_80km", title: "8 Hours / 80 KM", desc: "Full day city travel & shopping" },
@@ -196,12 +192,12 @@ export function CabBookingForm({
                 onClick={() => onChange("local_package", pkg.id)}
                 className={`p-3.5 rounded-xl border text-left transition-all ${
                   localPackage === pkg.id
-                    ? "bg-amber-500/10 border-amber-500/80 ring-1 ring-amber-500/30"
-                    : "bg-slate-900/60 border-slate-800 hover:border-slate-700"
+                    ? "bg-amber-50/90 border-amber-500 ring-1 ring-amber-500/40 shadow-xs"
+                    : "bg-white border-slate-200 hover:border-slate-300"
                 }`}
               >
-                <div className="font-bold text-sm text-slate-100">{pkg.title}</div>
-                <div className="text-[11px] text-slate-400 mt-1">{pkg.desc}</div>
+                <div className="font-extrabold text-sm text-slate-900">{pkg.title}</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">{pkg.desc}</div>
               </button>
             ))}
           </div>
@@ -210,7 +206,7 @@ export function CabBookingForm({
 
       {/* AIRPORT TRANSFER */}
       {tripType === "Airport Transfer" && (
-        <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 space-y-4">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-4">
           <div className="grid grid-cols-2 gap-2">
             {["Airport Drop", "Airport Pickup"].map((mode) => (
               <button
@@ -219,8 +215,8 @@ export function CabBookingForm({
                 onClick={() => onChange("airport_type", mode)}
                 className={`py-2 px-3 rounded-xl font-bold text-xs border text-center transition-all ${
                   airportType === mode
-                    ? "bg-amber-500 text-slate-950 border-amber-400"
-                    : "bg-slate-900 border-slate-800 text-slate-300"
+                    ? "bg-amber-500 text-slate-950 border-amber-500 shadow-xs"
+                    : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
                 }`}
               >
                 {mode === "Airport Drop" ? "🚗 City → Airport Drop" : "✈️ Airport Pickup → City"}
@@ -230,13 +226,13 @@ export function CabBookingForm({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">
+              <label className="text-xs font-bold text-slate-700 block mb-1">
                 Select Airport
               </label>
               <select
                 value={formData.airport_name || "Kempegowda Int'l Airport (BLR)"}
                 onChange={(e) => onChange("airport_name", e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
               >
                 <option>Kempegowda Int'l Airport (BLR), Bengaluru</option>
                 <option>Mysuru Airport (MYQ)</option>
@@ -247,7 +243,7 @@ export function CabBookingForm({
 
             {airportType === "Airport Pickup" ? (
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                <label className="text-xs font-bold text-slate-700 block mb-1">
                   Flight Number & Arrival Time (Optional)
                 </label>
                 <input
@@ -255,7 +251,7 @@ export function CabBookingForm({
                   placeholder="e.g. 6E-204 · 04:30 PM"
                   value={formData.flight_arrival_info || ""}
                   onChange={(e) => onChange("flight_arrival_info", e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
                 />
               </div>
             ) : null}
@@ -265,8 +261,8 @@ export function CabBookingForm({
 
       {/* SIGHTSEEING PACKAGES */}
       {tripType === "Sightseeing" && (
-        <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 space-y-3">
-          <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
             Select Sightseeing Circuit
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -282,8 +278,8 @@ export function CabBookingForm({
                 onClick={() => onChange("sightseeing_package", c)}
                 className={`p-2.5 rounded-xl border text-xs font-bold text-center transition-all ${
                   sightseeingPkg === c
-                    ? "bg-amber-500 text-slate-950 border-amber-400"
-                    : "bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700"
+                    ? "bg-amber-500 text-slate-950 border-amber-500 shadow-xs"
+                    : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-100"
                 }`}
               >
                 {c}
@@ -295,15 +291,15 @@ export function CabBookingForm({
 
       {/* ROUND TRIP MULTI-DESTINATION BUILDER */}
       {tripType === "Round Trip" && (
-        <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 space-y-3">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-              <Compass className="w-4 h-4 text-amber-400" /> Multi-Destination Itinerary Route
+            <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <Compass className="w-4 h-4 text-amber-600" /> Multi-Destination Itinerary Route
             </span>
             <button
               type="button"
               onClick={addItineraryPlace}
-              className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20"
+              className="text-xs font-bold text-amber-800 hover:text-amber-900 flex items-center gap-1 bg-amber-100/70 px-2.5 py-1 rounded-lg border border-amber-200"
             >
               <Plus className="w-3.5 h-3.5" /> Add Place
             </button>
@@ -312,20 +308,20 @@ export function CabBookingForm({
           <div className="space-y-2">
             {itineraryPlaces.map((place, idx) => (
               <div key={idx} className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-bold text-amber-400 shrink-0">
+                <div className="w-6 h-6 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-[10px] font-extrabold text-slate-700 shrink-0">
                   {idx + 1}
                 </div>
                 <input
                   type="text"
                   value={place}
                   onChange={(e) => updateItineraryPlace(idx, e.target.value)}
-                  className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+                  className="flex-1 bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
                 />
                 {itineraryPlaces.length > 2 && (
                   <button
                     type="button"
                     onClick={() => removeItineraryPlace(idx)}
-                    className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                    className="p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -335,15 +331,15 @@ export function CabBookingForm({
           </div>
 
           {/* Visual Route Flow */}
-          <div className="mt-3 pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex flex-wrap items-center gap-1.5">
-            <span className="font-semibold text-slate-300">Route Flow:</span>
+          <div className="mt-3 pt-3 border-t border-slate-200 text-[11px] text-slate-500 flex flex-wrap items-center gap-1.5">
+            <span className="font-bold text-slate-700">Route Flow:</span>
             {itineraryPlaces.map((p, idx) => (
               <React.Fragment key={idx}>
-                <span className="bg-slate-900 px-2 py-0.5 rounded text-amber-300 font-medium">
+                <span className="bg-white border border-slate-200 px-2 py-0.5 rounded text-amber-800 font-semibold shadow-2xs">
                   {p}
                 </span>
                 {idx < itineraryPlaces.length - 1 && (
-                  <ArrowRight className="w-3 h-3 text-slate-600" />
+                  <ArrowRight className="w-3 h-3 text-slate-400" />
                 )}
               </React.Fragment>
             ))}
@@ -354,72 +350,70 @@ export function CabBookingForm({
       {/* 3. Pickup & Drop Locations */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1 mb-1">
-            <MapPin className="w-3.5 h-3.5 text-emerald-400" /> Pickup Location *
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1 mb-1">
+            <MapPin className="w-3.5 h-3.5 text-emerald-600" /> Pickup Location *
           </label>
           <LocationSearchInput
             value={formData.pickup || ""}
             onChange={(val) => onChange("pickup", val)}
             placeholder="e.g. Indiranagar, Bengaluru or Hotel Name"
+            error={errors.pickup}
           />
-          {errors.pickup && <p className="text-xs text-red-400 mt-1">{errors.pickup}</p>}
         </div>
 
         <div>
-          <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1 mb-1">
-            <MapPin className="w-3.5 h-3.5 text-red-400" /> Drop / Destination *
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1 mb-1">
+            <MapPin className="w-3.5 h-3.5 text-red-600" /> Drop / Destination *
           </label>
           <LocationSearchInput
             value={formData.destination || ""}
             onChange={(val) => onChange("destination", val)}
             placeholder="e.g. Kempegowda Airport or Mysore Palace"
+            error={errors.destination}
           />
-          {errors.destination && (
-            <p className="text-xs text-red-400 mt-1">{errors.destination}</p>
-          )}
         </div>
       </div>
 
       {/* 4. Travel Date, Return Date & Pickup Time */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1 mb-1">
-            <Calendar className="w-3.5 h-3.5 text-amber-400" /> Travel Date *
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1 mb-1">
+            <Calendar className="w-3.5 h-3.5 text-amber-600" /> Travel Date *
           </label>
           <input
             type="date"
             min={new Date().toISOString().split("T")[0]}
             value={formData.date || ""}
             onChange={(e) => onChange("date", e.target.value)}
-            className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+            className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
           />
-          {errors.date && <p className="text-xs text-red-400 mt-1">{errors.date}</p>}
+          {errors.date && <p className="text-xs text-red-600 font-medium mt-1">{errors.date}</p>}
         </div>
 
         {(tripType === "Round Trip" || tripType === "Outstation") && (
           <div>
-            <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1 mb-1">
-              <Calendar className="w-3.5 h-3.5 text-amber-400" /> Return Date (If round trip)
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1 mb-1">
+              <Calendar className="w-3.5 h-3.5 text-amber-600" /> Return Date (If round trip)
             </label>
             <input
               type="date"
               min={formData.date || new Date().toISOString().split("T")[0]}
               value={formData.return_date || ""}
               onChange={(e) => onChange("return_date", e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
             />
           </div>
         )}
 
         <div>
-          <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1 mb-1">
-            <Clock className="w-3.5 h-3.5 text-amber-400" /> Pickup Time *
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1 mb-1">
+            <Clock className="w-3.5 h-3.5 text-amber-600" /> Pickup Time *
           </label>
           <input
             type="time"
             value={formData.time || "09:00"}
             onChange={(e) => onChange("time", e.target.value)}
-            className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:ring-2 focus:ring-amber-500"
+            className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
           />
         </div>
       </div>
@@ -427,10 +421,10 @@ export function CabBookingForm({
       {/* 5. Vehicle Selection Grid */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-            <Car className="w-3.5 h-3.5 text-amber-400" /> Select Vehicle Fleet *
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+            <Car className="w-3.5 h-3.5 text-amber-600" /> Select Vehicle Fleet *
           </label>
-          <span className="text-[11px] text-slate-400">All vehicles AC & GPS enabled</span>
+          <span className="text-[11px] text-slate-500">All vehicles AC & GPS enabled</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -444,17 +438,17 @@ export function CabBookingForm({
                 onClick={() => onChange("vehicle_slug", v.slug)}
                 className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between relative overflow-hidden group ${
                   isSelected
-                    ? "bg-gradient-to-b from-amber-950/30 to-slate-900 border-amber-500/80 ring-2 ring-amber-500/30 shadow-lg shadow-amber-500/5"
-                    : "bg-slate-900/70 border-slate-800 hover:border-slate-700 hover:bg-slate-800/40"
+                    ? "bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/40 shadow-sm scale-[1.01]"
+                    : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 shadow-2xs"
                 }`}
               >
                 {v.popular && (
-                  <span className="absolute top-2 right-2 bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">
-                    Most Popular
+                  <span className="absolute top-2 right-2 bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+                    Popular
                   </span>
                 )}
                 {v.luxury && (
-                  <span className="absolute top-2 right-2 bg-purple-500 text-white font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  <span className="absolute top-2 right-2 bg-purple-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
                     Premium
                   </span>
                 )}
@@ -463,23 +457,23 @@ export function CabBookingForm({
                   <img
                     src={v.image}
                     alt={v.name}
-                    className="w-16 h-12 object-cover rounded-xl border border-slate-800 shrink-0 bg-slate-950"
+                    className="w-16 h-12 object-cover rounded-xl border border-slate-200 shrink-0 bg-slate-100"
                   />
                   <div className="space-y-0.5">
-                    <div className="font-bold text-sm text-slate-100">{v.name}</div>
-                    <div className="text-[11px] text-slate-400">{v.models}</div>
-                    <div className="text-[10px] text-slate-400 flex items-center gap-2 pt-0.5">
+                    <div className="font-extrabold text-sm text-slate-900">{v.name}</div>
+                    <div className="text-[11px] text-slate-500">{v.models}</div>
+                    <div className="text-[10px] text-slate-500 flex items-center gap-2 pt-0.5">
                       <span>👥 {v.seats}</span>
                       <span>🧳 {v.bags}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                  <span className="text-slate-400 text-[11px]">
+                <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-slate-500 text-[11px]">
                     ₹{v.rate.extraKmRate}/KM extra
                   </span>
-                  <span className="font-black text-amber-400 text-sm">
+                  <span className="font-black text-amber-700 text-sm">
                     {tripType === "Local" && localPackage === "4hr_40km"
                       ? `₹${v.rate.fourHourFortyKm}`
                       : tripType === "Local"
