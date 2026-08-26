@@ -367,6 +367,41 @@ export function CabBookingForm({
           />
         </div>
       </div>
+
+      {/* 5. Select Vehicle Fleet */}
+      <div className="space-y-2">
+        <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+          <Car className="w-3.5 h-3.5 text-amber-600" /> Select Vehicle Fleet *
+        </label>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+          {[
+            { id: "hatchback", name: "Hatchback", desc: "Swift / WagonR (4 Seats)" },
+            { id: "sedan", name: "Prime Sedan", desc: "Dzire / Etios (4 Seats)" },
+            { id: "suv", name: "Ertiga / SUV", desc: "Maruti Ertiga (6 Seats)" },
+            { id: "innova", name: "Innova Crysta", desc: "Innova Crysta (7 Seats)" },
+            { id: "tempo", name: "Tempo Traveller", desc: "Force (12–17 Seats)" },
+          ].map((v) => {
+            const isSelected = (formData.vehicle_slug || "sedan") === v.id;
+            return (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => onChange("vehicle_slug", v.id)}
+                className={`p-3 rounded-2xl border text-left transition-all ${
+                  isSelected
+                    ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm ring-2 ring-amber-500/30 font-bold"
+                    : "bg-white border-slate-200 hover:border-slate-300 text-slate-800 hover:bg-slate-50"
+                }`}
+              >
+                <div className="font-extrabold text-xs">{v.name}</div>
+                <div className={`text-[10px] mt-0.5 ${isSelected ? "text-slate-950 font-semibold" : "text-slate-500"}`}>
+                  {v.desc}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

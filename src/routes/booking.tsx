@@ -12,6 +12,10 @@ import {
   Zap,
   CreditCard,
   CheckCircle2,
+  User,
+  Phone,
+  Mail,
+  Users,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { formatCurrency, formatDate, generateTicketNumber, generatePNR } from "@/lib/booking-utils";
@@ -64,7 +68,7 @@ const VEHICLE_NAMES: Record<string, string> = {
 };
 
 function BookingPage() {
-  // Step 0: Journey Details, Step 1: Payment, Step 2: Official Ticket Copy Voucher & Download
+  // Step 0: Client & Journey Details, Step 1: Payment, Step 2: Official Ticket Copy Voucher
   const [step, setStep] = useState(0);
   const [serviceType, setServiceType] = useState<ServiceType>("CAB");
   const [ticketNumber, setTicketNumber] = useState(() => generateTicketNumber());
@@ -72,8 +76,8 @@ function BookingPage() {
   const [upiCopied, setUpiCopied] = useState(false);
 
   const [formData, setFormData] = useState<any>({
-    name: "FORTUNE GROUP",
-    phone: "9845003000",
+    name: "",
+    phone: "",
     email: "",
     adults: 2,
     children: 0,
@@ -214,10 +218,14 @@ function BookingPage() {
     setTimeout(() => setUpiCopied(false), 2000);
   };
 
-  // Validation
-  const validateJourney = (): boolean => {
+  // Validate Step 0 (Client & Journey details)
+  const validateClientAndJourney = (): boolean => {
     const e: Record<string, string> = {};
 
+    if (!formData.name?.trim()) e.name = "Please enter passenger/client name.";
+    if (!formData.phone?.trim() || !/^[6-9]\d{9}$/.test(formData.phone.replace(/\s+/g, ""))) {
+      e.phone = "Enter a valid 10-digit mobile number.";
+    }
     if (!formData.date) e.date = "Travel date is required.";
 
     if (serviceType === "CAB") {
@@ -245,11 +253,11 @@ function BookingPage() {
   };
 
   const handleGoToPayment = () => {
-    if (validateJourney()) {
+    if (validateClientAndJourney()) {
       setStep(1);
       window.scrollTo({ top: 80, behavior: "smooth" });
     } else {
-      toast.error("Please fill required journey details.");
+      toast.error("Please fill required client and journey details.");
     }
   };
 
@@ -287,7 +295,7 @@ function BookingPage() {
         notes: [
           `Ticket No: ${ticketNumber}`,
           `PNR: ${pnrNumber}`,
-          `Payment Option: ${formData.advance_option === 100 ? "₹100 Advance Paid" : "Zero Advance"}`,
+          `Payment: ${formData.advance_option === 100 ? "₹100 Advance Paid" : "Zero Advance"}`,
           formData.utr_ref && `UTR: ${formData.utr_ref}`,
           formData.notes,
         ]
@@ -316,7 +324,7 @@ function BookingPage() {
       });
 
       setStep(2);
-      toast.success("Booking confirmed! Your ticket voucher is ready.");
+      toast.success("Booking confirmed! Your official ticket copy is generated below.");
       window.scrollTo({ top: 80, behavior: "smooth" });
     } catch (err: any) {
       toast.error(err.message || "An error occurred while confirming booking.");
@@ -379,7 +387,7 @@ function BookingPage() {
       <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6">
 
-          {/* STEP 0 — Service & Journey Details */}
+          {/* STEP 0 — Client & Journey Details */}
           {step === 0 && (
             <div className="space-y-6">
               {/* Service Selection */}
@@ -393,40 +401,84 @@ function BookingPage() {
                 />
               </div>
 
-              {/* Journey Form */}
+              {/* Passenger & Journey Form */}
               <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-                <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                  <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
-                    {SERVICE_LABELS[serviceType]}
-                  </span>
-                  <span className="text-slate-500 text-xs font-medium">Select Pickup, Drop & Travel Schedule</span>
+                {/* Client Contact Inputs */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
+                      Client Contact Info
+                    </span>
+                    <span className="text-slate-500 text-xs font-medium">Passenger details for booking</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
+                        <User className="w-3.5 h-3.5 text-amber-600" /> Passenger Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Fortune Group / Rajesh Kumar"
+                        value={formData.name}
+                        onChange={(e) => onChange("name", e.target.value)}
+                        className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
+                      />
+                      {errors.name && <p className="text-xs text-red-600 font-medium mt-1">{errors.name}</p>}
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
+                        <Phone className="w-3.5 h-3.5 text-amber-600" /> Mobile Number *
+                      </label>
+                      <input
+                        type="tel"
+                        placeholder="10-digit mobile number"
+                        value={formData.phone}
+                        onChange={(e) => onChange("phone", e.target.value)}
+                        maxLength={10}
+                        className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
+                      />
+                      {errors.phone && <p className="text-xs text-red-600 font-medium mt-1">{errors.phone}</p>}
+                    </div>
+                  </div>
                 </div>
 
-                {serviceType === "CAB" && (
-                  <CabBookingForm
-                    formData={formData}
-                    onChange={onChange}
-                    onFareCalculated={setFareResult}
-                    errors={errors}
-                  />
-                )}
-                {serviceType === "TRAIN" && (
-                  <TrainBookingForm formData={formData} onChange={onChange} errors={errors} />
-                )}
-                {serviceType === "BUS" && (
-                  <BusBookingForm formData={formData} onChange={onChange} errors={errors} />
-                )}
-                {serviceType === "FLIGHT" && (
-                  <FlightBookingForm formData={formData} onChange={onChange} errors={errors} />
-                )}
-                {serviceType === "TOUR" && (
-                  <TourBookingForm
-                    formData={formData}
-                    onChange={onChange}
-                    onFareCalculated={setFareResult}
-                    errors={errors}
-                  />
-                )}
+                {/* Journey Schedule Inputs */}
+                <div className="space-y-4 pt-4 border-t border-slate-100">
+                  <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
+                      {SERVICE_LABELS[serviceType]}
+                    </span>
+                    <span className="text-slate-500 text-xs font-medium">Select Pickup, Drop & Travel Schedule</span>
+                  </div>
+
+                  {serviceType === "CAB" && (
+                    <CabBookingForm
+                      formData={formData}
+                      onChange={onChange}
+                      onFareCalculated={setFareResult}
+                      errors={errors}
+                    />
+                  )}
+                  {serviceType === "TRAIN" && (
+                    <TrainBookingForm formData={formData} onChange={onChange} errors={errors} />
+                  )}
+                  {serviceType === "BUS" && (
+                    <BusBookingForm formData={formData} onChange={onChange} errors={errors} />
+                  )}
+                  {serviceType === "FLIGHT" && (
+                    <FlightBookingForm formData={formData} onChange={onChange} errors={errors} />
+                  )}
+                  {serviceType === "TOUR" && (
+                    <TourBookingForm
+                      formData={formData}
+                      onChange={onChange}
+                      onFareCalculated={setFareResult}
+                      errors={errors}
+                    />
+                  )}
+                </div>
 
                 {/* Continue to Payment Button */}
                 <div className="flex justify-end pt-4 border-t border-slate-100">
@@ -484,7 +536,7 @@ function BookingPage() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-600 leading-relaxed">
-                      Instant vehicle & driver lock with booking confirmation receipt.
+                      Instant vehicle & driver lock with booking confirmation ticket.
                     </p>
                   </button>
 
@@ -617,7 +669,7 @@ function BookingPage() {
             </div>
           )}
 
-          {/* STEP 2 — Official Ticket Copy Voucher & Download Format (Matching Spreadsheet Image) */}
+          {/* STEP 2 — Official Ticket Copy Voucher & Download Format (Generated After Client Fills Details & Confirms) */}
           {step === 2 && (
             <div className="space-y-6">
               {/* Success & Actions Banner */}
@@ -629,10 +681,10 @@ function BookingPage() {
                     </div>
                     <div>
                       <h2 className="font-extrabold text-slate-900 text-base sm:text-lg">
-                        Booking Registered Successfully!
+                        Booking Confirmed!
                       </h2>
                       <p className="text-xs text-slate-500">
-                        Your Ticket Copy voucher is ready for download & print below.
+                        Your official Ticket Copy is generated below. You can download PDF or print it.
                       </p>
                     </div>
                   </div>
@@ -670,7 +722,7 @@ function BookingPage() {
 
                   <a
                     href={buildWhatsAppUrl(
-                      `Hello Fortune Tourism! I have booked my journey.\n\n*Ticket No:* ${ticketNumber}\n*PNR:* ${pnrNumber}\n*Passenger:* ${formData.name || "FORTUNE GROUP"}\n*From:* ${fromLocation}\n*To:* ${toLocation}\n*Date:* ${departureFormatted}\n*Service:* ${SERVICE_LABELS[serviceType]}\n\nPlease confirm availability and driver assignment.`
+                      `Hello Fortune Tourism! I have booked my journey.\n\n*Ticket No:* ${ticketNumber}\n*PNR:* ${pnrNumber}\n*Passenger:* ${formData.name || "FORTUNE GROUP"}\n*Phone:* ${formData.phone || "9845003000"}\n*From:* ${fromLocation}\n*To:* ${toLocation}\n*Date:* ${departureFormatted}\n*Service:* ${SERVICE_LABELS[serviceType]}\n\nPlease confirm driver and vehicle assignment.`
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -717,26 +769,14 @@ function BookingPage() {
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 w-36 whitespace-nowrap">
                           Passenger Name:
                         </td>
-                        <td className="p-2.5">
-                          <input
-                            type="text"
-                            placeholder="FORTUNE GROUP"
-                            value={formData.name}
-                            onChange={(e) => onChange("name", e.target.value)}
-                            className="w-full font-black text-slate-900 uppercase bg-transparent outline-none border-b border-transparent focus:border-amber-500"
-                          />
+                        <td className="p-2.5 font-black text-slate-900 uppercase">
+                          {formData.name || "FORTUNE GROUP"}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 w-40 whitespace-nowrap">
                           Passenger Phone No.:
                         </td>
-                        <td className="p-2.5">
-                          <input
-                            type="text"
-                            placeholder="9845003000"
-                            value={formData.phone}
-                            onChange={(e) => onChange("phone", e.target.value)}
-                            className="w-full font-bold text-slate-900 bg-transparent outline-none border-b border-transparent focus:border-amber-500"
-                          />
+                        <td className="p-2.5 font-bold text-slate-900">
+                          {formData.phone || "9845003000"}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 w-28 whitespace-nowrap">
                           Tour Type
@@ -829,8 +869,8 @@ function BookingPage() {
                     setTicketNumber(generateTicketNumber());
                     setPnrNumber(generatePNR());
                     setFormData({
-                      name: "FORTUNE GROUP",
-                      phone: "9845003000",
+                      name: "",
+                      phone: "",
                       email: "",
                       adults: 2,
                       pickup: "",
