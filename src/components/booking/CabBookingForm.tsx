@@ -86,56 +86,6 @@ export function CabBookingForm({
     formData.advance_option,
   ]);
 
-  const vehicles = [
-    {
-      slug: "hatchback",
-      name: "Hatchback",
-      models: "Swift / Tiago / WagonR",
-      seats: "4 Passengers",
-      bags: "2 Bags",
-      image: "/images/fleet/car-hatchback.jpg",
-      rate: DEFAULT_CAB_RATES.hatchback,
-    },
-    {
-      slug: "sedan",
-      name: "Prime Sedan",
-      models: "Dzire / Etios / Ciaz",
-      seats: "4 Passengers",
-      bags: "3 Bags",
-      image: "/images/fleet/car-sedan.jpg",
-      rate: DEFAULT_CAB_RATES.sedan,
-      popular: true,
-    },
-    {
-      slug: "suv",
-      name: "Ertiga / SUV",
-      models: "Maruti Ertiga / Carens",
-      seats: "6 Passengers",
-      bags: "4 Bags",
-      image: "/images/fleet/car-suv.jpg",
-      rate: DEFAULT_CAB_RATES.suv,
-    },
-    {
-      slug: "innova",
-      name: "Innova Crysta",
-      models: "Toyota Innova Crysta",
-      seats: "7 Passengers",
-      bags: "5 Bags",
-      image: "/images/fleet/car-innova.jpg",
-      rate: DEFAULT_CAB_RATES.innova,
-      luxury: true,
-    },
-    {
-      slug: "tempo",
-      name: "Tempo Traveller",
-      models: "Force 12–17 Seater",
-      seats: "12–16 Passengers",
-      bags: "10 Bags",
-      image: "/images/fleet/car-tempo.jpg",
-      rate: DEFAULT_CAB_RATES.tempo,
-    },
-  ];
-
   return (
     <div className="space-y-6">
       {/* 1. Trip Type Selector */}
@@ -418,75 +368,22 @@ export function CabBookingForm({
         </div>
       </div>
 
-      {/* 5. Vehicle Selection Grid */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-            <Car className="w-3.5 h-3.5 text-amber-600" /> Select Vehicle Fleet *
-          </label>
-          <span className="text-[11px] text-slate-500">All vehicles AC & GPS enabled</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {vehicles.map((v) => {
-            const isSelected = vehicleSlug === v.slug;
-
-            return (
-              <button
-                key={v.slug}
-                type="button"
-                onClick={() => onChange("vehicle_slug", v.slug)}
-                className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between relative overflow-hidden group ${
-                  isSelected
-                    ? "bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/40 shadow-sm scale-[1.01]"
-                    : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 shadow-2xs"
-                }`}
-              >
-                {v.popular && (
-                  <span className="absolute top-2 right-2 bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
-                    Popular
-                  </span>
-                )}
-                {v.luxury && (
-                  <span className="absolute top-2 right-2 bg-purple-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
-                    Premium
-                  </span>
-                )}
-
-                <div className="flex items-start gap-3">
-                  <img
-                    src={v.image}
-                    alt={v.name}
-                    className="w-16 h-12 object-cover rounded-xl border border-slate-200 shrink-0 bg-slate-100"
-                  />
-                  <div className="space-y-0.5">
-                    <div className="font-extrabold text-sm text-slate-900">{v.name}</div>
-                    <div className="text-[11px] text-slate-500">{v.models}</div>
-                    <div className="text-[10px] text-slate-500 flex items-center gap-2 pt-0.5">
-                      <span>👥 {v.seats}</span>
-                      <span>🧳 {v.bags}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                  <span className="text-slate-500 text-[11px]">
-                    ₹{v.rate.extraKmRate}/KM extra
-                  </span>
-                  <span className="font-black text-amber-700 text-sm">
-                    {tripType === "Local" && localPackage === "4hr_40km"
-                      ? `₹${v.rate.fourHourFortyKm}`
-                      : tripType === "Local"
-                      ? `₹${v.rate.eightHourEightyKm}`
-                      : tripType === "Airport Transfer"
-                      ? `₹${v.rate.airportFlatRate}`
-                      : `From ₹${v.rate.extraKmRate}/KM`}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+      {/* 5. Vehicle Preference Selector */}
+      <div>
+        <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
+          <Car className="w-3.5 h-3.5 text-amber-600" /> Vehicle Preference
+        </label>
+        <select
+          value={vehicleSlug}
+          onChange={(e) => onChange("vehicle_slug", e.target.value)}
+          className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
+        >
+          <option value="hatchback">Hatchback (Swift / Tiago / WagonR — 4 Seats)</option>
+          <option value="sedan">Prime Sedan (Dzire / Etios / Ciaz — 4 Seats)</option>
+          <option value="suv">Ertiga / SUV (Maruti Ertiga / Carens — 6 Seats)</option>
+          <option value="innova">Innova Crysta (Toyota Innova Crysta — 7 Seats)</option>
+          <option value="tempo">Tempo Traveller (Force 12–17 Seater)</option>
+        </select>
       </div>
     </div>
   );
