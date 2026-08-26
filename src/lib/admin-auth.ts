@@ -1,29 +1,52 @@
 /**
- * Lightweight admin gate for mutating booking/payment endpoints.
+ * Admin authentication and authorization utilities.
  *
- * Set ADMIN_PASSWORD in the environment to lock down admin operations.
- * When the variable is NOT set the endpoints stay open (development /
- * backward-compatible mode) so existing workflows never break.
- *
- * The admin UI sends the key via the `x-admin-key` header.
+ * Configured Admin Credentials:
+ * User ID / Email: adminfortunetourism@gmail.com
+ * Password: Admin@fortunetourism2026
  */
-export function isAdminAuthorized(request: Request): boolean {
-  const pwd = process.env.ADMIN_PASSWORD;
-  if (!pwd) return true; // open mode — no ADMIN_PASSWORD configured
 
-  const headerKey = request.headers.get("x-admin-key");
-  if (headerKey && headerKey === pwd) return true;
+export const ADMIN_CONFIG = {
+  DEFAULT_EMAIL: "adminfortunetourism@gmail.com",
+  DEFAULT_PASSWORD: "Admin@fortunetourism2026",
+};
+
+export function getAdminEmail(): string {
+  return (process.env.ADMIN_EMAIL || ADMIN_CONFIG.DEFAULT_EMAIL).trim().toLowerCase();
+}
+
+export function getAdminPassword(): string {
+  return (process.env.ADMIN_PASSWORD || ADMIN_CONFIG.DEFAULT_PASSWORD).trim();
+}
+
+export function validateAdminCredentials(email?: string, password?: string): boolean {
+  if (!email || !password) return false;
+
+  const validEmail = getAdminEmail();
+  const validPassword = getAdminPassword();
+
+  const inputEmail = String(email).trim().toLowerCase();
+  const inputPassword = String(password).trim();
+
+  return inputEmail === validEmail && inputPassword === validPassword;
+}
+
+export function isAdminAuthorized(request: Request): boolean {
+  const validPwd = getAdminPassword();
+
+  const headerKey = request.headers.get("x-admin-key") || request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  if (headerKey && headerKey.trim() === validPwd) return true;
 
   const cookie = request.headers.get("cookie") || "";
   const match = cookie.match(/(?:^|;\s*)fortune_admin_key=([^;]+)/);
-  if (match && decodeURIComponent(match[1]) === pwd) return true;
+  if (match && decodeURIComponent(match[1]).trim() === validPwd) return true;
 
   return false;
 }
 
-export function unauthorizedResponse(): Response {
+export function unauthorizedResponse(msg: string = "Unauthorized. Admin authentication required."): Response {
   return new Response(
-    JSON.stringify({ success: false, error: "Unauthorized. Admin key required." }),
+    JSON.stringify({ success: false, error: msg }),
     { status: 401, headers: { "Content-Type": "application/json" } },
   );
 }

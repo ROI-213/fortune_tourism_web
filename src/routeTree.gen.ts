@@ -25,6 +25,7 @@ import { Route as ApiVehiclesRouteImport } from './routes/api/vehicles'
 import { Route as CarRentalsVehicleIdRouteImport } from './routes/car-rentals.$vehicleId'
 import { Route as DriverDashboardRouteImport } from './routes/driver/dashboard'
 import { Route as TourPackagesPackageIdRouteImport } from './routes/tour-packages.$packageId'
+import { Route as ApiAdminLoginRouteImport } from './routes/api/admin/login'
 import { Route as ApiBookingsIndexRouteImport } from './routes/api/bookings/index'
 import { Route as ApiBusinessResourceRouteImport } from './routes/api/business/$resource'
 import { Route as ApiBusinessHistoryRouteImport } from './routes/api/business/history'
@@ -119,6 +120,11 @@ const TourPackagesPackageIdRoute = TourPackagesPackageIdRouteImport.update({
   path: '/$packageId',
   getParentRoute: () => TourPackagesRoute,
 } as any)
+const ApiAdminLoginRoute = ApiAdminLoginRouteImport.update({
+  id: '/api/admin/login',
+  path: '/api/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiBookingsIndexRoute = ApiBookingsIndexRouteImport.update({
   id: '/api/bookings/',
   path: '/api/bookings/',
@@ -205,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
   '/driver/dashboard': typeof DriverDashboardRoute
   '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
+  '/api/admin/login': typeof ApiAdminLoginRoute
   '/api/business/$resource': typeof ApiBusinessResourceRoute
   '/api/business/history': typeof ApiBusinessHistoryRoute
   '/api/business/settle': typeof ApiBusinessSettleRoute
@@ -236,6 +243,7 @@ export interface FileRoutesByTo {
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
   '/driver/dashboard': typeof DriverDashboardRoute
   '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
+  '/api/admin/login': typeof ApiAdminLoginRoute
   '/api/business/$resource': typeof ApiBusinessResourceRoute
   '/api/business/history': typeof ApiBusinessHistoryRoute
   '/api/business/settle': typeof ApiBusinessSettleRoute
@@ -268,6 +276,7 @@ export interface FileRoutesById {
   '/car-rentals/$vehicleId': typeof CarRentalsVehicleIdRoute
   '/driver/dashboard': typeof DriverDashboardRoute
   '/tour-packages/$packageId': typeof TourPackagesPackageIdRoute
+  '/api/admin/login': typeof ApiAdminLoginRoute
   '/api/business/$resource': typeof ApiBusinessResourceRoute
   '/api/business/history': typeof ApiBusinessHistoryRoute
   '/api/business/settle': typeof ApiBusinessSettleRoute
@@ -301,6 +310,7 @@ export interface FileRouteTypes {
     | '/car-rentals/$vehicleId'
     | '/driver/dashboard'
     | '/tour-packages/$packageId'
+    | '/api/admin/login'
     | '/api/business/$resource'
     | '/api/business/history'
     | '/api/business/settle'
@@ -332,6 +342,7 @@ export interface FileRouteTypes {
     | '/car-rentals/$vehicleId'
     | '/driver/dashboard'
     | '/tour-packages/$packageId'
+    | '/api/admin/login'
     | '/api/business/$resource'
     | '/api/business/history'
     | '/api/business/settle'
@@ -363,6 +374,7 @@ export interface FileRouteTypes {
     | '/car-rentals/$vehicleId'
     | '/driver/dashboard'
     | '/tour-packages/$packageId'
+    | '/api/admin/login'
     | '/api/business/$resource'
     | '/api/business/history'
     | '/api/business/settle'
@@ -393,6 +405,7 @@ export interface RootRouteChildren {
   ApiPackagesRoute: typeof ApiPackagesRoute
   ApiVehiclesRoute: typeof ApiVehiclesRoute
   DriverDashboardRoute: typeof DriverDashboardRoute
+  ApiAdminLoginRoute: typeof ApiAdminLoginRoute
   ApiBusinessResourceRoute: typeof ApiBusinessResourceRoute
   ApiBusinessHistoryRoute: typeof ApiBusinessHistoryRoute
   ApiBusinessSettleRoute: typeof ApiBusinessSettleRoute
@@ -521,6 +534,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tour-packages/$packageId'
       preLoaderRoute: typeof TourPackagesPackageIdRouteImport
       parentRoute: typeof TourPackagesRoute
+    }
+    '/api/admin/login': {
+      id: '/api/admin/login'
+      path: '/api/admin/login'
+      fullPath: '/api/admin/login'
+      preLoaderRoute: typeof ApiAdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/bookings/': {
       id: '/api/bookings/'
@@ -655,6 +675,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPackagesRoute: ApiPackagesRoute,
   ApiVehiclesRoute: ApiVehiclesRoute,
   DriverDashboardRoute: DriverDashboardRoute,
+  ApiAdminLoginRoute: ApiAdminLoginRoute,
   ApiBusinessResourceRoute: ApiBusinessResourceRoute,
   ApiBusinessHistoryRoute: ApiBusinessHistoryRoute,
   ApiBusinessSettleRoute: ApiBusinessSettleRoute,
