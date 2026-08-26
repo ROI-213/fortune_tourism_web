@@ -19,10 +19,8 @@ import {
   ArrowLeftRight,
   User,
   Phone,
-  Mail,
   ShieldCheck,
   Star,
-  Luggage,
   Users,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
@@ -204,8 +202,9 @@ function BookingPage() {
   // Step 0: Choose Service (5 cards)
   // Step 1: Cab Journey Route & Dropdown (One Way / Round Trip / Local / Airport)
   // Step 2: Fleet Selection Page (Hatchback, Sedan, SUV, Innova, Tempo)
-  // Step 3: Passenger Details & Payment (₹100 or Zero advance)
-  // Step 4: Official Ticket Confirmation PDF Voucher
+  // Step 3: Passenger Details (Name & Phone Number only) -> [ NEXT PAGE ]
+  // Step 4: Payment Choice Page (₹100 or Zero advance) -> [ CONFIRM BOOKING ]
+  // Step 5: Official Ticket Confirmation PDF Voucher
   const [step, setStep] = useState(0);
   const [serviceType, setServiceType] = useState<ServiceType | null>(null);
 
@@ -222,12 +221,13 @@ function BookingPage() {
 
   // Selected Fleet
   const [selectedFleetId, setSelectedFleetId] = useState<string>("sedan");
-  const [selectedFuel, setSelectedFuel] = useState<string>("Diesel");
   const [withLuggageCarrier, setWithLuggageCarrier] = useState<boolean>(false);
 
-  // Passenger & Payment state
+  // Passenger state (Cleaned: no predefined values)
   const [passengerName, setPassengerName] = useState("");
   const [passengerPhone, setPassengerPhone] = useState("");
+
+  // Payment state
   const [advanceOption, setAdvanceOption] = useState<number>(100);
   const [utrRef, setUtrRef] = useState("");
 
@@ -325,9 +325,10 @@ function BookingPage() {
     return cabTripType;
   }, [cabTripType, localPackage]);
 
+  // Vehicle display without fuel text
   const vehicleDisplay = useMemo(() => {
-    return `${selectedFleet.name.toUpperCase()} (${selectedFuel})${withLuggageCarrier ? " + CARRIER" : ""}`;
-  }, [selectedFleet, selectedFuel, withLuggageCarrier]);
+    return `${selectedFleet.name.toUpperCase()}${withLuggageCarrier ? " + CARRIER" : ""}`;
+  }, [selectedFleet, withLuggageCarrier]);
 
   const swapLocations = () => {
     const temp = cabFrom;
@@ -342,7 +343,7 @@ function BookingPage() {
     window.scrollTo({ top: 80, behavior: "smooth" });
   };
 
-  // Step 1 -> Step 2 (Route validation)
+  // Step 1 -> Step 2 (Route validation to Fleet Selection)
   const handleGoToFleetSelection = () => {
     const e: Record<string, string> = {};
     if (cabTripType !== "LOCAL") {
@@ -360,30 +361,35 @@ function BookingPage() {
     }
   };
 
-  // Step 2 -> Step 3 (Fleet Selection to Payment)
-  const handleGoToPayment = () => {
+  // Step 2 -> Step 3 (Fleet Selection to Passenger Details)
+  const handleGoToPassengerDetails = () => {
     setStep(3);
     window.scrollTo({ top: 80, behavior: "smooth" });
   };
 
-  // Step 3 -> Step 4 (Confirm & Generate Ticket)
-  const handleConfirmAndGenerateTicket = async () => {
+  // Step 3 -> Step 4 (Passenger Details validation to Payment Choice)
+  const handleGoToPayment = () => {
     if (!passengerName.trim()) {
-      toast.error("Please enter passenger name.");
+      toast.error("Please enter passenger full name.");
       return;
     }
     if (!passengerPhone.trim() || !/^[6-9]\d{9}$/.test(passengerPhone.replace(/\s+/g, ""))) {
       toast.error("Please enter a valid 10-digit mobile number.");
       return;
     }
+    setStep(4);
+    window.scrollTo({ top: 80, behavior: "smooth" });
+  };
 
+  // Step 4 -> Step 5 (Confirm & Generate Ticket)
+  const handleConfirmAndGenerateTicket = async () => {
     setIsSubmitting(true);
 
     try {
       const payload: Record<string, any> = {
-        name: passengerName || "FORTUNE GROUP",
+        name: passengerName || "GUEST",
         phone: passengerPhone.replace(/\s+/g, ""),
-        email: passengerEmail || null,
+        email: null,
         service: "Taxi",
         booking_type: "CAB",
         pickup: fromLocationDisplay,
@@ -399,7 +405,6 @@ function BookingPage() {
           `Fleet: ${vehicleDisplay}`,
           `Fare: ₹${calculatedFare}`,
           `Payment: ${advanceOption === 100 ? "₹100 Advance Paid" : "Zero Advance"}`,
-          pickupLandmark && `Landmark: ${pickupLandmark}`,
           utrRef && `UTR: ${utrRef}`,
         ]
           .filter(Boolean)
@@ -419,7 +424,7 @@ function BookingPage() {
         throw new Error(data.message || data.error || "Failed to submit booking.");
       }
 
-      setStep(4);
+      setStep(5);
       toast.success("Booking confirmed! Your official ticket copy is generated below.");
       window.scrollTo({ top: 80, behavior: "smooth" });
     } catch (err: any) {
@@ -441,7 +446,7 @@ function BookingPage() {
       ticketNumber,
       pnrNumber,
       bookingDate: todayFormatted,
-      passengerName: passengerName || "FORTUNE GROUP",
+      passengerName: passengerName || "GUEST",
       passengerPhone: passengerPhone || "9845003000",
       tourType: tourTypeDisplay,
       fromLocation: fromLocationDisplay,
@@ -449,7 +454,7 @@ function BookingPage() {
       departureOn: departureDateFormatted,
       tripType: cabTripType,
       vehicleOrMode: vehicleDisplay,
-      boardingPoint: (pickupLandmark || fromLocationDisplay).toUpperCase(),
+      boardingPoint: fromLocationDisplay,
     });
     toast.success("Ticket PDF downloaded successfully!");
   };
@@ -500,7 +505,7 @@ function BookingPage() {
             </div>
           )}
 
-          {/* STEP 1: Cab Booking Route & Journey Form (Images 2 & 3) */}
+          {/* STEP 1: Cab Booking Route & Journey Form */}
           {step === 1 && serviceType === "CAB" && (
             <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-5 sm:p-7 space-y-6 animate-in fade-in duration-300">
               {/* Top Header with Back */}
@@ -561,7 +566,7 @@ function BookingPage() {
                 </div>
               )}
 
-              {/* INPUT FIELDS ROW (Image 3) */}
+              {/* INPUT FIELDS ROW */}
               <div className="pt-2">
                 {/* ONE WAY & ROUND TRIP */}
                 {(cabTripType === "ONE WAY" || cabTripType === "ROUND TRIP") && (
@@ -754,7 +759,7 @@ function BookingPage() {
                 )}
               </div>
 
-              {/* NEXT PAGE ORANGE BUTTON (Replaced Explore Cabs) */}
+              {/* NEXT PAGE ORANGE BUTTON */}
               <div className="flex justify-center pt-3 border-t border-slate-100">
                 <button
                   type="button"
@@ -816,7 +821,7 @@ function BookingPage() {
             </div>
           )}
 
-          {/* STEP 2: SELECT VEHICLE FLEET PAGE */}
+          {/* STEP 2: SELECT VEHICLE FLEET PAGE (Clean without fuel selector) */}
           {step === 2 && (
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-in fade-in duration-300">
               {/* Header */}
@@ -891,26 +896,6 @@ function BookingPage() {
                               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Driver Allowance Included
                             </span>
                           </div>
-
-                          {/* Fuel Selector */}
-                          {isSelected && (
-                            <div className="pt-2 flex items-center gap-4 text-xs font-bold text-slate-700">
-                              <span>Fuel:</span>
-                              {["Diesel", "CNG"].map((fuel) => (
-                                <label key={fuel} className="flex items-center gap-1 cursor-pointer">
-                                  <input
-                                    type="radio"
-                                    name="fleet_fuel"
-                                    value={fuel}
-                                    checked={selectedFuel === fuel}
-                                    onChange={() => setSelectedFuel(fuel)}
-                                    className="text-[#f97316]"
-                                  />
-                                  <span>{fuel}</span>
-                                </label>
-                              ))}
-                            </div>
-                          )}
                         </div>
 
                         <div className="md:col-span-4 flex flex-col items-end justify-center space-y-2 border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-4 text-right">
@@ -926,7 +911,7 @@ function BookingPage() {
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedFleetId(fleet.id);
-                              handleGoToPayment();
+                              handleGoToPassengerDetails();
                             }}
                             className={`px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-sm transition-all ${
                               isSelected
@@ -957,7 +942,7 @@ function BookingPage() {
                 <span className="text-sky-800 font-extrabold">+₹149 Extra</span>
               </div>
 
-              {/* Bottom Continue to Payment Button */}
+              {/* Bottom Continue to Passenger Details Button */}
               <div className="flex justify-between pt-4 border-t border-slate-100">
                 <button
                   type="button"
@@ -969,26 +954,26 @@ function BookingPage() {
 
                 <button
                   type="button"
-                  onClick={handleGoToPayment}
+                  onClick={handleGoToPassengerDetails}
                   className="bg-[#f97316] hover:bg-[#ea580c] text-white font-black px-8 py-3.5 rounded-xl uppercase tracking-wider text-sm shadow-md transition-all hover:scale-105 flex items-center gap-2"
                 >
-                  Continue to Payment <ArrowRight className="w-4 h-4" />
+                  Continue to Passenger Details <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 3: PASSENGER DETAILS & PAYMENT */}
+          {/* STEP 3: PASSENGER DETAILS PAGE (Only Name & Phone Number -> NEXT PAGE button) */}
           {step === 3 && (
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-in fade-in duration-300">
               {/* Header */}
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div>
                   <h2 className="font-extrabold text-slate-900 text-lg sm:text-xl">
-                    Passenger & Payment
+                    Passenger Details
                   </h2>
                   <p className="text-xs text-slate-500">
-                    Review trip details and confirm your booking
+                    Enter passenger details for your trip
                   </p>
                 </div>
 
@@ -1005,7 +990,7 @@ function BookingPage() {
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                    Selected Vehicle & Route
+                    SELECTED VEHICLE & ROUTE
                   </span>
                   <div className="font-black text-slate-900 text-base sm:text-lg">
                     {vehicleDisplay}
@@ -1026,13 +1011,13 @@ function BookingPage() {
               {/* Passenger Inputs (Only Name and Mobile Number) */}
               <div className="space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-800 block">
-                  Passenger Contact
+                  PASSENGER CONTACT
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
-                      Passenger Full Name *
+                      PASSENGER FULL NAME *
                     </label>
                     <input
                       type="text"
@@ -1045,7 +1030,7 @@ function BookingPage() {
 
                   <div>
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
-                      Mobile Number *
+                      MOBILE NUMBER *
                     </label>
                     <input
                       type="tel"
@@ -1059,10 +1044,76 @@ function BookingPage() {
                 </div>
               </div>
 
-              {/* Payment Choice */}
-              <div className="space-y-4 pt-4 border-t border-slate-100">
+              {/* Bottom NEXT PAGE Button */}
+              <div className="flex justify-between pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Fleet
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleGoToPayment}
+                  className="bg-[#f97316] hover:bg-[#ea580c] text-white font-black px-10 py-3.5 rounded-xl uppercase tracking-wider text-sm shadow-md transition-all hover:scale-105 flex items-center gap-2"
+                >
+                  NEXT PAGE <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4: PAYMENT CHOICE PAGE */}
+          {step === 4 && (
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-in fade-in duration-300">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h2 className="font-extrabold text-slate-900 text-lg sm:text-xl">
+                    Payment Choice
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Select payment option to confirm your reservation
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setStep(3)}
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Passenger Details
+                </button>
+              </div>
+
+              {/* Booking Summary Box */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    PASSENGER & VEHICLE
+                  </span>
+                  <div className="font-black text-slate-900 text-base sm:text-lg">
+                    {passengerName || "Guest"} ({passengerPhone}) · {vehicleDisplay}
+                  </div>
+                  <div className="text-xs text-slate-600 font-medium">
+                    {fromLocationDisplay} → {toLocationDisplay} · {departureDateFormatted} · {cabTripType}
+                  </div>
+                </div>
+
+                <div className="text-right shrink-0">
+                  <span className="text-[10px] font-bold text-slate-400 block">TOTAL FARE</span>
+                  <div className="text-2xl font-black text-[#00a2d2]">
+                    ₹{calculatedFare.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Options */}
+              <div className="space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-800 block">
-                  Payment Choice
+                  PAYMENT CHOICE
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1078,7 +1129,7 @@ function BookingPage() {
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-black text-slate-900 text-sm sm:text-base">⚡ Pay ₹100 Advance</span>
                       <span className="bg-[#f97316] text-white font-black text-[10px] px-2 py-0.5 rounded-full uppercase">
-                        Priority Lock
+                        PRIORITY LOCK
                       </span>
                     </div>
                     <p className="text-xs text-slate-600">
@@ -1184,10 +1235,10 @@ function BookingPage() {
               <div className="flex justify-between pt-4 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setStep(2)}
+                  onClick={() => setStep(3)}
                   className="text-xs font-bold text-slate-600 hover:text-slate-900 px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Fleet
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Passenger Details
                 </button>
 
                 <button
@@ -1211,8 +1262,8 @@ function BookingPage() {
             </div>
           )}
 
-          {/* STEP 4: OFFICIAL TICKET COPY VOUCHER & PDF DOWNLOAD (Exact 4-Row Spreadsheet) */}
-          {step === 4 && (
+          {/* STEP 5: OFFICIAL TICKET COPY VOUCHER & PDF DOWNLOAD (Exact 4-Row Spreadsheet) */}
+          {step === 5 && (
             <div className="space-y-6">
               {/* Success Banner */}
               <div className="no-print bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
@@ -1264,7 +1315,7 @@ function BookingPage() {
 
                   <a
                     href={buildWhatsAppUrl(
-                      `Hello Fortune Tourism! I have booked my cab.\n\n*Ticket No:* ${ticketNumber}\n*PNR:* ${pnrNumber}\n*Passenger:* ${passengerName || "FORTUNE GROUP"}\n*Phone:* ${passengerPhone || "9845003000"}\n*From:* ${fromLocationDisplay}\n*To:* ${toLocationDisplay}\n*Date:* ${departureDateFormatted}\n*Vehicle:* ${vehicleDisplay}\n\nPlease confirm driver assignment.`
+                      `Hello Fortune Tourism! I have booked my cab.\n\n*Ticket No:* ${ticketNumber}\n*PNR:* ${pnrNumber}\n*Passenger:* ${passengerName || "GUEST"}\n*Phone:* ${passengerPhone || "9845003000"}\n*From:* ${fromLocationDisplay}\n*To:* ${toLocationDisplay}\n*Date:* ${departureDateFormatted}\n*Vehicle:* ${vehicleDisplay}\n\nPlease confirm driver assignment.`
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -1302,7 +1353,7 @@ function BookingPage() {
                           Passenger Name:
                         </td>
                         <td className="p-2.5 font-black text-slate-900 uppercase">
-                          {passengerName || "FORTUNE GROUP"}
+                          {passengerName || "GUEST"}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 w-40 whitespace-nowrap">
                           Passenger Phone No.:
@@ -1374,7 +1425,7 @@ function BookingPage() {
                           Boarding point:
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 uppercase">
-                          {(pickupLandmark || fromLocationDisplay).toUpperCase()}
+                          {fromLocationDisplay}
                         </td>
                       </tr>
                     </tbody>
