@@ -70,7 +70,7 @@ const VEHICLE_NAMES: Record<string, string> = {
 function BookingPage() {
   // Step 0: Client & Journey Details, Step 1: Payment, Step 2: Official Ticket Copy Voucher
   const [step, setStep] = useState(0);
-  const [serviceType, setServiceType] = useState<ServiceType>("CAB");
+  const [serviceType, setServiceType] = useState<ServiceType | null>(null);
   const [ticketNumber, setTicketNumber] = useState(() => generateTicketNumber());
   const [pnrNumber, setPnrNumber] = useState(() => generatePNR());
   const [upiCopied, setUpiCopied] = useState(false);
@@ -191,7 +191,7 @@ function BookingPage() {
     if (serviceType === "CAB") {
       return (formData.trip_type || "LOCAL TRIP").toUpperCase();
     }
-    return SERVICE_TO_TOUR_TYPE[serviceType];
+    return serviceType ? SERVICE_TO_TOUR_TYPE[serviceType] : "LOCAL TRIP";
   }, [serviceType, formData.trip_type]);
 
   const tripTypeDisplay = useMemo(() => {
@@ -220,6 +220,11 @@ function BookingPage() {
 
   // Validate Step 0 (Journey details)
   const validateClientAndJourney = (): boolean => {
+    if (!serviceType) {
+      toast.error("Please select what you would like to book first.");
+      return false;
+    }
+
     const e: Record<string, string> = {};
 
     if (!formData.date) e.date = "Travel date is required.";
@@ -383,13 +388,13 @@ function BookingPage() {
       <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6">
 
-          {/* STEP 0 — Client & Journey Details */}
+          {/* STEP 0 — Service Selection & Tailored Journey Form */}
           {step === 0 && (
             <div className="space-y-6">
-              {/* Service Selection */}
+              {/* Service Selection Cards */}
               <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-4">
                 <MultiServiceTypeCards
-                  selected={serviceType}
+                  selectedService={serviceType}
                   onSelect={(type) => {
                     setServiceType(type);
                     setErrors({});
@@ -397,48 +402,57 @@ function BookingPage() {
                 />
               </div>
 
-              {/* Journey Form */}
-              <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-                {/* Journey Schedule Inputs */}
-                <div className="space-y-4">
-                  {serviceType === "CAB" && (
-                    <CabBookingForm
-                      formData={formData}
-                      onChange={onChange}
-                      onFareCalculated={setFareResult}
-                      errors={errors}
-                    />
-                  )}
-                  {serviceType === "TRAIN" && (
-                    <TrainBookingForm formData={formData} onChange={onChange} errors={errors} />
-                  )}
-                  {serviceType === "BUS" && (
-                    <BusBookingForm formData={formData} onChange={onChange} errors={errors} />
-                  )}
-                  {serviceType === "FLIGHT" && (
-                    <FlightBookingForm formData={formData} onChange={onChange} errors={errors} />
-                  )}
-                  {serviceType === "TOUR" && (
-                    <TourBookingForm
-                      formData={formData}
-                      onChange={onChange}
-                      onFareCalculated={setFareResult}
-                      errors={errors}
-                    />
-                  )}
-                </div>
+              {/* Show Tailored Journey Form ONLY after clicking/selecting a service */}
+              {serviceType && (
+                <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                  <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
+                      {SERVICE_LABELS[serviceType]}
+                    </span>
+                    <span className="text-slate-500 text-xs font-medium">Select Route & Travel Schedule</span>
+                  </div>
 
-                {/* Continue to Payment Button */}
-                <div className="flex justify-end pt-4 border-t border-slate-100">
-                  <button
-                    type="button"
-                    onClick={handleGoToPayment}
-                    className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black px-7 py-3.5 rounded-xl shadow-md shadow-amber-500/20 hover:shadow-lg transition-all text-sm"
-                  >
-                    Continue to Payment <ArrowRight className="w-4 h-4" />
-                  </button>
+                  {/* Journey Schedule Inputs */}
+                  <div className="space-y-4">
+                    {serviceType === "CAB" && (
+                      <CabBookingForm
+                        formData={formData}
+                        onChange={onChange}
+                        onFareCalculated={setFareResult}
+                        errors={errors}
+                      />
+                    )}
+                    {serviceType === "TRAIN" && (
+                      <TrainBookingForm formData={formData} onChange={onChange} errors={errors} />
+                    )}
+                    {serviceType === "BUS" && (
+                      <BusBookingForm formData={formData} onChange={onChange} errors={errors} />
+                    )}
+                    {serviceType === "FLIGHT" && (
+                      <FlightBookingForm formData={formData} onChange={onChange} errors={errors} />
+                    )}
+                    {serviceType === "TOUR" && (
+                      <TourBookingForm
+                        formData={formData}
+                        onChange={onChange}
+                        onFareCalculated={setFareResult}
+                        errors={errors}
+                      />
+                    )}
+                  </div>
+
+                  {/* Continue to Payment Button */}
+                  <div className="flex justify-end pt-4 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={handleGoToPayment}
+                      className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black px-7 py-3.5 rounded-xl shadow-md shadow-amber-500/20 hover:shadow-lg transition-all text-sm"
+                    >
+                      Continue to Payment <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 

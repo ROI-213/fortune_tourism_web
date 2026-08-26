@@ -4,7 +4,7 @@ import { Car, TrainFront, Bus, Plane, Palmtree, CheckCircle2 } from "lucide-reac
 export type ServiceType = "CAB" | "TRAIN" | "BUS" | "FLIGHT" | "TOUR";
 
 interface MultiServiceTypeCardsProps {
-  selectedService: ServiceType;
+  selectedService: ServiceType | null;
   onSelect: (service: ServiceType) => void;
 }
 
