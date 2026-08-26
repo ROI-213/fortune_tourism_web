@@ -301,50 +301,7 @@ function BookingPage() {
 
   return (
     <SiteLayout>
-      <div className="min-h-screen bg-slate-50/70 py-10 px-4">
-        {/* Hero Header */}
-        <div className="text-center mb-8 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-50 border border-amber-200/80 rounded-full text-amber-800 text-xs font-bold mb-3 shadow-xs">
-            <Shield className="w-3.5 h-3.5 text-amber-600" />
-            Trusted by 10,000+ South India Travellers
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
-            Plan Your Journey
-          </h1>
-          <p className="text-slate-600 text-sm">
-            Transparent pricing · Live fare calculation · Instant confirmation
-          </p>
-        </div>
-
-        {/* Step Progress Bar */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <div className="flex items-center justify-between relative">
-            <div className="absolute top-4 left-0 right-0 h-1 bg-slate-200 z-0 rounded-full" />
-            <div
-              className="absolute top-4 left-0 h-1 bg-gradient-to-r from-amber-500 to-amber-600 z-0 rounded-full transition-all duration-500"
-              style={{ width: `${(step / (STEPS.length - 1)) * 100}%` }}
-            />
-            {STEPS.map((s) => (
-              <div key={s.id} className="flex flex-col items-center gap-1.5 z-10">
-                <div
-                  className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-black transition-all shadow-xs ${
-                    s.id < step
-                      ? "bg-amber-500 border-amber-500 text-white"
-                      : s.id === step
-                      ? "bg-white border-amber-500 text-amber-600 ring-4 ring-amber-100"
-                      : "bg-white border-slate-300 text-slate-400"
-                  }`}
-                >
-                  {s.id < step ? <Check className="w-4 h-4 stroke-[3]" /> : s.id + 1}
-                </div>
-                <span className={`text-[11px] font-bold hidden sm:block ${s.id <= step ? "text-slate-800" : "text-slate-400"}`}>
-                  {s.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
+      <div className="min-h-screen bg-slate-50/70 py-8 px-4">
         <div className="max-w-6xl mx-auto">
           {/* STEP 0 — Service Selection */}
           {step === 0 && (
