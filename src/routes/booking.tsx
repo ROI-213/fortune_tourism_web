@@ -827,40 +827,30 @@ function BookingPage() {
                           />
                         </div>
 
-                        {/* 2. Drop Airport Dropdown */}
+                        {/* 2. Drop Airport (Searchable & Editable) */}
                         <div className="md:col-span-3 space-y-1">
                           <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                             DROP AIRPORT
                           </label>
-                          <select
+                          <LocationSearchInput
                             value={airportName}
-                            onChange={(e) => setAirportName(e.target.value)}
-                            className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
-                          >
-                            <option>Terminal 1, Kempegowda International Airport (BLR)</option>
-                            <option>Terminal 2, Kempegowda International Airport (BLR)</option>
-                            <option>Mysuru Airport (MYQ)</option>
-                            <option>Mangaluru Int'l Airport (IXE)</option>
-                          </select>
+                            onChange={setAirportName}
+                            placeholder="Enter Airport / Terminal (e.g. Terminal 1, BLR)"
+                          />
                         </div>
                       </>
                     ) : (
                       <>
-                        {/* 1. Pickup Airport Dropdown */}
+                        {/* 1. Pickup Airport (Searchable & Editable) */}
                         <div className="md:col-span-3 space-y-1">
                           <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                             PICKUP AIRPORT
                           </label>
-                          <select
+                          <LocationSearchInput
                             value={airportName}
-                            onChange={(e) => setAirportName(e.target.value)}
-                            className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
-                          >
-                            <option>Terminal 1, Kempegowda International Airport (BLR)</option>
-                            <option>Terminal 2, Kempegowda International Airport (BLR)</option>
-                            <option>Mysuru Airport (MYQ)</option>
-                            <option>Mangaluru Int'l Airport (IXE)</option>
-                          </select>
+                            onChange={setAirportName}
+                            placeholder="Enter Airport / Terminal (e.g. Terminal 2, BLR)"
+                          />
                         </div>
 
                         {/* 2. Drop Location (Search + GPS) */}

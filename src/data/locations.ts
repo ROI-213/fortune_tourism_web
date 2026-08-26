@@ -14,6 +14,30 @@ export interface LocationItem {
 export const LOCATIONS: LocationItem[] = [
   // --- Bengaluru / Karnataka ---
   {
+    id: "blr-t1-airport",
+    name: "Terminal 1, Kempegowda International Airport (BLR)",
+    normalizedName: "terminal 1 kempegowda international airport blr bangalore t1 kia",
+    city: "Bengaluru",
+    state: "Karnataka",
+    country: "India",
+    code: "BLR-T1",
+    type: "airport",
+    aliases: ["terminal 1", "t1", "blr t1", "kia t1", "kempegowda t1", "bangalore airport t1", "kia", "blr", "airport", "terminal1"],
+    coords: { lat: 13.1986, lng: 77.7066 },
+  },
+  {
+    id: "blr-t2-airport",
+    name: "Terminal 2, Kempegowda International Airport (BLR)",
+    normalizedName: "terminal 2 kempegowda international airport blr bangalore t2 kia",
+    city: "Bengaluru",
+    state: "Karnataka",
+    country: "India",
+    code: "BLR-T2",
+    type: "airport",
+    aliases: ["terminal 2", "t2", "blr t2", "kia t2", "kempegowda t2", "bangalore airport t2", "kia", "blr", "airport", "terminal2"],
+    coords: { lat: 13.2045, lng: 77.712 },
+  },
+  {
     id: "blr-airport",
     name: "Bengaluru (BLR) — Kempegowda International Airport",
     normalizedName: "bengaluru kempegowda international airport blr bangalore",
@@ -22,7 +46,7 @@ export const LOCATIONS: LocationItem[] = [
     country: "India",
     code: "BLR",
     type: "airport",
-    aliases: ["blr", "bengaluru", "bangalore", "kempegowda", "airport", "ben", "banga"],
+    aliases: ["blr", "bengaluru", "bangalore", "kempegowda", "airport", "ben", "banga", "kia"],
     coords: { lat: 13.1986, lng: 77.7066 },
   },
   {
