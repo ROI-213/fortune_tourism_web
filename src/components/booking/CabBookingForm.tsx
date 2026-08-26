@@ -367,24 +367,6 @@ export function CabBookingForm({
           />
         </div>
       </div>
-
-      {/* 5. Vehicle Preference Selector */}
-      <div>
-        <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
-          <Car className="w-3.5 h-3.5 text-amber-600" /> Vehicle Preference
-        </label>
-        <select
-          value={vehicleSlug}
-          onChange={(e) => onChange("vehicle_slug", e.target.value)}
-          className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
-        >
-          <option value="hatchback">Hatchback (Swift / Tiago / WagonR — 4 Seats)</option>
-          <option value="sedan">Prime Sedan (Dzire / Etios / Ciaz — 4 Seats)</option>
-          <option value="suv">Ertiga / SUV (Maruti Ertiga / Carens — 6 Seats)</option>
-          <option value="innova">Innova Crysta (Toyota Innova Crysta — 7 Seats)</option>
-          <option value="tempo">Tempo Traveller (Force 12–17 Seater)</option>
-        </select>
-      </div>
     </div>
   );
 }
