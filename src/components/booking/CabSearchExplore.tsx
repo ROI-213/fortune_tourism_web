@@ -533,38 +533,34 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
           {/* ONE WAY */}
           {searchData.tab === "ONE WAY" && (
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-              {/* FROM */}
-              <div className="md:col-span-3 space-y-1">
-                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                  FROM
-                </label>
-                <div className="relative">
+              {/* FROM + SWAP + TO (Equal 50/50 Symmetrical Width) */}
+              <div className="md:col-span-6 flex items-end gap-2">
+                <div className="flex-1 min-w-0 space-y-1">
+                  <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                    FROM
+                  </label>
                   <LocationSearchInput
                     value={searchData.from}
                     onChange={(val) => setSearchData((prev) => ({ ...prev, from: val }))}
                     placeholder="Enter Pickup Location"
                   />
                 </div>
-              </div>
 
-              {/* Swap Button */}
-              <div className="hidden md:flex md:col-span-1 justify-center items-center pb-1">
-                <button
-                  type="button"
-                  onClick={swapLocations}
-                  className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
-                  title="Swap From and To"
-                >
-                  <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
-                </button>
-              </div>
+                <div className="flex-shrink-0 pb-1">
+                  <button
+                    type="button"
+                    onClick={swapLocations}
+                    className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
+                    title="Swap From and To"
+                  >
+                    <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
+                  </button>
+                </div>
 
-              {/* TO */}
-              <div className="md:col-span-3 space-y-1">
-                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                  TO
-                </label>
-                <div className="relative">
+                <div className="flex-1 min-w-0 space-y-1">
+                  <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                    TO
+                  </label>
                   <LocationSearchInput
                     value={searchData.to}
                     onChange={(val) => setSearchData((prev) => ({ ...prev, to: val }))}
@@ -574,7 +570,7 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
               </div>
 
               {/* PICK UP DATE */}
-              <div className="md:col-span-2 space-y-1">
+              <div className="md:col-span-3 space-y-1">
                 <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                   PICK UP DATE
                 </label>
@@ -605,38 +601,34 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
           {/* ROUND TRIP */}
           {searchData.tab === "ROUND TRIP" && (
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-              {/* FROM */}
-              <div className="md:col-span-3 space-y-1">
-                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                  FROM
-                </label>
-                <div className="relative">
+              {/* FROM + SWAP + TO (Equal 50/50 Symmetrical Width) */}
+              <div className="md:col-span-6 flex items-end gap-2">
+                <div className="flex-1 min-w-0 space-y-1">
+                  <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                    FROM
+                  </label>
                   <LocationSearchInput
                     value={searchData.from}
                     onChange={(val) => setSearchData((prev) => ({ ...prev, from: val }))}
                     placeholder="Enter Pickup Location"
                   />
                 </div>
-              </div>
 
-              {/* Swap Button */}
-              <div className="hidden md:flex md:col-span-1 justify-center items-center pb-1">
-                <button
-                  type="button"
-                  onClick={swapLocations}
-                  className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
-                  title="Swap From and To"
-                >
-                  <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
-                </button>
-              </div>
+                <div className="flex-shrink-0 pb-1">
+                  <button
+                    type="button"
+                    onClick={swapLocations}
+                    className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
+                    title="Swap From and To"
+                  >
+                    <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
+                  </button>
+                </div>
 
-              {/* TO */}
-              <div className="md:col-span-2 space-y-1">
-                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                  TO
-                </label>
-                <div className="relative">
+                <div className="flex-1 min-w-0 space-y-1">
+                  <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                    TO
+                  </label>
                   <LocationSearchInput
                     value={searchData.to}
                     onChange={(val) => setSearchData((prev) => ({ ...prev, to: val }))}

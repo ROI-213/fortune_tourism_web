@@ -555,40 +555,43 @@ function BookingPage() {
                 {/* ONE WAY */}
                 {cabTripType === "ONE WAY" && (
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                    {/* FROM + SWAP + TO (Equal 50/50 Symmetrical Width) */}
+                    <div className="md:col-span-6 flex items-end gap-2">
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                          FROM
+                        </label>
+                        <LocationSearchInput
+                          value={cabFrom}
+                          onChange={setCabFrom}
+                          placeholder="Enter Pickup Location"
+                        />
+                      </div>
+
+                      <div className="flex-shrink-0 pb-1">
+                        <button
+                          type="button"
+                          onClick={swapLocations}
+                          className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
+                          title="Swap Locations"
+                        >
+                          <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
+                        </button>
+                      </div>
+
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                          TO
+                        </label>
+                        <LocationSearchInput
+                          value={cabTo}
+                          onChange={setCabTo}
+                          placeholder="Enter Drop Location"
+                        />
+                      </div>
+                    </div>
+
                     <div className="md:col-span-3 space-y-1">
-                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                        FROM
-                      </label>
-                      <LocationSearchInput
-                        value={cabFrom}
-                        onChange={setCabFrom}
-                        placeholder="Enter Pickup Location"
-                      />
-                    </div>
-
-                    <div className="hidden md:flex md:col-span-1 justify-center items-center pb-1">
-                      <button
-                        type="button"
-                        onClick={swapLocations}
-                        className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
-                        title="Swap Locations"
-                      >
-                        <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
-                      </button>
-                    </div>
-
-                    <div className="md:col-span-3 space-y-1">
-                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                        TO
-                      </label>
-                      <LocationSearchInput
-                        value={cabTo}
-                        onChange={setCabTo}
-                        placeholder="Enter Drop Location"
-                      />
-                    </div>
-
-                    <div className="md:col-span-2 space-y-1">
                       <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                         PICK UP DATE
                       </label>
@@ -618,37 +621,40 @@ function BookingPage() {
                 {/* ROUND TRIP */}
                 {cabTripType === "ROUND TRIP" && (
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-                    <div className="md:col-span-3 space-y-1">
-                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                        FROM
-                      </label>
-                      <LocationSearchInput
-                        value={cabFrom}
-                        onChange={setCabFrom}
-                        placeholder="Enter Pickup Location"
-                      />
-                    </div>
+                    {/* FROM + SWAP + TO (Equal 50/50 Symmetrical Width) */}
+                    <div className="md:col-span-6 flex items-end gap-2">
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                          FROM
+                        </label>
+                        <LocationSearchInput
+                          value={cabFrom}
+                          onChange={setCabFrom}
+                          placeholder="Enter Pickup Location"
+                        />
+                      </div>
 
-                    <div className="hidden md:flex md:col-span-1 justify-center items-center pb-1">
-                      <button
-                        type="button"
-                        onClick={swapLocations}
-                        className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
-                        title="Swap Locations"
-                      >
-                        <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
-                      </button>
-                    </div>
+                      <div className="flex-shrink-0 pb-1">
+                        <button
+                          type="button"
+                          onClick={swapLocations}
+                          className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
+                          title="Swap Locations"
+                        >
+                          <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
+                        </button>
+                      </div>
 
-                    <div className="md:col-span-2 space-y-1">
-                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                        TO
-                      </label>
-                      <LocationSearchInput
-                        value={cabTo}
-                        onChange={setCabTo}
-                        placeholder="Enter Drop Location"
-                      />
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                          TO
+                        </label>
+                        <LocationSearchInput
+                          value={cabTo}
+                          onChange={setCabTo}
+                          placeholder="Enter Drop Location"
+                        />
+                      </div>
                     </div>
 
                     <div className="md:col-span-2 space-y-1">
