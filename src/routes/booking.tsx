@@ -543,8 +543,8 @@ function BookingPage() {
                 </div>
               </div>
 
-              {/* LOCAL HOURLY DROPDOWN (Image 2: 4 hrs | 40 km, 8 hrs | 80 km, 12 hrs | 120 km) */}
-              {cabTripType === "LOCAL" && (
+              {/* LOCAL & ONE WAY HOURLY DROPDOWN (4 hrs | 40 km, 8 hrs | 80 km, 12 hrs | 120 km) */}
+              {(cabTripType === "LOCAL" || cabTripType === "ONE WAY") && (
                 <div className="space-y-2 max-w-md mx-auto pt-2">
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                     <Clock className="w-4 h-4 text-[#00a2d2]" /> Select Local Rental Package *
