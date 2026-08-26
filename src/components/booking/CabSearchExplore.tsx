@@ -514,9 +514,10 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                   key={tab}
                   type="button"
                   onClick={() => setSearchData((prev) => ({ ...prev, tab }))}
+                  style={isActive ? { backgroundColor: "#0E6B50", color: "#ffffff" } : undefined}
                   className={`px-4 sm:px-6 py-2.5 transition-colors uppercase tracking-wider ${
                     isActive
-                      ? "bg-[#00a2d2] text-white font-extrabold shadow-inner"
+                      ? "bg-[#0E6B50] text-white font-extrabold shadow-inner"
                       : "text-slate-700 hover:bg-slate-50 border-r last:border-r-0 border-slate-200"
                   }`}
                 >
@@ -529,8 +530,8 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
 
         {/* Input Fields Row */}
         <div className="pt-2">
-          {/* ONE WAY & ROUND TRIP */}
-          {(searchData.tab === "ONE WAY" || searchData.tab === "ROUND TRIP") && (
+          {/* ONE WAY */}
+          {searchData.tab === "ONE WAY" && (
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
               {/* FROM */}
               <div className="md:col-span-3 space-y-1">
@@ -554,7 +555,7 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                   className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
                   title="Swap From and To"
                 >
-                  <ArrowLeftRight className="w-4 h-4 text-[#00a2d2]" />
+                  <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
                 </button>
               </div>
 
@@ -582,28 +583,12 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                   min={today}
                   value={searchData.pickupDate}
                   onChange={(e) => setSearchData((prev) => ({ ...prev, pickupDate: e.target.value }))}
-                  className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                  className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                 />
               </div>
 
-              {/* RETURN DATE (Only for Round Trip) */}
-              {searchData.tab === "ROUND TRIP" ? (
-                <div className="md:col-span-2 space-y-1">
-                  <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                    RETURN DATE
-                  </label>
-                  <input
-                    type="date"
-                    min={searchData.pickupDate || today}
-                    value={searchData.returnDate}
-                    onChange={(e) => setSearchData((prev) => ({ ...prev, returnDate: e.target.value }))}
-                    className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
-                  />
-                </div>
-              ) : null}
-
               {/* PICK UP TIME */}
-              <div className={searchData.tab === "ROUND TRIP" ? "md:col-span-1 space-y-1" : "md:col-span-3 space-y-1"}>
+              <div className="md:col-span-3 space-y-1">
                 <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                   PICK UP TIME
                 </label>
@@ -611,27 +596,57 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                   type="time"
                   value={searchData.pickupTime}
                   onChange={(e) => setSearchData((prev) => ({ ...prev, pickupTime: e.target.value }))}
-                  className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                  className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                 />
               </div>
             </div>
           )}
 
-          {/* LOCAL */}
-          {searchData.tab === "LOCAL" && (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-              <div className="md:col-span-4 space-y-1">
+          {/* ROUND TRIP */}
+          {searchData.tab === "ROUND TRIP" && (
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+              {/* FROM */}
+              <div className="md:col-span-3 space-y-1">
                 <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                  CITY / PICKUP LOCATION
+                  FROM
                 </label>
-                <LocationSearchInput
-                  value={searchData.from}
-                  onChange={(val) => setSearchData((prev) => ({ ...prev, from: val }))}
-                  placeholder="Enter City (e.g. Bangalore, Indiranagar)"
-                />
+                <div className="relative">
+                  <LocationSearchInput
+                    value={searchData.from}
+                    onChange={(val) => setSearchData((prev) => ({ ...prev, from: val }))}
+                    placeholder="Enter Pickup Location"
+                  />
+                </div>
               </div>
 
-              <div className="md:col-span-4 space-y-1">
+              {/* Swap Button */}
+              <div className="hidden md:flex md:col-span-1 justify-center items-center pb-1">
+                <button
+                  type="button"
+                  onClick={swapLocations}
+                  className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
+                  title="Swap From and To"
+                >
+                  <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
+                </button>
+              </div>
+
+              {/* TO */}
+              <div className="md:col-span-2 space-y-1">
+                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                  TO
+                </label>
+                <div className="relative">
+                  <LocationSearchInput
+                    value={searchData.to}
+                    onChange={(val) => setSearchData((prev) => ({ ...prev, to: val }))}
+                    placeholder="Enter Drop Location"
+                  />
+                </div>
+              </div>
+
+              {/* PICK UP DATE */}
+              <div className="md:col-span-2 space-y-1">
                 <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                   PICK UP DATE
                 </label>
@@ -640,11 +655,93 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                   min={today}
                   value={searchData.pickupDate}
                   onChange={(e) => setSearchData((prev) => ({ ...prev, pickupDate: e.target.value }))}
-                  className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                  className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                 />
               </div>
 
-              <div className="md:col-span-4 space-y-1">
+              {/* RETURN DATE */}
+              <div className="md:col-span-2 space-y-1">
+                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                  RETURN DATE
+                </label>
+                <input
+                  type="date"
+                  min={searchData.pickupDate || today}
+                  value={searchData.returnDate}
+                  onChange={(e) => setSearchData((prev) => ({ ...prev, returnDate: e.target.value }))}
+                  className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                />
+              </div>
+
+              {/* PICK UP TIME */}
+              <div className="md:col-span-2 space-y-1">
+                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800 whitespace-nowrap">
+                  PICK UP TIME
+                </label>
+                <input
+                  type="time"
+                  value={searchData.pickupTime}
+                  onChange={(e) => setSearchData((prev) => ({ ...prev, pickupTime: e.target.value }))}
+                  className="w-full min-w-[100px] bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* LOCAL (With Drop Location and Package in row) */}
+          {searchData.tab === "LOCAL" && (
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+              <div className="md:col-span-3 space-y-1">
+                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                  PICKUP LOCATION
+                </label>
+                <LocationSearchInput
+                  value={searchData.from}
+                  onChange={(val) => setSearchData((prev) => ({ ...prev, from: val }))}
+                  placeholder="Enter Pickup Location"
+                />
+              </div>
+
+              <div className="md:col-span-3 space-y-1">
+                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                  DROP LOCATION
+                </label>
+                <LocationSearchInput
+                  value={searchData.to}
+                  onChange={(val) => setSearchData((prev) => ({ ...prev, to: val }))}
+                  placeholder="Enter Drop Location"
+                />
+              </div>
+
+              <div className="md:col-span-2 space-y-1">
+                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800 flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-emerald-600" /> PACKAGE
+                </label>
+                <select
+                  value={searchData.localPackage}
+                  onChange={(e) => setSearchData((prev) => ({ ...prev, localPackage: e.target.value as any }))}
+                  className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-1 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none cursor-pointer"
+                >
+                  <option value="4hr_40km">4 hrs | 40 km</option>
+                  <option value="8hr_80km">8 hrs | 80 km</option>
+                  <option value="12hr_120km">12 hrs | 120 km</option>
+                </select>
+              </div>
+
+              <div className="md:col-span-2 space-y-1">
+                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                  PICK UP DATE
+                </label>
+                <input
+                  type="date"
+                  min={today}
+                  value={searchData.pickupDate}
+                  onChange={(e) => setSearchData((prev) => ({ ...prev, pickupDate: e.target.value }))}
+                  className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                />
+              </div>
+
+              <div className="md:col-span-2 space-y-1">
                 <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                   PICK UP TIME
                 </label>
@@ -652,7 +749,7 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                   type="time"
                   value={searchData.pickupTime}
                   onChange={(e) => setSearchData((prev) => ({ ...prev, pickupTime: e.target.value }))}
-                  className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                  className="w-full min-w-[100px] bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                 />
               </div>
             </div>
@@ -668,7 +765,7 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                 <select
                   value={searchData.airportTripType}
                   onChange={(e) => setSearchData((prev) => ({ ...prev, airportTripType: e.target.value as any }))}
-                  className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                  className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                 >
                   <option value="Drop to Airport">Drop to Airport</option>
                   <option value="Pickup from Airport">Pickup from Airport</option>
@@ -693,7 +790,7 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                 <select
                   value={searchData.airportName}
                   onChange={(e) => setSearchData((prev) => ({ ...prev, airportName: e.target.value }))}
-                  className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                  className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                 >
                   <option>Terminal 1, Kempegowda International Airport (BLR)</option>
                   <option>Terminal 2, Kempegowda International Airport (BLR)</option>
@@ -711,7 +808,7 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                   min={today}
                   value={searchData.pickupDate}
                   onChange={(e) => setSearchData((prev) => ({ ...prev, pickupDate: e.target.value }))}
-                  className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                  className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                 />
               </div>
 
@@ -723,7 +820,7 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                   type="time"
                   value={searchData.pickupTime}
                   onChange={(e) => setSearchData((prev) => ({ ...prev, pickupTime: e.target.value }))}
-                  className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                  className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                 />
               </div>
             </div>
@@ -780,7 +877,7 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
               onClick={() => {
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className="text-[#00a2d2] hover:text-[#0284c7] font-bold text-xs underline"
+              className="text-emerald-600 hover:text-emerald-700 font-bold text-xs underline"
             >
               Modify Booking
             </button>
@@ -803,7 +900,7 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                       onClick={() => setSearchData((prev) => ({ ...prev, localPackage: pkg.id as any }))}
                       className={`px-5 py-2 transition-colors ${
                         isActive
-                          ? "bg-[#00a2d2] text-white font-black"
+                          ? "bg-emerald-600 text-white font-black"
                           : "text-slate-700 hover:bg-slate-50 border-r last:border-r-0 border-slate-200"
                       }`}
                     >
@@ -815,10 +912,10 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
             </div>
           )}
 
-          {/* Blue Feature Assurance Bar */}
-          <div className="bg-[#00a2d2] text-white rounded-xl py-3 px-4 sm:px-8 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm font-semibold items-center shadow-xs">
+          {/* Green Feature Assurance Bar */}
+          <div className="bg-emerald-600 text-white rounded-xl py-3 px-4 sm:px-8 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm font-semibold items-center shadow-xs">
             <div className="flex items-center gap-2 justify-center sm:justify-start">
-              <IndianRupee className="w-5 h-5 bg-white text-[#00a2d2] rounded-full p-0.5" />
+              <IndianRupee className="w-5 h-5 bg-white text-emerald-600 rounded-full p-0.5" />
               <span>Book Now at Zero Cost</span>
             </div>
             <div className="flex items-center gap-2 justify-center">
@@ -918,7 +1015,7 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                         </span>
                       </div>
 
-                      <div className="text-2xl sm:text-3xl font-black text-[#00a2d2]">
+                      <div className="text-2xl sm:text-3xl font-black text-emerald-700">
                         ₹{finalPrice.toLocaleString()}
                       </div>
 
@@ -937,7 +1034,7 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                   </div>
 
                   {/* Cab with Luggage Carrier Add-on Strip */}
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between bg-sky-50/70 p-2.5 rounded-xl text-xs">
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between bg-emerald-50/70 p-2.5 rounded-xl text-xs">
                     <label className="flex items-center gap-2 cursor-pointer font-medium text-slate-800">
                       <input
                         type="checkbox"
@@ -948,11 +1045,11 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                             [cab.id]: e.target.checked,
                           }))
                         }
-                        className="rounded text-[#00a2d2] focus:ring-[#00a2d2]"
+                        className="rounded text-emerald-600 focus:ring-emerald-600"
                       />
                       <span>🚙 Cab with Luggage Carrier @ ₹149</span>
                     </label>
-                    <span className="text-[11px] text-sky-700 font-bold">Extra Roof Carrier</span>
+                    <span className="text-[11px] text-emerald-700 font-bold">Extra Roof Carrier</span>
                   </div>
                 </div>
               );

@@ -455,6 +455,7 @@ function BookingPage() {
       tripType: cabTripType,
       vehicleOrMode: vehicleDisplay,
       boardingPoint: fromLocationDisplay,
+      serviceType,
     });
     toast.success("Ticket PDF downloaded successfully!");
   };
@@ -535,9 +536,10 @@ function BookingPage() {
                         key={tab}
                         type="button"
                         onClick={() => setCabTripType(tab)}
+                        style={isActive ? { backgroundColor: "#0E6B50", color: "#ffffff" } : undefined}
                         className={`px-3 sm:px-5 py-2.5 transition-colors uppercase tracking-wider ${
                           isActive
-                            ? "bg-[#00a2d2] text-white font-extrabold shadow-inner"
+                            ? "bg-[#0E6B50] text-white font-extrabold shadow-inner"
                             : "text-slate-700 hover:bg-slate-50 border-r last:border-r-0 border-slate-200"
                         }`}
                       >
@@ -548,28 +550,10 @@ function BookingPage() {
                 </div>
               </div>
 
-              {/* LOCAL, ONE WAY & HOURLY PACKAGE DROPDOWN (4 hrs | 40 km, 8 hrs | 80 km, 12 hrs | 120 km) */}
-              {(cabTripType === "LOCAL" || cabTripType === "ONE WAY" || cabTripType === "HOURLY PACKAGE") && (
-                <div className="space-y-2 max-w-md mx-auto pt-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-[#00a2d2]" /> Select Hourly Rental Package *
-                  </label>
-                  <select
-                    value={localPackage}
-                    onChange={(e) => setLocalPackage(e.target.value as any)}
-                    className="w-full bg-white border-2 border-[#00a2d2] rounded-xl px-4 py-3 text-sm font-black text-slate-900 focus:ring-2 focus:ring-[#00a2d2] outline-none shadow-xs cursor-pointer"
-                  >
-                    <option value="4hr_40km">4 hrs | 40 km (Short City Errands)</option>
-                    <option value="8hr_80km">8 hrs | 80 km (Full Day City Travel & Shopping)</option>
-                    <option value="12hr_120km">12 hrs | 120 km (Extended Day Rental)</option>
-                  </select>
-                </div>
-              )}
-
               {/* INPUT FIELDS ROW */}
               <div className="pt-2">
-                {/* ONE WAY & ROUND TRIP */}
-                {(cabTripType === "ONE WAY" || cabTripType === "ROUND TRIP") && (
+                {/* ONE WAY */}
+                {cabTripType === "ONE WAY" && (
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
                     <div className="md:col-span-3 space-y-1">
                       <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
@@ -589,7 +573,7 @@ function BookingPage() {
                         className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
                         title="Swap Locations"
                       >
-                        <ArrowLeftRight className="w-4 h-4 text-[#00a2d2]" />
+                        <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
                       </button>
                     </div>
 
@@ -613,26 +597,11 @@ function BookingPage() {
                         min={today}
                         value={cabDate}
                         onChange={(e) => setCabDate(e.target.value)}
-                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                       />
                     </div>
 
-                    {cabTripType === "ROUND TRIP" ? (
-                      <div className="md:col-span-2 space-y-1">
-                        <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                          RETURN DATE
-                        </label>
-                        <input
-                          type="date"
-                          min={cabDate || today}
-                          value={cabReturnDate}
-                          onChange={(e) => setCabReturnDate(e.target.value)}
-                          className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
-                        />
-                      </div>
-                    ) : null}
-
-                    <div className={cabTripType === "ROUND TRIP" ? "md:col-span-1 space-y-1" : "md:col-span-3 space-y-1"}>
+                    <div className="md:col-span-3 space-y-1">
                       <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                         PICK UP TIME
                       </label>
@@ -640,27 +609,49 @@ function BookingPage() {
                         type="time"
                         value={cabTime}
                         onChange={(e) => setCabTime(e.target.value)}
-                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                       />
                     </div>
                   </div>
                 )}
 
-                {/* LOCAL & HOURLY PACKAGE */}
-                {(cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") && (
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                    <div className="md:col-span-4 space-y-1">
+                {/* ROUND TRIP */}
+                {cabTripType === "ROUND TRIP" && (
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                    <div className="md:col-span-3 space-y-1">
                       <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                        CITY / PICKUP LOCATION
+                        FROM
                       </label>
                       <LocationSearchInput
                         value={cabFrom}
                         onChange={setCabFrom}
-                        placeholder="Enter City (e.g. Bangalore, Indiranagar)"
+                        placeholder="Enter Pickup Location"
                       />
                     </div>
 
-                    <div className="md:col-span-4 space-y-1">
+                    <div className="hidden md:flex md:col-span-1 justify-center items-center pb-1">
+                      <button
+                        type="button"
+                        onClick={swapLocations}
+                        className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors shadow-2xs"
+                        title="Swap Locations"
+                      >
+                        <ArrowLeftRight className="w-4 h-4 text-emerald-600" />
+                      </button>
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        TO
+                      </label>
+                      <LocationSearchInput
+                        value={cabTo}
+                        onChange={setCabTo}
+                        placeholder="Enter Drop Location"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
                       <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                         PICK UP DATE
                       </label>
@@ -669,11 +660,91 @@ function BookingPage() {
                         min={today}
                         value={cabDate}
                         onChange={(e) => setCabDate(e.target.value)}
-                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                       />
                     </div>
 
-                    <div className="md:col-span-4 space-y-1">
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        RETURN DATE
+                      </label>
+                      <input
+                        type="date"
+                        min={cabDate || today}
+                        value={cabReturnDate}
+                        onChange={(e) => setCabReturnDate(e.target.value)}
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800 whitespace-nowrap">
+                        PICK UP TIME
+                      </label>
+                      <input
+                        type="time"
+                        value={cabTime}
+                        onChange={(e) => setCabTime(e.target.value)}
+                        className="w-full min-w-[100px] bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* LOCAL & HOURLY PACKAGE (Package in row + Drop Location) */}
+                {(cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") && (
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                    <div className="md:col-span-3 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        PICKUP LOCATION
+                      </label>
+                      <LocationSearchInput
+                        value={cabFrom}
+                        onChange={setCabFrom}
+                        placeholder="Enter Pickup Location"
+                      />
+                    </div>
+
+                    <div className="md:col-span-3 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        DROP LOCATION
+                      </label>
+                      <LocationSearchInput
+                        value={cabTo}
+                        onChange={setCabTo}
+                        placeholder="Enter Drop Location"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800 flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-emerald-600" /> PACKAGE
+                      </label>
+                      <select
+                        value={localPackage}
+                        onChange={(e) => setLocalPackage(e.target.value as any)}
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-1 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none cursor-pointer"
+                      >
+                        <option value="4hr_40km">4 hrs | 40 km</option>
+                        <option value="8hr_80km">8 hrs | 80 km</option>
+                        <option value="12hr_120km">12 hrs | 120 km</option>
+                      </select>
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
+                      <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                        PICK UP DATE
+                      </label>
+                      <input
+                        type="date"
+                        min={today}
+                        value={cabDate}
+                        onChange={(e) => setCabDate(e.target.value)}
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 space-y-1">
                       <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
                         PICK UP TIME
                       </label>
@@ -681,7 +752,7 @@ function BookingPage() {
                         type="time"
                         value={cabTime}
                         onChange={(e) => setCabTime(e.target.value)}
-                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                        className="w-full min-w-[100px] bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                       />
                     </div>
                   </div>
@@ -697,7 +768,7 @@ function BookingPage() {
                       <select
                         value={airportTripType}
                         onChange={(e) => setAirportTripType(e.target.value as any)}
-                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                       >
                         <option value="Drop to Airport">Drop to Airport</option>
                         <option value="Pickup from Airport">Pickup from Airport</option>
@@ -722,7 +793,7 @@ function BookingPage() {
                       <select
                         value={airportName}
                         onChange={(e) => setAirportName(e.target.value)}
-                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                       >
                         <option>Terminal 1, Kempegowda International Airport (BLR)</option>
                         <option>Terminal 2, Kempegowda International Airport (BLR)</option>
@@ -740,7 +811,7 @@ function BookingPage() {
                         min={today}
                         value={cabDate}
                         onChange={(e) => setCabDate(e.target.value)}
-                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                       />
                     </div>
 
@@ -752,7 +823,7 @@ function BookingPage() {
                         type="time"
                         value={cabTime}
                         onChange={(e) => setCabTime(e.target.value)}
-                        className="w-full bg-white border-b-2 border-slate-300 focus:border-[#00a2d2] px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                        className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
                       />
                     </div>
                   </div>
@@ -899,7 +970,7 @@ function BookingPage() {
                         </div>
 
                         <div className="md:col-span-4 flex flex-col items-end justify-center space-y-2 border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-4 text-right">
-                          <div className="text-2xl font-black text-[#00a2d2]">
+                          <div className="text-2xl font-black text-emerald-700">
                             ₹{price.toLocaleString()}
                           </div>
                           <div className="text-[11px] text-slate-400 font-medium">
@@ -929,17 +1000,17 @@ function BookingPage() {
               </div>
 
               {/* Luggage Carrier Add-on */}
-              <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl flex items-center justify-between text-xs">
+              <div className="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl flex items-center justify-between text-xs">
                 <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-800">
                   <input
                     type="checkbox"
                     checked={withLuggageCarrier}
                     onChange={(e) => setWithLuggageCarrier(e.target.checked)}
-                    className="rounded text-[#00a2d2] focus:ring-[#00a2d2]"
+                    className="rounded text-emerald-600 focus:ring-emerald-600"
                   />
                   <span>🚙 Add Roof Luggage Carrier @ ₹149</span>
                 </label>
-                <span className="text-sky-800 font-extrabold">+₹149 Extra</span>
+                <span className="text-emerald-800 font-extrabold">+₹149 Extra</span>
               </div>
 
               {/* Bottom Continue to Passenger Details Button */}
@@ -1002,7 +1073,7 @@ function BookingPage() {
 
                 <div className="text-right shrink-0">
                   <span className="text-[10px] font-bold text-slate-400 block">TOTAL FARE</span>
-                  <div className="text-2xl font-black text-[#00a2d2]">
+                  <div className="text-2xl font-black text-emerald-700">
                     ₹{calculatedFare.toLocaleString()}
                   </div>
                 </div>
@@ -1088,27 +1159,6 @@ function BookingPage() {
                 </button>
               </div>
 
-              {/* Booking Summary Box */}
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                    PASSENGER & VEHICLE
-                  </span>
-                  <div className="font-black text-slate-900 text-base sm:text-lg">
-                    {passengerName || "Guest"} ({passengerPhone}) · {vehicleDisplay}
-                  </div>
-                  <div className="text-xs text-slate-600 font-medium">
-                    {fromLocationDisplay} → {toLocationDisplay} · {departureDateFormatted} · {cabTripType}
-                  </div>
-                </div>
-
-                <div className="text-right shrink-0">
-                  <span className="text-[10px] font-bold text-slate-400 block">TOTAL FARE</span>
-                  <div className="text-2xl font-black text-[#00a2d2]">
-                    ₹{calculatedFare.toLocaleString()}
-                  </div>
-                </div>
-              </div>
 
               {/* Payment Options */}
               <div className="space-y-4">
@@ -1416,7 +1466,15 @@ function BookingPage() {
                           {cabTripType}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 whitespace-nowrap">
-                          Type Of Car:/bus/Flight
+                          {serviceType === "FLIGHT"
+                            ? "Type Of Flight:"
+                            : serviceType === "BUS"
+                            ? "Type Of Bus:"
+                            : serviceType === "TRAIN"
+                            ? "Type Of Train:"
+                            : serviceType === "TOUR"
+                            ? "Tour Package:"
+                            : "Type Of Cab:"}
                         </td>
                         <td className="p-2.5 font-black text-slate-900 uppercase">
                           {vehicleDisplay}

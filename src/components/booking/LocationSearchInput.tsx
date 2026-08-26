@@ -3,7 +3,7 @@ import { MapPin, Navigation, Check, Loader2 } from "lucide-react";
 import { searchLocations, detectUserLocation, type LocationItem } from "@/data/locations";
 
 interface LocationSearchInputProps {
-  label: string;
+  label?: string;
   placeholder?: string;
   value: string;
   onChange: (val: string, loc?: LocationItem) => void;
@@ -90,18 +90,43 @@ export function LocationSearchInput({
 
   const handleDetectLocation = async () => {
     setIsDetecting(true);
-    setDetectMsg("Detecting current location...");
-    const res = await detectUserLocation();
-    setIsDetecting(false);
+    setDetectMsg("Detecting your live GPS location...");
+    toast.info("Detecting your live GPS location...", { id: "gps-status" });
+    try {
+      const res = await detectUserLocation();
+      setIsDetecting(false);
 
-    if (res.success && res.location) {
-      setDetectMsg(`Detected: ${res.location.name}`);
-      handleSelect(res.location);
-    } else if (res.error) {
-      setDetectMsg(res.error);
+      if (res.success && res.location) {
+        setDetectMsg(`📍 Located: ${res.location.name}`);
+        setQuery(res.location.name);
+        onChange(res.location.name, res.location);
+        toast.success(`📍 Live Location Detected: ${res.location.name}`, { id: "gps-status" });
+        setTimeout(() => {
+          setIsOpen(false);
+          setDetectMsg(null);
+        }, 1200);
+      } else {
+        const fallbackName = res.cityName || "Bangalore, Karnataka";
+        setQuery(fallbackName);
+        onChange(fallbackName);
+        toast.success(`📍 Location: ${fallbackName}`, { id: "gps-status" });
+        setDetectMsg(`📍 Located: ${fallbackName}`);
+        setTimeout(() => {
+          setIsOpen(false);
+          setDetectMsg(null);
+        }, 1200);
+      }
+    } catch {
+      setIsDetecting(false);
+      setDetectMsg("Using Bangalore as default location");
+      setQuery("Bangalore, Karnataka");
+      onChange("Bangalore, Karnataka");
+      toast.info("Location set to Bangalore", { id: "gps-status" });
+      setTimeout(() => {
+        setIsOpen(false);
+        setDetectMsg(null);
+      }, 1200);
     }
-
-    setTimeout(() => setDetectMsg(null), 4000);
   };
 
   // Helper to highlight matched substring
@@ -112,7 +137,7 @@ export function LocationSearchInput({
       <span>
         {parts.map((part, i) =>
           part.toLowerCase() === search.trim().toLowerCase() ? (
-            <span key={i} className="bg-amber-100 text-amber-900 font-bold px-0.5 rounded">
+            <span key={i} className="bg-emerald-100 text-emerald-900 font-bold px-0.5 rounded">
               {part}
             </span>
           ) : (
@@ -125,21 +150,23 @@ export function LocationSearchInput({
 
   return (
     <div ref={wrapperRef} className={`relative flex-1 ${className}`}>
-      <label className="block text-[11px] font-bold tracking-wider text-slate-500 uppercase mb-1">
-        {label}
-      </label>
+      {label && (
+        <label className="block text-[11px] font-bold tracking-wider text-slate-500 uppercase mb-1">
+          {label}
+        </label>
+      )}
 
       <div
-        className={`relative flex items-center bg-white rounded-2xl border transition-all duration-200 ${
+        className={`relative flex items-center bg-white rounded-xl sm:rounded-2xl border transition-all duration-200 ${
           error
             ? "border-red-500 ring-2 ring-red-100"
             : isOpen
-              ? "border-amber-500 ring-2 ring-amber-100 shadow-md"
+              ? "border-emerald-600 ring-2 ring-emerald-100 shadow-md"
               : "border-slate-300 hover:border-slate-400"
         }`}
       >
         <div className="pl-3.5 pr-2 text-slate-400">
-          <Icon className="h-4 w-4" />
+          <Icon className="h-4 w-4 text-slate-500" />
         </div>
 
         <input
@@ -157,23 +184,39 @@ export function LocationSearchInput({
           aria-expanded={isOpen}
           aria-autocomplete="list"
           aria-controls={listboxId}
-          className="w-full py-3 pr-9 font-semibold text-slate-900 text-sm focus:outline-none bg-transparent placeholder:text-slate-400 placeholder:font-normal"
+          className="w-full py-3 pr-16 font-semibold text-slate-900 text-xs sm:text-sm focus:outline-none bg-transparent placeholder:text-slate-400 placeholder:font-normal"
         />
 
-        {query && (
+        <div className="absolute right-2 flex items-center gap-1">
+          {query ? (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                onChange("");
+                inputRef.current?.focus();
+              }}
+              className="text-slate-400 hover:text-slate-600 text-xs font-bold p-1"
+              title="Clear input"
+            >
+              ✕
+            </button>
+          ) : null}
+
           <button
             type="button"
-            onClick={() => {
-              setQuery("");
-              onChange("");
-              inputRef.current?.focus();
-            }}
-            className="absolute right-3 text-slate-400 hover:text-slate-600 text-xs font-bold p-1"
-            title="Clear input"
+            onClick={handleDetectLocation}
+            disabled={isDetecting}
+            title="Detect Live GPS Location"
+            className="p-1 rounded-md text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 transition"
           >
-            ✕
+            {isDetecting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-600" />
+            ) : (
+              <Navigation className="h-3.5 w-3.5 text-emerald-600 fill-emerald-50" />
+            )}
           </button>
-        )}
+        </div>
       </div>
 
       {error && <span className="block text-[11px] font-medium text-red-500 mt-1">{error}</span>}
@@ -190,7 +233,7 @@ export function LocationSearchInput({
             type="button"
             onClick={handleDetectLocation}
             disabled={isDetecting}
-            className="w-full px-4 py-3 flex items-center justify-between text-left text-xs font-bold text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100 transition"
+            className="w-full px-4 py-3 flex items-center justify-between text-left text-xs font-bold text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100 transition cursor-pointer"
           >
             <div className="flex items-center gap-2">
               {isDetecting ? (
@@ -201,13 +244,14 @@ export function LocationSearchInput({
               <span>📍 Use Current Location</span>
             </div>
             <span className="text-[10px] bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded-full font-bold">
-              GPS
+              {isDetecting ? "Detecting..." : "GPS"}
             </span>
           </button>
 
           {detectMsg && (
-            <div className="px-4 py-2 bg-slate-800 text-white text-[11px] font-medium animate-fadeIn">
-              {detectMsg}
+            <div className="px-4 py-2 bg-slate-900 text-white text-[11px] font-medium animate-fadeIn flex items-center gap-2">
+              {isDetecting && <Loader2 className="h-3 w-3 animate-spin text-emerald-400" />}
+              <span>{detectMsg}</span>
             </div>
           )}
 
@@ -226,7 +270,7 @@ export function LocationSearchInput({
                   onClick={() => handleSelect(item)}
                   onMouseEnter={() => setSelectedIndex(idx)}
                   className={`px-4 py-3 cursor-pointer flex items-center justify-between transition ${
-                    isSelected ? "bg-amber-50 text-amber-900" : "hover:bg-slate-50 text-slate-800"
+                    isSelected ? "bg-emerald-50 text-emerald-950 font-semibold" : "hover:bg-slate-50 text-slate-800"
                   }`}
                 >
                   <div className="flex items-start gap-2.5">

@@ -14,6 +14,8 @@ export interface TicketCopyData {
   tripType: string;
   vehicleOrMode: string;
   boardingPoint: string;
+  serviceType?: string;
+  vehicleLabel?: string;
 }
 
 export function downloadTicketCopyPDF(data: TicketCopyData) {
@@ -79,7 +81,20 @@ export function downloadTicketCopyPDF(data: TicketCopyData) {
       [
         { content: "Trip Type:", styles: { fontStyle: "bold", fillColor: [245, 245, 245] } },
         { content: (data.tripType || "PACKAGE").toUpperCase(), styles: { fontStyle: "bold" } },
-        { content: "Type Of Car:/bus/Flight", styles: { fontStyle: "bold", fillColor: [245, 245, 245] } },
+        {
+          content:
+            data.vehicleLabel ||
+            (data.serviceType === "FLIGHT"
+              ? "Type Of Flight:"
+              : data.serviceType === "BUS"
+              ? "Type Of Bus:"
+              : data.serviceType === "TRAIN"
+              ? "Type Of Train:"
+              : data.serviceType === "TOUR"
+              ? "Tour Package:"
+              : "Type Of Cab:"),
+          styles: { fontStyle: "bold", fillColor: [245, 245, 245] },
+        },
         { content: (data.vehicleOrMode || "MARUTI SUZUKI CIAZ").toUpperCase(), styles: { fontStyle: "bold" } },
         { content: "Boarding point:", styles: { fontStyle: "bold", fillColor: [245, 245, 245] } },
         { content: (data.boardingPoint || "BANGALORE AIRPORT").toUpperCase(), styles: { fontStyle: "bold" } },

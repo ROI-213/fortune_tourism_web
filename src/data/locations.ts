@@ -361,7 +361,228 @@ export function searchLocations(
 }
 
 /**
- * Detect Nearest Location using Geolocation API
+ * Reverse geocode latitude and longitude to real location/area details using public CORS geocoding services
+ */
+async function reverseGeocodeCoords(
+  latitude: number,
+  longitude: number,
+): Promise<{ name: string; city: string; state: string; country: string } | null> {
+  // 1. Try BigDataCloud reverse geocode client API (fast, CORS enabled, no API key required)
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
+      { signal: controller.signal },
+    );
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      const locality =
+        data.locality ||
+        data.localityInfo?.administrative?.[3]?.name ||
+        data.localityInfo?.administrative?.[2]?.name ||
+        "";
+      const city = data.city || data.principalSubdivision || "";
+      const state = data.principalSubdivision || "";
+      const country = data.countryName || "India";
+
+      let name = "";
+      if (locality && city && locality !== city) {
+        name = `${locality}, ${city}`;
+      } else if (city && state && city !== state) {
+        name = `${city}, ${state}`;
+      } else {
+        name = locality || city || state || "Current Location";
+      }
+
+      return {
+        name,
+        city: city || locality || "Bengaluru",
+        state: state || "Karnataka",
+        country,
+      };
+    }
+  } catch {
+    // Continue to next fallback
+  }
+
+  // 2. Try OpenStreetMap Nominatim reverse geocoding
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=14&addressdetails=1`,
+      {
+        headers: { "Accept-Language": "en" },
+        signal: controller.signal,
+      },
+    );
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      const addr = data.address || {};
+      const suburb = addr.suburb || addr.neighbourhood || addr.residential || addr.quarter || "";
+      const city = addr.city || addr.town || addr.municipality || addr.village || addr.county || "";
+      const state = addr.state || "";
+      const country = addr.country || "India";
+
+      let name = "";
+      if (suburb && city) {
+        name = `${suburb}, ${city}`;
+      } else if (city) {
+        name = state ? `${city}, ${state}` : city;
+      } else {
+        name = data.display_name?.split(",")?.slice(0, 2)?.join(",") || "Current Location";
+      }
+
+      return {
+        name,
+        city: city || suburb || "Bengaluru",
+        state: state || "Karnataka",
+        country,
+      };
+    }
+  } catch {
+    // Continue
+  }
+
+  return null;
+}
+
+/**
+ * Fallback to IP-based Geolocation when browser GPS is blocked, unavailable, or times out
+ */
+async function detectByIp(): Promise<{
+  success: boolean;
+  location?: LocationItem;
+  cityName?: string;
+  error?: string;
+}> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch("https://ipapi.co/json/", { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.city) {
+        const city = data.city;
+        const state = data.region || data.region_code || "Karnataka";
+        const country = data.country_name || "India";
+        const displayName = state ? `${city}, ${state}` : city;
+
+        const locItem: LocationItem = {
+          id: `ip-${Date.now()}`,
+          name: displayName,
+          normalizedName: displayName.toLowerCase(),
+          city,
+          state,
+          country,
+          type: "area",
+          aliases: [city.toLowerCase(), state.toLowerCase()],
+          coords:
+            data.latitude && data.longitude
+              ? { lat: data.latitude, lng: data.longitude }
+              : undefined,
+        };
+
+        return { success: true, location: locItem, cityName: city };
+      }
+    }
+  } catch {
+    // Try secondary IP lookup service
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch("https://ipwho.is/", { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.city) {
+          const city = data.city;
+          const state = data.region || "Karnataka";
+          const country = data.country || "India";
+          const displayName = state ? `${city}, ${state}` : city;
+
+          const locItem: LocationItem = {
+            id: `ip-${Date.now()}`,
+            name: displayName,
+            normalizedName: displayName.toLowerCase(),
+            city,
+            state,
+            country,
+            type: "area",
+            aliases: [city.toLowerCase(), state.toLowerCase()],
+            coords:
+              data.latitude && data.longitude
+                ? { lat: data.latitude, lng: data.longitude }
+                : undefined,
+          };
+
+          return { success: true, location: locItem, cityName: city };
+        }
+      }
+    } catch {
+      // Continue
+    }
+  }
+
+  return {
+    success: false,
+    error: "Location access disabled or unavailable. Please select your location manually.",
+  };
+}
+
+/**
+ * Obtain browser coordinates with high-accuracy and standard-accuracy retry mechanisms
+ */
+function getBrowserCoordinates(): Promise<{ latitude: number; longitude: number } | null> {
+  return new Promise((resolve) => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      resolve(null);
+      return;
+    }
+
+    let settled = false;
+
+    // Step 1: Try high accuracy GPS (fast 5s limit)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (!settled) {
+          settled = true;
+          resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+        }
+      },
+      () => {
+        // Step 2: High accuracy failed or timed out, try standard WiFi / cell tower positioning
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            if (!settled) {
+              settled = true;
+              resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+            }
+          },
+          () => {
+            if (!settled) {
+              settled = true;
+              resolve(null);
+            }
+          },
+          { timeout: 5000, enableHighAccuracy: false, maximumAge: 120000 },
+        );
+      },
+      { timeout: 5000, enableHighAccuracy: true, maximumAge: 60000 },
+    );
+  });
+}
+
+/**
+ * Detect Nearest / Live User Location using Browser Geolocation with Reverse Geocoding and IP fallback
  */
 export async function detectUserLocation(): Promise<{
   success: boolean;
@@ -369,47 +590,68 @@ export async function detectUserLocation(): Promise<{
   cityName?: string;
   error?: string;
 }> {
-  return new Promise((resolve) => {
-    if (!navigator.geolocation) {
-      resolve({
-        success: false,
-        error: "Geolocation is not supported by your browser.",
-      });
-      return;
-    }
+  try {
+    const coords = await getBrowserCoordinates();
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
+    if (coords) {
+      const { latitude, longitude } = coords;
 
-        // Find closest known location in our database
-        let minDistance = Infinity;
-        let closestLocation: LocationItem = LOCATIONS[0]; // default Bengaluru
+      // 1. Try reverse geocoding to retrieve actual locality/suburb/city
+      const geoResult = await reverseGeocodeCoords(latitude, longitude);
+      if (geoResult) {
+        const liveLocation: LocationItem = {
+          id: `gps-${Date.now()}`,
+          name: geoResult.name,
+          normalizedName: geoResult.name.toLowerCase(),
+          city: geoResult.city,
+          state: geoResult.state,
+          country: geoResult.country,
+          type: "area",
+          aliases: [geoResult.city.toLowerCase(), geoResult.state.toLowerCase()],
+          coords: { lat: latitude, lng: longitude },
+        };
+        return {
+          success: true,
+          location: liveLocation,
+          cityName: geoResult.city,
+        };
+      }
 
-        for (const loc of LOCATIONS) {
-          if (loc.coords) {
-            const dist = Math.hypot(loc.coords.lat - latitude, loc.coords.lng - longitude);
-            if (dist < minDistance) {
-              minDistance = dist;
-              closestLocation = loc;
-            }
+      // 2. If reverse geocoding networks are unreachable, find the nearest preset location
+      let minDistance = Infinity;
+      let closestLocation: LocationItem = LOCATIONS[0];
+
+      for (const loc of LOCATIONS) {
+        if (loc.coords) {
+          const dist = Math.hypot(loc.coords.lat - latitude, loc.coords.lng - longitude);
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestLocation = loc;
           }
         }
+      }
 
-        resolve({
-          success: true,
-          location: closestLocation,
-          cityName: closestLocation.city,
-        });
-      },
-      (error) => {
-        let msg = "Unable to retrieve location.";
-        if (error.code === error.PERMISSION_DENIED) {
-          msg = "Location permission denied. Please select your location manually.";
-        }
-        resolve({ success: false, error: msg });
-      },
-      { timeout: 10000, enableHighAccuracy: true },
-    );
-  });
+      return {
+        success: true,
+        location: closestLocation,
+        cityName: closestLocation.city,
+      };
+    }
+
+    // 3. If GPS is unavailable/denied, fallback to IP detection
+    const ipResult = await detectByIp();
+    if (ipResult.success) {
+      return ipResult;
+    }
+
+    return {
+      success: false,
+      error: "Location access disabled or unavailable. Please enter pickup location manually.",
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: err?.message || "Unable to detect location. Please type manually.",
+    };
+  }
 }
