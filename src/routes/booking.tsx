@@ -227,12 +227,16 @@ function BookingPage() {
 
     const e: Record<string, string> = {};
 
-    if (!formData.date) e.date = "Travel date is required.";
-
     if (serviceType === "CAB") {
-      if (!formData.pickup?.trim()) e.pickup = "Pickup location is required.";
-      if (!formData.destination?.trim()) e.destination = "Drop location is required.";
+      if (formData.trip_type !== "Local") {
+        if (!formData.date) e.date = "Travel date is required.";
+        if (!formData.pickup?.trim()) e.pickup = "Pickup location is required.";
+        if (!formData.destination?.trim()) e.destination = "Drop location is required.";
+      }
+    } else {
+      if (!formData.date) e.date = "Travel date is required.";
     }
+
     if (serviceType === "TRAIN") {
       if (!formData.from_station?.trim()) e.from_station = "Departure station is required.";
       if (!formData.to_station?.trim()) e.to_station = "Destination station is required.";
