@@ -407,20 +407,6 @@ function BookingPage() {
                   />
                 )}
 
-                {/* Special Notes */}
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
-                    <MessageCircle className="w-3.5 h-3.5 text-slate-500" /> Special Requirements / Notes
-                  </label>
-                  <textarea
-                    rows={2}
-                    placeholder="Any special requirements, landmark or additional information..."
-                    value={formData.notes}
-                    onChange={(e) => onChange("notes", e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none resize-none transition-all"
-                  />
-                </div>
-
                 {/* Next Step Button */}
                 <div className="flex justify-end pt-4 border-t border-slate-100">
                   <button
