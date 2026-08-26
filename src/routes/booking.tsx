@@ -216,10 +216,6 @@ function BookingPage() {
   const validateForm = (): boolean => {
     const e: Record<string, string> = {};
 
-    if (!formData.name?.trim()) e.name = "Full name is required.";
-    if (!formData.phone?.trim() || !/^[6-9]\d{9}$/.test(formData.phone.replace(/\s+/g, ""))) {
-      e.phone = "Enter a valid 10-digit Indian mobile number.";
-    }
     if (!formData.date) e.date = "Travel date is required.";
 
     if (serviceType === "CAB") {
@@ -362,7 +358,7 @@ function BookingPage() {
       <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6">
 
-          {/* STEP 0 — Service, Contact & Journey Details */}
+          {/* STEP 0 — Service & Journey Details */}
           {step === 0 && (
             <div className="space-y-6">
               {/* Service Selection */}
@@ -376,113 +372,40 @@ function BookingPage() {
                 />
               </div>
 
-              {/* Passenger Contact & Journey Form */}
+              {/* Journey Form */}
               <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-                {/* Passenger Contact Header */}
-                <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-                  <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 font-bold">
-                    <User className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h2 className="font-extrabold text-slate-900 text-lg">Passenger & Contact Details</h2>
-                    <p className="text-xs text-slate-500">Details for ticket copy and journey confirmation</p>
-                  </div>
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
+                    {SERVICE_LABELS[serviceType]}
+                  </span>
+                  <span className="text-slate-500 text-xs font-medium">Select Pickup, Drop & Travel Schedule</span>
                 </div>
 
-                {/* Name & Phone Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
-                      <User className="w-3.5 h-3.5 text-amber-600" /> Passenger Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Fortune Group / Rajesh Kumar"
-                      value={formData.name}
-                      onChange={(e) => onChange("name", e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
-                    />
-                    {errors.name && <p className="text-xs text-red-600 font-medium mt-1">{errors.name}</p>}
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
-                      <Phone className="w-3.5 h-3.5 text-amber-600" /> Passenger Phone No. *
-                    </label>
-                    <input
-                      type="tel"
-                      placeholder="10-digit mobile number (e.g. 9845003000)"
-                      value={formData.phone}
-                      onChange={(e) => onChange("phone", e.target.value)}
-                      maxLength={10}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
-                    />
-                    {errors.phone && <p className="text-xs text-red-600 font-medium mt-1">{errors.phone}</p>}
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
-                      <Mail className="w-3.5 h-3.5 text-slate-500" /> Email Address
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="Optional — for ticket receipt"
-                      value={formData.email}
-                      onChange={(e) => onChange("email", e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 mb-1.5">
-                      <Users className="w-3.5 h-3.5 text-amber-600" /> Number of Passengers
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="50"
-                      value={formData.adults || 2}
-                      onChange={(e) => onChange("adults", e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* Journey Specific Form */}
-                <div className="pt-4 border-t border-slate-100 space-y-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
-                      {SERVICE_LABELS[serviceType]}
-                    </span>
-                    <span className="text-slate-500 text-xs font-medium">Route & Schedule</span>
-                  </div>
-
-                  {serviceType === "CAB" && (
-                    <CabBookingForm
-                      formData={formData}
-                      onChange={onChange}
-                      onFareCalculated={setFareResult}
-                      errors={errors}
-                    />
-                  )}
-                  {serviceType === "TRAIN" && (
-                    <TrainBookingForm formData={formData} onChange={onChange} errors={errors} />
-                  )}
-                  {serviceType === "BUS" && (
-                    <BusBookingForm formData={formData} onChange={onChange} errors={errors} />
-                  )}
-                  {serviceType === "FLIGHT" && (
-                    <FlightBookingForm formData={formData} onChange={onChange} errors={errors} />
-                  )}
-                  {serviceType === "TOUR" && (
-                    <TourBookingForm
-                      formData={formData}
-                      onChange={onChange}
-                      onFareCalculated={setFareResult}
-                      errors={errors}
-                    />
-                  )}
-                </div>
+                {serviceType === "CAB" && (
+                  <CabBookingForm
+                    formData={formData}
+                    onChange={onChange}
+                    onFareCalculated={setFareResult}
+                    errors={errors}
+                  />
+                )}
+                {serviceType === "TRAIN" && (
+                  <TrainBookingForm formData={formData} onChange={onChange} errors={errors} />
+                )}
+                {serviceType === "BUS" && (
+                  <BusBookingForm formData={formData} onChange={onChange} errors={errors} />
+                )}
+                {serviceType === "FLIGHT" && (
+                  <FlightBookingForm formData={formData} onChange={onChange} errors={errors} />
+                )}
+                {serviceType === "TOUR" && (
+                  <TourBookingForm
+                    formData={formData}
+                    onChange={onChange}
+                    onFareCalculated={setFareResult}
+                    errors={errors}
+                  />
+                )}
 
                 {/* Special Notes */}
                 <div>
@@ -591,14 +514,26 @@ function BookingPage() {
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 w-36 whitespace-nowrap">
                           Passenger Name:
                         </td>
-                        <td className="p-2.5 font-black text-slate-900 uppercase">
-                          {formData.name || "FORTUNE GROUP"}
+                        <td className="p-2.5">
+                          <input
+                            type="text"
+                            placeholder="FORTUNE GROUP"
+                            value={formData.name}
+                            onChange={(e) => onChange("name", e.target.value)}
+                            className="w-full font-black text-slate-900 uppercase bg-transparent outline-none border-b border-transparent focus:border-amber-500"
+                          />
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 w-40 whitespace-nowrap">
                           Passenger Phone No.:
                         </td>
-                        <td className="p-2.5 font-bold text-slate-900">
-                          {formData.phone || "9845003000"}
+                        <td className="p-2.5">
+                          <input
+                            type="text"
+                            placeholder="9845003000"
+                            value={formData.phone}
+                            onChange={(e) => onChange("phone", e.target.value)}
+                            className="w-full font-bold text-slate-900 bg-transparent outline-none border-b border-transparent focus:border-amber-500"
+                          />
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 w-28 whitespace-nowrap">
                           Tour Type
