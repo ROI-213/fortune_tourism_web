@@ -108,6 +108,8 @@ export function PremiumQuickEnquiry() {
     return filtered;
   }, [form.destination]);
 
+  const [submittedRef, setSubmittedRef] = useState<string | null>(null);
+
   const submit = async (mode: "quote" | "whatsapp") => {
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
@@ -121,16 +123,48 @@ export function PremiumQuickEnquiry() {
     if (loading) return;
     setLoading(true);
     try {
+      const payload = {
+        name: parsed.data.name,
+        phone: parsed.data.phone,
+        service: parsed.data.service,
+        pickup: parsed.data.pickup,
+        destination: parsed.data.destination,
+        date: parsed.data.date || null,
+        passengers: parsed.data.passengers || "4",
+        notes: parsed.data.notes || null,
+        source: "HOME_BANNER_ENQUIRY",
+        client_token:
+          typeof crypto !== "undefined" && "randomUUID" in crypto
+            ? crypto.randomUUID()
+            : `tok-banner-${Date.now()}`,
+      };
+
+      const res = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const d = await res.json().catch(() => ({}));
+      const refNum = d?.enquiry?.enquiry_number || d?.booking_reference || `ENQ-${Date.now().toString().slice(-6)}`;
+
       if (mode === "whatsapp") {
-        const url = buildWhatsAppUrl({ ...parsed.data });
+        const url = buildWhatsAppUrl({
+          ...parsed.data,
+          notes: `[Ref: ${refNum}] ${parsed.data.notes || ""}`,
+        });
         window.open(url, "_blank", "noopener");
+        toast.success(`Enquiry submitted! Ref: ${refNum}`);
       } else {
-        await new Promise((r) => setTimeout(r, 700));
+        setSubmittedRef(refNum);
         toast.success(
-          "Thank you! Your travel request has been received. Our team will contact you shortly.",
+          `Thank you! Your travel enquiry (${refNum}) has been saved in our system. Our team will contact you shortly.`,
         );
         setForm(initial);
       }
+    } catch (err) {
+      console.error("Error submitting quick enquiry:", err);
+      toast.error("Failed to submit enquiry. Please try again or WhatsApp us directly.");
     } finally {
       setLoading(false);
     }
@@ -258,6 +292,20 @@ export function PremiumQuickEnquiry() {
                 Personalised written quote within 15 minutes during business hours.
               </p>
             </div>
+
+            {submittedRef && (
+              <div className="mt-4 rounded-2xl border border-emerald-300 bg-emerald-50 p-4 text-center animate-fade-in shadow-xs">
+                <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                  Enquiry Registered with Fortune Tourism
+                </p>
+                <p className="mt-1 font-heading text-2xl font-black text-[#0f6b52] tracking-wider">
+                  {submittedRef}
+                </p>
+                <p className="mt-1 text-[11px] text-emerald-700">
+                  Our team has received your enquiry. We will contact you with a customized quote shortly.
+                </p>
+              </div>
+            )}
 
             {/* Chips */}
             <div className="mt-4 flex flex-wrap gap-1.5">

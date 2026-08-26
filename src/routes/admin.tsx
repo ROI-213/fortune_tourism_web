@@ -45,6 +45,10 @@ import {
   LogOut,
   Mail,
   Shield,
+  Search,
+  PhoneCall,
+  MessageSquare,
+  Home,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -63,16 +67,24 @@ export const Route = createFileRoute("/admin")({
 
 interface Enquiry {
   id: string;
+  enquiry_number?: string;
   created_at: string;
   name: string;
   phone: string;
+  email?: string;
+  whatsapp?: string;
   service: string;
   pickup?: string;
   destination?: string;
   travel_date?: string;
+  pickup_time?: string;
   passengers?: string;
   notes?: string;
   status: string;
+  source?: string;
+  trip_type?: string;
+  vehicle_name?: string;
+  car_type?: string;
 }
 
 interface TourPackageItem {
@@ -120,6 +132,8 @@ function AdminPage() {
   const [vehiclesList, setVehiclesList] = useState<VehicleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("All");
+  const [filterSource, setFilterSource] = useState<string>("All");
+  const [enquirySearch, setEnquirySearch] = useState<string>("");
 
   // New & Edit Package Modal / Form state
   const [showPackageForm, setShowPackageForm] = useState(false);
@@ -508,9 +522,33 @@ function AdminPage() {
     }
   };
 
-  const filteredEnquiries = enquiries.filter(
-    (e) => filterStatus === "All" || e.status === filterStatus,
-  );
+  const filteredEnquiries = enquiries.filter((e) => {
+    const statusNormalized = (e.status || "NEW").toUpperCase();
+    const matchesStatus =
+      filterStatus === "All" ||
+      statusNormalized === filterStatus.toUpperCase() ||
+      (filterStatus === "New" && (statusNormalized === "NEW" || statusNormalized === "PENDING"));
+
+    const sourceVal = e.source || "HOME_BANNER_ENQUIRY";
+    const matchesSource =
+      filterSource === "All" ||
+      (filterSource === "Home Banner" && (sourceVal === "HOME_BANNER_ENQUIRY" || !e.source)) ||
+      (filterSource === "Website Booking" && sourceVal === "WEBSITE");
+
+    const q = enquirySearch.trim().toLowerCase();
+    const matchesSearch =
+      !q ||
+      e.name?.toLowerCase().includes(q) ||
+      e.phone?.toLowerCase().includes(q) ||
+      e.email?.toLowerCase().includes(q) ||
+      e.enquiry_number?.toLowerCase().includes(q) ||
+      e.pickup?.toLowerCase().includes(q) ||
+      e.destination?.toLowerCase().includes(q) ||
+      e.service?.toLowerCase().includes(q) ||
+      e.notes?.toLowerCase().includes(q);
+
+    return matchesStatus && matchesSource && matchesSearch;
+  });
 
   const stats = [
     {
@@ -949,124 +987,272 @@ function AdminPage() {
 
           {/* TAB 1: ENQUIRIES */}
           {activeTab === "enquiries" && (
-            <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-border p-5 gap-3 bg-slate-50/50">
-                <h2 className="font-heading text-lg font-bold">Customer Enquiries</h2>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold uppercase text-muted-foreground">
-                    Filter status:
-                  </span>
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium"
-                  >
-                    <option>All</option>
-                    <option>New</option>
-                    <option>Quoted</option>
-                    <option>Confirmed</option>
-                    <option>Closed</option>
-                  </select>
+            <div className="space-y-6">
+              {/* Summary Header */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase text-slate-500">Total Enquiries</p>
+                    <p className="text-2xl font-black text-slate-900 mt-1">{enquiries.length}</p>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
+                    <Users className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <div className="bg-white border border-emerald-200/80 rounded-2xl p-4 shadow-xs flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase text-emerald-700">Home Banner Enquiries</p>
+                    <p className="text-2xl font-black text-emerald-800 mt-1">
+                      {enquiries.filter((e) => e.source === "HOME_BANNER_ENQUIRY" || !e.source).length}
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+                    <Home className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <div className="bg-white border border-amber-200/80 rounded-2xl p-4 shadow-xs flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase text-amber-700">New / Uncontacted</p>
+                    <p className="text-2xl font-black text-amber-800 mt-1">
+                      {enquiries.filter((e) => (e.status || "").toUpperCase() === "NEW").length}
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold">
+                    <AlertCircle className="w-5 h-5" />
+                  </div>
                 </div>
               </div>
 
-              {loading ? (
-                <div className="p-12 text-center text-muted-foreground text-sm">
-                  Loading customer enquiries...
+              {/* Table Card */}
+              <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between border-b border-border p-4 sm:p-5 gap-3 bg-slate-50/50">
+                  <div>
+                    <h2 className="font-heading text-lg font-bold text-slate-900">Customer Enquiries ({filteredEnquiries.length})</h2>
+                    <p className="text-xs text-slate-500">Live enquiries received from Home Page Quick Enquiry Banner & website forms.</p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                    {/* Search */}
+                    <div className="relative flex-1 sm:w-64">
+                      <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        placeholder="Search name, phone, ref, place..."
+                        value={enquirySearch}
+                        onChange={(e) => setEnquirySearch(e.target.value)}
+                        className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Source Filter */}
+                    <select
+                      value={filterSource}
+                      onChange={(e) => setFilterSource(e.target.value)}
+                      className="rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-amber-500 outline-none"
+                    >
+                      <option value="All">All Sources</option>
+                      <option value="Home Banner">Home Banner Enquiry</option>
+                      <option value="Website Booking">Website Booking</option>
+                    </select>
+
+                    {/* Status Filter */}
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      className="rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-amber-500 outline-none"
+                    >
+                      <option value="All">All Statuses</option>
+                      <option value="NEW">New</option>
+                      <option value="CONTACTED">Contacted</option>
+                      <option value="QUOTED">Quoted</option>
+                      <option value="CONFIRMED">Confirmed</option>
+                      <option value="CLOSED">Closed</option>
+                    </select>
+                  </div>
                 </div>
-              ) : filteredEnquiries.length === 0 ? (
-                <div className="p-12 text-center text-muted-foreground text-sm">
-                  No enquiries found for status "{filterStatus}".
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-slate-100/70 text-left text-xs uppercase tracking-wider text-muted-foreground">
-                      <tr>
-                        <th className="px-5 py-3">Customer</th>
-                        <th className="px-5 py-3">Contact</th>
-                        <th className="px-5 py-3">Service & Route</th>
-                        <th className="px-5 py-3">Travel Date</th>
-                        <th className="px-5 py-3">Status</th>
-                        <th className="px-5 py-3 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {filteredEnquiries.map((e) => (
-                        <tr key={e.id} className="hover:bg-slate-50/80 transition">
-                          <td className="px-5 py-4 font-semibold text-foreground">
-                            {e.name}
-                            {e.notes && (
-                              <p className="text-xs text-muted-foreground font-normal mt-0.5 max-w-xs truncate">
-                                {e.notes}
-                              </p>
-                            )}
-                          </td>
-                          <td className="px-5 py-4 text-xs font-medium text-slate-700">
-                            {e.phone}
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className="font-medium text-xs rounded bg-slate-100 px-2 py-0.5">
-                              {e.service}
-                            </span>
-                            {(e.pickup || e.destination) && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {e.pickup || "Any"} → {e.destination || "Any"}
-                              </p>
-                            )}
-                          </td>
-                          <td className="px-5 py-4 text-xs text-muted-foreground">
-                            {e.travel_date || "Not specified"}
-                          </td>
-                          <td className="px-5 py-4">
-                            <span
-                              className={
-                                "rounded-full px-2.5 py-1 text-xs font-semibold " +
-                                (e.status === "New"
-                                  ? "bg-amber-100 text-amber-800"
-                                  : e.status === "Quoted"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : e.status === "Confirmed"
-                                      ? "bg-emerald-100 text-emerald-800"
-                                      : "bg-slate-100 text-slate-700")
-                              }
-                            >
-                              {e.status}
-                            </span>
-                          </td>
-                          <td className="px-5 py-4 text-right">
-                            <div className="inline-flex items-center gap-1">
-                              {e.status !== "Quoted" && (
-                                <button
-                                  onClick={() => handleUpdateStatus(e.id, "Quoted")}
-                                  className="px-2 py-1 text-xs font-medium rounded bg-blue-50 text-blue-700 hover:bg-blue-100"
-                                >
-                                  Quote
-                                </button>
-                              )}
-                              {e.status !== "Confirmed" && (
-                                <button
-                                  onClick={() => handleUpdateStatus(e.id, "Confirmed")}
-                                  className="px-2 py-1 text-xs font-medium rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                                >
-                                  Confirm
-                                </button>
-                              )}
-                              <button
-                                onClick={() => handleDeleteEnquiry(e.id)}
-                                className="p-1 text-red-500 hover:bg-red-50 rounded"
-                                title="Delete"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </td>
+
+                {loading ? (
+                  <div className="p-12 text-center text-slate-500 text-sm">
+                    <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    Loading customer enquiries...
+                  </div>
+                ) : filteredEnquiries.length === 0 ? (
+                  <div className="p-12 text-center text-slate-500 text-sm">
+                    No enquiries found matching the selected filters.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-slate-100/70 text-left text-xs uppercase tracking-wider text-slate-500">
+                        <tr>
+                          <th className="px-5 py-3">Enquiry Ref & Time</th>
+                          <th className="px-5 py-3">Customer Details</th>
+                          <th className="px-5 py-3">Service & Route</th>
+                          <th className="px-5 py-3">Travel Date</th>
+                          <th className="px-5 py-3">Notes & Requirements</th>
+                          <th className="px-5 py-3">Status</th>
+                          <th className="px-5 py-3 text-right">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredEnquiries.map((e) => {
+                          const isHomeBanner = e.source === "HOME_BANNER_ENQUIRY" || !e.source;
+                          const waMessage = `Hello ${e.name}! Thank you for your enquiry with Fortune Tourism regarding ${e.service || "Travel"} from ${e.pickup || "your location"} to ${e.destination || "destination"}. How can we assist you with the booking? (Ref: ${e.enquiry_number || e.id.slice(-6)})`;
+                          const waUrl = `https://wa.me/${e.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(waMessage)}`;
+
+                          return (
+                            <tr key={e.id} className="hover:bg-slate-50/80 transition">
+                              {/* Ref & Source */}
+                              <td className="px-5 py-4 align-top">
+                                <div className="font-mono font-black text-amber-700 text-xs">
+                                  {e.enquiry_number || `ENQ-${e.id.slice(-6).toUpperCase()}`}
+                                </div>
+                                <div className="text-[11px] text-slate-500 mt-0.5">
+                                  {new Date(e.created_at).toLocaleDateString("en-IN", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </div>
+                                <div className="mt-1.5">
+                                  {isHomeBanner ? (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">
+                                      <Home className="w-3 h-3 text-emerald-600" /> Home Banner
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-blue-800 text-[10px] font-bold">
+                                      🌐 Website Form
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* Customer */}
+                              <td className="px-5 py-4 align-top">
+                                <div className="font-bold text-slate-900 text-sm">{e.name}</div>
+                                <div className="text-xs text-slate-600 font-medium mt-0.5 flex items-center gap-1">
+                                  <PhoneCall className="w-3 h-3 text-slate-400" />
+                                  <a href={`tel:${e.phone}`} className="hover:text-amber-700 hover:underline">
+                                    {e.phone}
+                                  </a>
+                                </div>
+                                {e.email && (
+                                  <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
+                                    <Mail className="w-3 h-3 text-slate-400" />
+                                    {e.email}
+                                  </div>
+                                )}
+                              </td>
+
+                              {/* Service & Route */}
+                              <td className="px-5 py-4 align-top">
+                                <span className="font-bold text-xs rounded-lg bg-amber-50 border border-amber-200 text-amber-900 px-2.5 py-1">
+                                  {e.service}
+                                </span>
+                                {(e.pickup || e.destination) && (
+                                  <div className="text-xs text-slate-700 mt-1.5 font-medium">
+                                    {e.pickup || "Bengaluru"} → {e.destination || "Open"}
+                                  </div>
+                                )}
+                                {e.passengers && (
+                                  <div className="text-[11px] text-slate-500 mt-0.5">
+                                    👥 {e.passengers} Passengers
+                                  </div>
+                                )}
+                              </td>
+
+                              {/* Travel Date */}
+                              <td className="px-5 py-4 align-top text-xs text-slate-700 font-medium">
+                                {e.travel_date ? (
+                                  <div>
+                                    <span>{e.travel_date}</span>
+                                    {e.pickup_time && <span className="text-slate-500 block text-[11px]">{e.pickup_time}</span>}
+                                  </div>
+                                ) : (
+                                  <span className="text-slate-400 italic">Not specified</span>
+                                )}
+                              </td>
+
+                              {/* Notes */}
+                              <td className="px-5 py-4 align-top text-xs text-slate-600 max-w-xs">
+                                {e.notes ? (
+                                  <p className="line-clamp-3 leading-relaxed bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                    {e.notes}
+                                  </p>
+                                ) : (
+                                  <span className="text-slate-400 italic">—</span>
+                                )}
+                              </td>
+
+                              {/* Status */}
+                              <td className="px-5 py-4 align-top">
+                                <select
+                                  value={(e.status || "NEW").toUpperCase()}
+                                  onChange={(eVal) => handleUpdateStatus(e.id, eVal.target.value)}
+                                  className={`rounded-lg px-2.5 py-1 text-xs font-bold border outline-none cursor-pointer ${
+                                    (e.status || "").toUpperCase() === "NEW"
+                                      ? "bg-amber-50 text-amber-800 border-amber-200"
+                                      : (e.status || "").toUpperCase() === "CONTACTED"
+                                      ? "bg-blue-50 text-blue-800 border-blue-200"
+                                      : (e.status || "").toUpperCase() === "QUOTED"
+                                      ? "bg-purple-50 text-purple-800 border-purple-200"
+                                      : (e.status || "").toUpperCase() === "CONFIRMED"
+                                      ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                                      : "bg-slate-100 text-slate-700 border-slate-200"
+                                  }`}
+                                >
+                                  <option value="NEW">NEW</option>
+                                  <option value="CONTACTED">CONTACTED</option>
+                                  <option value="QUOTED">QUOTED</option>
+                                  <option value="CONFIRMED">CONFIRMED</option>
+                                  <option value="CLOSED">CLOSED</option>
+                                </select>
+                              </td>
+
+                              {/* Actions */}
+                              <td className="px-5 py-4 align-top text-right">
+                                <div className="inline-flex items-center gap-1.5">
+                                  {/* WhatsApp button */}
+                                  <a
+                                    href={waUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition"
+                                    title="WhatsApp Customer"
+                                  >
+                                    <MessageSquare className="w-4 h-4" />
+                                  </a>
+
+                                  {/* Phone call button */}
+                                  <a
+                                    href={`tel:${e.phone}`}
+                                    className="p-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition"
+                                    title="Call Customer"
+                                  >
+                                    <PhoneCall className="w-4 h-4" />
+                                  </a>
+
+                                  {/* Delete */}
+                                  <button
+                                    onClick={() => handleDeleteEnquiry(e.id)}
+                                    className="p-1.5 text-red-500 hover:bg-red-50 hover:text-red-700 rounded-lg transition"
+                                    title="Delete Enquiry"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
