@@ -796,32 +796,69 @@ export function CabSearchExplore({ onSelectCar, initialSearchData }: CabSearchEx
                 </select>
               </div>
 
-              <div className="md:col-span-3 space-y-1">
-                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                  PICKUP ADDRESS
-                </label>
-                <LocationSearchInput
-                  value={searchData.from}
-                  onChange={(val) => setSearchData((prev) => ({ ...prev, from: val }))}
-                  placeholder="Enter Pickup Location"
-                />
-              </div>
+              {searchData.airportTripType === "Drop to Airport" ? (
+                <>
+                  {/* 1. Pickup Location (Search + GPS) */}
+                  <div className="md:col-span-3 space-y-1">
+                    <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                      PICKUP LOCATION
+                    </label>
+                    <LocationSearchInput
+                      value={searchData.from}
+                      onChange={(val) => setSearchData((prev) => ({ ...prev, from: val }))}
+                      placeholder="Enter Pickup Location / Area (e.g. Rajajinagar)"
+                    />
+                  </div>
 
-              <div className="md:col-span-3 space-y-1">
-                <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
-                  DROP AIRPORT
-                </label>
-                <select
-                  value={searchData.airportName}
-                  onChange={(e) => setSearchData((prev) => ({ ...prev, airportName: e.target.value }))}
-                  className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
-                >
-                  <option>Terminal 1, Kempegowda International Airport (BLR)</option>
-                  <option>Terminal 2, Kempegowda International Airport (BLR)</option>
-                  <option>Mysuru Airport (MYQ)</option>
-                  <option>Mangaluru Int'l Airport (IXE)</option>
-                </select>
-              </div>
+                  {/* 2. Drop Airport Dropdown */}
+                  <div className="md:col-span-3 space-y-1">
+                    <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                      DROP AIRPORT
+                    </label>
+                    <select
+                      value={searchData.airportName}
+                      onChange={(e) => setSearchData((prev) => ({ ...prev, airportName: e.target.value }))}
+                      className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                    >
+                      <option>Terminal 1, Kempegowda International Airport (BLR)</option>
+                      <option>Terminal 2, Kempegowda International Airport (BLR)</option>
+                      <option>Mysuru Airport (MYQ)</option>
+                      <option>Mangaluru Int'l Airport (IXE)</option>
+                    </select>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* 1. Pickup Airport Dropdown */}
+                  <div className="md:col-span-3 space-y-1">
+                    <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                      PICKUP AIRPORT
+                    </label>
+                    <select
+                      value={searchData.airportName}
+                      onChange={(e) => setSearchData((prev) => ({ ...prev, airportName: e.target.value }))}
+                      className="w-full bg-white border-b-2 border-slate-300 focus:border-emerald-600 px-2 py-2 text-xs sm:text-sm font-semibold text-slate-900 outline-none"
+                    >
+                      <option>Terminal 1, Kempegowda International Airport (BLR)</option>
+                      <option>Terminal 2, Kempegowda International Airport (BLR)</option>
+                      <option>Mysuru Airport (MYQ)</option>
+                      <option>Mangaluru Int'l Airport (IXE)</option>
+                    </select>
+                  </div>
+
+                  {/* 2. Drop Location (Search + GPS) */}
+                  <div className="md:col-span-3 space-y-1">
+                    <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">
+                      DROP LOCATION
+                    </label>
+                    <LocationSearchInput
+                      value={searchData.to}
+                      onChange={(val) => setSearchData((prev) => ({ ...prev, to: val }))}
+                      placeholder="Enter Drop Location / Area (e.g. Rajajinagar)"
+                    />
+                  </div>
+                </>
+              )}
 
               <div className="md:col-span-2 space-y-1">
                 <label className="text-[11px] font-black tracking-wider uppercase text-slate-800">

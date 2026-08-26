@@ -51,13 +51,13 @@ export const LOCATIONS: LocationItem[] = [
   },
   {
     id: "rajajinagar-area",
-    name: "Rajajinagar",
-    normalizedName: "rajajinagar bengaluru karnataka rajaji nagar",
+    name: "Rajajinagar, Bengaluru",
+    normalizedName: "rajajinagar bengaluru karnataka rajaji nagar rajai",
     city: "Bengaluru",
     state: "Karnataka",
     country: "India",
     type: "area",
-    aliases: ["rajaji", "rajajinagar", "rajaji nagar", "raj"],
+    aliases: ["rajaji", "rajajinagar", "rajaji nagar", "raj", "rajai", "rajajinagar 1st block", "rajajinagar 2nd block"],
     coords: { lat: 12.9899, lng: 77.5534 },
   },
   {
@@ -346,9 +346,10 @@ export function searchLocations(
     if (filterType === "flight" && loc.type === "station") return false;
     if (filterType === "train" && loc.type === "airport") return false;
 
-    // Direct check name or code
+    // Direct check name or code or normalizedName
     const nameMatch = loc.name.toLowerCase().replace(/\s+/g, "").includes(q);
     const cityMatch = loc.city.toLowerCase().replace(/\s+/g, "").includes(q);
+    const normMatch = loc.normalizedName.toLowerCase().replace(/\s+/g, "").includes(q);
     const codeMatch = loc.code ? loc.code.toLowerCase().includes(q) : false;
     const aliasMatch = loc.aliases.some(
       (alias) =>
@@ -356,7 +357,7 @@ export function searchLocations(
         q.includes(alias.toLowerCase().replace(/\s+/g, "")),
     );
 
-    return nameMatch || cityMatch || codeMatch || aliasMatch;
+    return nameMatch || cityMatch || normMatch || codeMatch || aliasMatch;
   }).slice(0, 10);
 }
 
