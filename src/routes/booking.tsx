@@ -226,10 +226,8 @@ function BookingPage() {
   const [withLuggageCarrier, setWithLuggageCarrier] = useState<boolean>(false);
 
   // Passenger & Payment state
-  const [passengerName, setPassengerName] = useState("FORTUNE GROUP");
-  const [passengerPhone, setPassengerPhone] = useState("9845003000");
-  const [passengerEmail, setPassengerEmail] = useState("");
-  const [pickupLandmark, setPickupLandmark] = useState("");
+  const [passengerName, setPassengerName] = useState("");
+  const [passengerPhone, setPassengerPhone] = useState("");
   const [advanceOption, setAdvanceOption] = useState<number>(100);
   const [utrRef, setUtrRef] = useState("");
 
@@ -1025,7 +1023,7 @@ function BookingPage() {
                 </div>
               </div>
 
-              {/* Passenger Inputs */}
+              {/* Passenger Inputs (Only Name and Mobile Number) */}
               <div className="space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-800 block">
                   Passenger Contact
@@ -1038,7 +1036,7 @@ function BookingPage() {
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. Rajesh Kumar"
+                      placeholder="Enter passenger full name"
                       value={passengerName}
                       onChange={(e) => setPassengerName(e.target.value)}
                       className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 outline-none"
@@ -1055,34 +1053,6 @@ function BookingPage() {
                       maxLength={10}
                       value={passengerPhone}
                       onChange={(e) => setPassengerPhone(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
-                      Pickup Address / Landmark (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Indiranagar, Near Metro Station"
-                      value={pickupLandmark}
-                      onChange={(e) => setPickupLandmark(e.target.value)}
-                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
-                      Email Address (Optional)
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="e.g. rajesh@example.com"
-                      value={passengerEmail}
-                      onChange={(e) => setPassengerEmail(e.target.value)}
                       className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 outline-none"
                     />
                   </div>
@@ -1431,10 +1401,8 @@ function BookingPage() {
                     setServiceType(null);
                     setTicketNumber(generateTicketNumber());
                     setPnrNumber(generatePNR());
-                    setPassengerName("FORTUNE GROUP");
-                    setPassengerPhone("9845003000");
-                    setPassengerEmail("");
-                    setPickupLandmark("");
+                    setPassengerName("");
+                    setPassengerPhone("");
                   }}
                   className="text-xs font-bold text-slate-600 hover:text-slate-900 px-4 py-2.5 border border-slate-300 rounded-xl hover:bg-slate-50 transition-all"
                 >
