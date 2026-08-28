@@ -22,6 +22,9 @@ import {
   ShieldCheck,
   Star,
   Users,
+  TrainFront,
+  Plane,
+  Bus,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { generateTicketNumber, generatePNR } from "@/lib/booking-utils";
