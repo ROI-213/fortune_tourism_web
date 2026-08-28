@@ -87,9 +87,15 @@ export function downloadTicketCopyPDF(data: TicketCopyData) {
       ],
       [
         { content: "Ticket Number:", styles: { fontStyle: "bold", fillColor: [245, 245, 245] } },
-        { content: data.ticketNumber || "FT3423CZ", styles: { fontStyle: "bold" } },
+        {
+          content: (data.ticketNumber || "FT3423CZ").toUpperCase(),
+          styles: { fontStyle: "bold", fontSize: 9.5, textColor: [180, 83, 9] },
+        },
         { content: "PNR Number:", styles: { fontStyle: "bold", fillColor: [245, 245, 245] } },
-        { content: data.pnrNumber || "FC17G3423", styles: { fontStyle: "bold" } },
+        {
+          content: (data.pnrNumber || "FC17G3423").toUpperCase(),
+          styles: { fontStyle: "bold", fontSize: 9.5, textColor: [10, 10, 10] },
+        },
         { content: "Departure On:", styles: { fontStyle: "bold", fillColor: [245, 245, 245] } },
         { content: data.departureOn, styles: { fontStyle: "bold" } },
       ],

@@ -1417,14 +1417,18 @@ function BookingPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-                  <div className="flex items-center gap-4">
-                    <span>
-                      <strong className="text-slate-500 uppercase text-[10px]">Ticket No:</strong>{" "}
-                      <span className="font-mono font-black text-amber-700 text-sm">{ticketNumber}</span>
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <span className="flex items-center gap-1.5">
+                      <strong className="text-slate-700 uppercase text-xs font-black">TICKET NO:</strong>{" "}
+                      <span className="font-mono font-black text-amber-700 text-base sm:text-lg tracking-wider bg-amber-50 px-2.5 py-0.5 rounded-lg border border-amber-300 shadow-2xs">
+                        {ticketNumber}
+                      </span>
                     </span>
-                    <span>
-                      <strong className="text-slate-500 uppercase text-[10px]">PNR:</strong>{" "}
-                      <span className="font-mono font-black text-slate-900 text-sm">{pnrNumber}</span>
+                    <span className="flex items-center gap-1.5">
+                      <strong className="text-slate-700 uppercase text-xs font-black">PNR:</strong>{" "}
+                      <span className="font-mono font-black text-slate-950 text-base sm:text-lg tracking-wider bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-300 shadow-2xs">
+                        {pnrNumber}
+                      </span>
                     </span>
                   </div>
 
@@ -1530,13 +1534,13 @@ function BookingPage() {
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 whitespace-nowrap">
                           Ticket Number:
                         </td>
-                        <td className="p-2.5 font-black font-mono text-slate-900">
+                        <td className="p-2.5 font-black font-mono text-amber-700 text-sm tracking-wider">
                           {ticketNumber}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 whitespace-nowrap">
                           PNR Number:
                         </td>
-                        <td className="p-2.5 font-black font-mono text-slate-900">
+                        <td className="p-2.5 font-black font-mono text-slate-950 text-sm tracking-wider">
                           {pnrNumber}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 whitespace-nowrap">
