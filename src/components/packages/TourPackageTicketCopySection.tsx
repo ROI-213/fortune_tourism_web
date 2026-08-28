@@ -205,20 +205,14 @@ export function TourPackageTicketCopySection() {
           <div className="ticket-copy-print-area border-2 border-slate-900 rounded-2xl overflow-hidden bg-white p-4 space-y-4">
             {/* Header with Logo & Address */}
             <div className="border-b-2 border-slate-900 pb-3 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
+              <div className="space-y-1">
                 <img
-                  src="/images/packages/fortune-tourism-logo.png"
-                  alt="Fortune Tourism"
-                  className="h-10 sm:h-12 w-auto object-contain"
+                  src="/images/packages/fortune-tourism-full-logo.png"
+                  alt="FORTUNE Tourism"
+                  className="h-8 sm:h-10 w-auto object-contain"
                 />
-                <div>
-                  <div className="text-lg font-black tracking-wider text-emerald-950 flex items-center gap-1">
-                    <span>FORTUNE</span>
-                    <span className="font-serif italic font-normal text-emerald-800">Tourism</span>
-                  </div>
-                  <div className="text-[11px] font-bold text-slate-800">
-                    Address: No.256/A next To Narayana Hospital, Health City, Bommasandra Bangalore.560099
-                  </div>
+                <div className="text-[11px] font-bold text-slate-800">
+                  Address: No.256/A next To Narayana Hospital, Health City, Bommasandra Bangalore.560099
                 </div>
               </div>
               <div className="text-right">
