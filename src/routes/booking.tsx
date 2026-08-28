@@ -1616,14 +1616,12 @@ function BookingPage() {
                 </div>
 
                 <div className="space-y-1.5 text-slate-900 font-sans text-xs">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-1 font-bold text-sm">
+                  <div className="flex items-center justify-between pt-1">
                     <div className="text-slate-950 font-black tracking-wide text-base sm:text-lg">
                       Ticket Copy For Your Journey
                     </div>
-                  </div>
-                  <div className="pt-0.5 pb-1">
-                    <span className="text-xs font-black text-slate-800">
-                      TICKET NUMBER :{" "}
+                    <span className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                      TICKET NUMBER :
                       <strong className="font-mono font-black text-amber-700 text-sm sm:text-base tracking-wider bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-300 shadow-2xs">
                         {ticketNumber}
                       </strong>
