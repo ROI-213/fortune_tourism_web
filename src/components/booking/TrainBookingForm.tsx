@@ -51,12 +51,19 @@ export function TrainBookingForm({ formData, onChange, errors, onCompleteBooking
     ? formData.passengers
     : [{ name: "", age: "", gender: "Male", berth_preference: "No Preference" }];
 
-  const addPassenger = () => {
-    if (passengers.length >= 6) return;
-    onChange("passengers", [
-      ...passengers,
-      { name: "", age: "", gender: "Male", berth_preference: "No Preference" },
-    ]);
+  const setPassengerCount = (count: number) => {
+    const current = passengers;
+    if (count > current.length) {
+      // Add more passengers
+      const newPassengers = [...current];
+      for (let i = current.length; i < count; i++) {
+        newPassengers.push({ name: "", age: "", gender: "Male", berth_preference: "No Preference" });
+      }
+      onChange("passengers", newPassengers);
+    } else if (count < current.length) {
+      // Trim passengers
+      onChange("passengers", current.slice(0, count));
+    }
   };
 
   const removePassenger = (index: number) => {
@@ -240,19 +247,22 @@ export function TrainBookingForm({ formData, onChange, errors, onCompleteBooking
       ) : (
         /* STEP 2: PASSENGER DETAILS (Max 6 Members) */
         <div className="space-y-5 animate-in fade-in duration-300">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-              <Users className="w-4 h-4 text-amber-600" /> Passenger Details ({passengers.length}/6)
+              <Users className="w-4 h-4 text-amber-600" /> Passenger Details
             </h3>
-            {passengers.length < 6 && (
-              <button
-                type="button"
-                onClick={addPassenger}
-                className="text-xs font-bold text-amber-800 hover:text-amber-900 flex items-center gap-1 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200"
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-bold text-slate-700">Number of Passengers:</label>
+              <select
+                value={passengers.length}
+                onChange={(e) => setPassengerCount(Number(e.target.value))}
+                className="bg-white border border-amber-300 rounded-xl px-3 py-1.5 text-sm font-black text-amber-800 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none shadow-2xs"
               >
-                <Plus className="w-3.5 h-3.5" /> Add Passenger
-              </button>
-            )}
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -309,7 +319,7 @@ export function TrainBookingForm({ formData, onChange, errors, onCompleteBooking
                     >
                       <option>Male</option>
                       <option>Female</option>
-                      <option>Other</option>
+                      <option>Child</option>
                     </select>
                   </div>
                 </div>
