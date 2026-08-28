@@ -19,18 +19,40 @@ interface TrainBookingFormProps {
   formData: any;
   onChange: (field: string, value: any) => void;
   errors: Record<string, string>;
+  onCompleteBooking: () => void;
+  isSubmitting?: boolean;
 }
 
-const CLASS_OPTIONS = ["1A", "2A", "3A", "3E", "SL", "CC", "2S", "Other"];
-const QUOTA_OPTIONS = ["General", "Tatkal", "Ladies", "Senior Citizen", "Other"];
+const CLASS_OPTIONS = [
+  { value: "3A", label: "3A - AC 3 Tier" },
+  { value: "2A", label: "2A - AC 2 Tier" },
+  { value: "1A", label: "1A - AC First Class" },
+  { value: "3E", label: "3E - 3 AC Economy" },
+  { value: "SL", label: "SL - Sleeper Class" },
+  { value: "CC", label: "CC - AC Chair Car" },
+  { value: "2S", label: "2S - Second Sitting" },
+  { value: "Other", label: "Other / Any" },
+];
+
+const QUOTA_OPTIONS = [
+  { value: "General", label: "General Quota" },
+  { value: "Tatkal", label: "Tatkal Quota" },
+  { value: "Ladies", label: "Ladies Quota" },
+  { value: "Senior Citizen", label: "Senior Citizen Quota" },
+  { value: "Other", label: "Other" },
+];
+
 const BERTH_OPTIONS = ["Lower", "Middle", "Upper", "Side Lower", "Side Upper", "No Preference"];
 
-export function TrainBookingForm({ formData, onChange, errors }: TrainBookingFormProps) {
-  const passengers: Passenger[] = formData.passengers || [
-    { name: "", age: "", gender: "Male", berth_preference: "No Preference" },
-  ];
+export function TrainBookingForm({ formData, onChange, errors, onCompleteBooking, isSubmitting }: TrainBookingFormProps) {
+  const [trainStep, setTrainStep] = React.useState<"JOURNEY" | "PASSENGERS">("JOURNEY");
+
+  const passengers: Passenger[] = formData.passengers && formData.passengers.length > 0
+    ? formData.passengers
+    : [{ name: "", age: "", gender: "Male", berth_preference: "No Preference" }];
 
   const addPassenger = () => {
+    if (passengers.length >= 6) return;
     onChange("passengers", [
       ...passengers,
       { name: "", age: "", gender: "Male", berth_preference: "No Preference" },
@@ -52,6 +74,35 @@ export function TrainBookingForm({ formData, onChange, errors }: TrainBookingFor
     onChange("passengers", updated);
   };
 
+  const handleContinueToPassengers = () => {
+    if (!formData.from_station || !formData.from_station.trim()) {
+      alert("Please enter From Station.");
+      return;
+    }
+    if (!formData.to_station || !formData.to_station.trim()) {
+      alert("Please enter To Station.");
+      return;
+    }
+    if (!formData.date) {
+      alert("Please select Journey Date.");
+      return;
+    }
+    setTrainStep("PASSENGERS");
+  };
+
+  const handleFinalSubmit = () => {
+    const firstP = passengers[0];
+    if (!firstP || !firstP.name.trim()) {
+      alert("Please enter Passenger 1 Full Name.");
+      return;
+    }
+    if (!firstP.age || !firstP.age.trim()) {
+      alert("Please enter Passenger 1 Age.");
+      return;
+    }
+    onCompleteBooking();
+  };
+
   return (
     <div className="space-y-6">
       {/* Notice Banner */}
@@ -64,209 +115,248 @@ export function TrainBookingForm({ formData, onChange, errors }: TrainBookingFor
         </div>
       </div>
 
-      {/* Journey Details */}
-      <div className="space-y-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-          <TrainFront className="w-4 h-4 text-amber-600" /> Train Journey Details
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1">From Station *</label>
-            <input
-              type="text"
-              placeholder="e.g. Bangalore City (SBC)"
-              value={formData.from_station || ""}
-              onChange={(e) => onChange("from_station", e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-            />
-            {errors.from_station && <p className="text-xs text-red-600 font-medium mt-1">{errors.from_station}</p>}
-          </div>
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1">To Station *</label>
-            <input
-              type="text"
-              placeholder="e.g. Chennai Central (MAS)"
-              value={formData.to_station || ""}
-              onChange={(e) => onChange("to_station", e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-            />
-            {errors.to_station && <p className="text-xs text-red-600 font-medium mt-1">{errors.to_station}</p>}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1">
-              <Calendar className="w-3.5 h-3.5 inline mr-1 text-amber-600" /> Journey Date *
-            </label>
-            <input
-              type="date"
-              min={new Date().toISOString().split("T")[0]}
-              value={formData.date || ""}
-              onChange={(e) => onChange("date", e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-            />
-            {errors.date && <p className="text-xs text-red-600 font-medium mt-1">{errors.date}</p>}
-          </div>
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1">Preferred Train</label>
-            <input
-              type="text"
-              placeholder="e.g. Shatabdi / Rajdhani / Any"
-              value={formData.preferred_train || ""}
-              onChange={(e) => onChange("preferred_train", e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1">Preferred Time</label>
-            <input
-              type="time"
-              value={formData.time || ""}
-              onChange={(e) => onChange("time", e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1">Class *</label>
-            <div className="grid grid-cols-4 gap-1.5">
-              {CLASS_OPTIONS.map((cls) => (
-                <button
-                  key={cls}
-                  type="button"
-                  onClick={() => onChange("travel_class", cls)}
-                  className={`py-2 rounded-xl font-bold text-xs border transition-all ${
-                    formData.travel_class === cls
-                      ? "bg-amber-500 text-slate-950 border-amber-500 shadow-xs"
-                      : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300"
-                  }`}
-                >
-                  {cls}
-                </button>
-              ))}
-            </div>
-            {errors.travel_class && <p className="text-xs text-red-600 font-medium mt-1">{errors.travel_class}</p>}
-          </div>
-          <div>
-            <label className="text-xs font-bold text-slate-700 block mb-1">Quota</label>
-            <div className="grid grid-cols-3 gap-1.5">
-              {QUOTA_OPTIONS.map((q) => (
-                <button
-                  key={q}
-                  type="button"
-                  onClick={() => onChange("quota", q)}
-                  className={`py-2 rounded-xl font-bold text-xs border transition-all ${
-                    (formData.quota || "General") === q
-                      ? "bg-amber-500 text-slate-950 border-amber-500 shadow-xs"
-                      : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300"
-                  }`}
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Passenger Details */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
+      {trainStep === "JOURNEY" ? (
+        /* STEP 1: TRAIN JOURNEY DETAILS */
+        <div className="space-y-5">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-            <Users className="w-4 h-4 text-amber-600" /> Passenger Details ({passengers.length})
+            <TrainFront className="w-4 h-4 text-amber-600" /> Train Journey Details
           </h3>
-          <button
-            type="button"
-            onClick={addPassenger}
-            className="text-xs font-bold text-amber-800 hover:text-amber-900 flex items-center gap-1 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200"
-          >
-            <Plus className="w-3.5 h-3.5" /> Add Passenger
-          </button>
-        </div>
 
-        <div className="space-y-3">
-          {passengers.map((p, idx) => (
-            <div
-              key={idx}
-              className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold text-amber-800">Passenger {idx + 1}</span>
-                {passengers.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removePassenger(idx)}
-                    className="p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="col-span-2">
-                  <label className="text-[11px] font-bold text-slate-600 block mb-1">Full Name *</label>
-                  <input
-                    type="text"
-                    placeholder="As per Aadhaar / ID"
-                    value={p.name}
-                    onChange={(e) => updatePassenger(idx, "name", e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-slate-600 block mb-1">Age *</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="120"
-                    placeholder="Age"
-                    value={p.age}
-                    onChange={(e) => updatePassenger(idx, "age", e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-slate-600 block mb-1">Gender *</label>
-                  <select
-                    value={p.gender}
-                    onChange={(e) => updatePassenger(idx, "gender", e.target.value)}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-                  >
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-slate-600 block mb-1">Berth Preference</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {BERTH_OPTIONS.map((b) => (
-                    <button
-                      key={b}
-                      type="button"
-                      onClick={() => updatePassenger(idx, "berth_preference", b)}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${
-                        p.berth_preference === b
-                          ? "bg-amber-500 text-slate-950 border-amber-500 shadow-2xs"
-                          : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
-                      }`}
-                    >
-                      {b}
-                    </button>
-                  ))}
-                </div>
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">From Station *</label>
+              <input
+                type="text"
+                placeholder="e.g. Bangalore City (SBC)"
+                value={formData.from_station || ""}
+                onChange={(e) => onChange("from_station", e.target.value)}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+              />
+              {errors.from_station && <p className="text-xs text-red-600 font-medium mt-1">{errors.from_station}</p>}
             </div>
-          ))}
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">To Station *</label>
+              <input
+                type="text"
+                placeholder="e.g. Chennai Central (MAS)"
+                value={formData.to_station || ""}
+                onChange={(e) => onChange("to_station", e.target.value)}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+              />
+              {errors.to_station && <p className="text-xs text-red-600 font-medium mt-1">{errors.to_station}</p>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">
+                <Calendar className="w-3.5 h-3.5 inline mr-1 text-amber-600" /> Journey Date *
+              </label>
+              <input
+                type="date"
+                min={new Date().toISOString().split("T")[0]}
+                value={formData.date || ""}
+                onChange={(e) => onChange("date", e.target.value)}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+              />
+              {errors.date && <p className="text-xs text-red-600 font-medium mt-1">{errors.date}</p>}
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">Preferred Train</label>
+              <input
+                type="text"
+                placeholder="e.g. Shatabdi / Rajdhani / Any"
+                value={formData.preferred_train || ""}
+                onChange={(e) => onChange("preferred_train", e.target.value)}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">Class *</label>
+              <select
+                value={formData.travel_class || "3A"}
+                onChange={(e) => onChange("travel_class", e.target.value)}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+              >
+                {CLASS_OPTIONS.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">Quota *</label>
+              <select
+                value={formData.quota || "General"}
+                onChange={(e) => onChange("quota", e.target.value)}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+              >
+                {QUOTA_OPTIONS.map((q) => (
+                  <option key={q.value} value={q.value}>
+                    {q.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">Preferred Time</label>
+              <input
+                type="time"
+                value={formData.time || "07:00"}
+                onChange={(e) => onChange("time", e.target.value)}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">Train Number (Optional)</label>
+              <input
+                type="text"
+                placeholder="e.g. 12608 / 12028 / Any"
+                value={formData.train_number || ""}
+                onChange={(e) => onChange("train_number", e.target.value)}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={handleContinueToPassengers}
+              className="bg-[#f97316] hover:bg-[#ea580c] text-white font-black px-8 py-3.5 rounded-xl uppercase text-sm shadow-md transition-all hover:scale-105"
+            >
+              Continue to Passenger Details →
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        /* STEP 2: PASSENGER DETAILS (Max 6 Members) */
+        <div className="space-y-5 animate-in fade-in duration-300">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+              <Users className="w-4 h-4 text-amber-600" /> Passenger Details ({passengers.length}/6)
+            </h3>
+            {passengers.length < 6 && (
+              <button
+                type="button"
+                onClick={addPassenger}
+                className="text-xs font-bold text-amber-800 hover:text-amber-900 flex items-center gap-1 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200"
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Passenger
+              </button>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            {passengers.map((p, idx) => (
+              <div
+                key={idx}
+                className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-2xs"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-extrabold text-amber-800">Passenger {idx + 1}</span>
+                  {passengers.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removePassenger(idx)}
+                      className="p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Remove Passenger"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                  <div className="sm:col-span-6">
+                    <label className="text-[11px] font-bold text-slate-600 block mb-1">Full Name *</label>
+                    <input
+                      type="text"
+                      placeholder="As per Aadhaar / ID"
+                      value={p.name}
+                      onChange={(e) => updatePassenger(idx, "name", e.target.value)}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label className="text-[11px] font-bold text-slate-600 block mb-1">Age *</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="120"
+                      placeholder="Age"
+                      value={p.age}
+                      onChange={(e) => updatePassenger(idx, "age", e.target.value)}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label className="text-[11px] font-bold text-slate-600 block mb-1">Gender *</label>
+                    <select
+                      value={p.gender}
+                      onChange={(e) => updatePassenger(idx, "gender", e.target.value)}
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                    >
+                      <option>Male</option>
+                      <option>Female</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-600 block mb-1">Berth Preference</label>
+                  <div className="flex flex-wrap gap-2">
+                    {BERTH_OPTIONS.map((b) => (
+                      <button
+                        key={b}
+                        type="button"
+                        onClick={() => updatePassenger(idx, "berth_preference", b)}
+                        className={`px-3 py-1 rounded-xl text-xs font-bold border transition-all ${
+                          p.berth_preference === b
+                            ? "bg-amber-500 text-slate-950 border-amber-500 shadow-2xs"
+                            : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                        }`}
+                      >
+                        {b}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-between pt-4 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setTrainStep("JOURNEY")}
+              className="text-xs font-bold text-slate-600 hover:text-slate-900 px-4 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50"
+            >
+              ← Back to Journey Details
+            </button>
+
+            <button
+              type="button"
+              onClick={handleFinalSubmit}
+              disabled={isSubmitting}
+              className="bg-[#f97316] hover:bg-[#ea580c] text-white font-black px-10 py-3.5 rounded-xl uppercase text-sm shadow-md transition-all hover:scale-105 disabled:opacity-60"
+            >
+              {isSubmitting ? "Confirming Ticket Copy..." : "CONTINUE TO BOOKING →"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -298,13 +298,21 @@ function BookingPage() {
 
   // From and To locations
   const fromLocationDisplay = useMemo(() => {
+    if (serviceType === "TRAIN") return (otherFormData.from_station || "BANGALORE CITY (SBC)").toUpperCase();
+    if (serviceType === "BUS") return (otherFormData.from_location || "BANGALORE").toUpperCase();
+    if (serviceType === "FLIGHT") return (otherFormData.from_airport || "BANGALORE (BLR)").toUpperCase();
+    if (serviceType === "TOUR") return "BANGALORE";
     if (cabTripType === "AIRPORT" && airportTripType === "Pickup from Airport") {
       return airportName.split(",")[0].toUpperCase();
     }
     return (cabFrom || "BANGALORE").toUpperCase();
-  }, [cabTripType, airportTripType, airportName, cabFrom]);
+  }, [serviceType, otherFormData, cabTripType, airportTripType, airportName, cabFrom]);
 
   const toLocationDisplay = useMemo(() => {
+    if (serviceType === "TRAIN") return (otherFormData.to_station || "CHENNAI CENTRAL (MAS)").toUpperCase();
+    if (serviceType === "BUS") return (otherFormData.destination || "MYSORE").toUpperCase();
+    if (serviceType === "FLIGHT") return (otherFormData.to_airport || "DELHI (DEL)").toUpperCase();
+    if (serviceType === "TOUR") return (otherFormData.package_title || "SOUTH INDIA TOUR").toUpperCase();
     if (cabTripType === "AIRPORT" && airportTripType === "Drop to Airport") {
       return airportName.split(",")[0].toUpperCase();
     }
@@ -315,26 +323,100 @@ function BookingPage() {
       return (cabFrom || "BANGALORE LOCAL").toUpperCase();
     }
     return (cabTo || "MYSORE").toUpperCase();
-  }, [cabTripType, airportTripType, airportName, cabTo, cabFrom]);
+  }, [serviceType, otherFormData, cabTripType, airportTripType, airportName, cabTo, cabFrom]);
+
+  const primaryPassengerName = useMemo(() => {
+    if (serviceType === "TRAIN" && otherFormData.passengers?.[0]?.name) {
+      const count = otherFormData.passengers.length;
+      return count > 1
+        ? `${otherFormData.passengers[0].name.toUpperCase()} (+${count - 1} OTHERS)`
+        : otherFormData.passengers[0].name.toUpperCase();
+    }
+    return (passengerName || "GUEST").toUpperCase();
+  }, [serviceType, otherFormData, passengerName]);
 
   const tourTypeDisplay = useMemo(() => {
+    if (serviceType === "TRAIN") return `TRAIN (${otherFormData.travel_class || "3A"})`;
+    if (serviceType === "BUS") return `BUS (${otherFormData.bus_type || "AC SLEEPER"})`;
+    if (serviceType === "FLIGHT") return `FLIGHT (${otherFormData.cabin_class || "ECONOMY"})`;
+    if (serviceType === "TOUR") return "TOUR PACKAGE";
     if (cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") {
       if (localPackage === "8hr_80km") return "HOURLY (8 HRS / 80 KM)";
       if (localPackage === "12hr_120km") return "HOURLY (12 HRS / 120 KM)";
       return "HOURLY (4 HRS / 40 KM)";
     }
     return cabTripType;
-  }, [cabTripType, localPackage]);
+  }, [serviceType, otherFormData, cabTripType, localPackage]);
 
   // Vehicle display without fuel text
   const vehicleDisplay = useMemo(() => {
+    if (serviceType === "TRAIN") {
+      return `TRAIN: ${otherFormData.preferred_train || otherFormData.train_number || "IRCTC EXPRESS"} (${otherFormData.travel_class || "3A"})`;
+    }
+    if (serviceType === "BUS") {
+      return `BUS: ${otherFormData.bus_type || "AC SLEEPER / VOLVO"}`;
+    }
+    if (serviceType === "FLIGHT") {
+      return `FLIGHT: ${otherFormData.cabin_class || "ECONOMY"} (${otherFormData.flight_trip_type || "ONE WAY"})`;
+    }
+    if (serviceType === "TOUR") {
+      return `TOUR: ${otherFormData.package_title || "SOUTH INDIA HOLIDAY"}`;
+    }
     return `${selectedFleet.name.toUpperCase()}${withLuggageCarrier ? " + CARRIER" : ""}`;
-  }, [selectedFleet, withLuggageCarrier]);
+  }, [serviceType, otherFormData, selectedFleet, withLuggageCarrier]);
 
   const swapLocations = () => {
     const temp = cabFrom;
     setCabFrom(cabTo);
     setCabTo(temp);
+  };
+
+  // Direct confirmation for Ticket Booking (No payment step)
+  const handleCompleteTicketBooking = async () => {
+    setIsSubmitting(true);
+    try {
+      const isTrain = serviceType === "TRAIN";
+      const isBus = serviceType === "BUS";
+      const isFlight = serviceType === "FLIGHT";
+
+      const firstPassenger = otherFormData.passengers?.[0]?.name || passengerName || "GUEST";
+      const pCount = otherFormData.passengers?.length || 1;
+
+      const payload = {
+        name: firstPassenger,
+        phone: passengerPhone || "9845003000",
+        service: isTrain ? "Train" : isBus ? "Bus" : isFlight ? "Flight" : "Tour",
+        booking_type: serviceType,
+        pickup: isTrain ? otherFormData.from_station : isBus ? otherFormData.from_location : otherFormData.from_airport || "BANGALORE",
+        destination: isTrain ? otherFormData.to_station : isBus ? otherFormData.destination : otherFormData.to_airport || "CHENNAI",
+        date: otherFormData.date || today,
+        time: otherFormData.time || "07:00",
+        passengers: String(pCount),
+        notes: [
+          `Ticket No: ${ticketNumber}`,
+          `PNR: ${pnrNumber}`,
+          isTrain && `Train: ${otherFormData.preferred_train || "Any"} | No: ${otherFormData.train_number || "N/A"} | Class: ${otherFormData.travel_class} | Quota: ${otherFormData.quota}`,
+          isBus && `Bus Type: ${otherFormData.bus_type}`,
+          isFlight && `Flight: ${otherFormData.cabin_class} | Trip: ${otherFormData.flight_trip_type}`,
+          otherFormData.passengers && `Passengers: ${otherFormData.passengers.map((p: any, i: number) => `P${i + 1}: ${p.name} (${p.age}y/${p.gender}/${p.berth_preference || "None"})`).join(", ")}`,
+        ].filter(Boolean).join(" | "),
+        client_token: `FT-TKT-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      };
+
+      await fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      setStep(5);
+      window.scrollTo({ top: 80, behavior: "smooth" });
+      toast.success("Booking submitted! Official Ticket Copy generated.");
+    } catch (err: any) {
+      toast.error(err.message || "An error occurred while confirming booking.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Step 0 -> Step 1
@@ -913,24 +995,78 @@ function BookingPage() {
           {step === 1 && serviceType !== "CAB" && (
             <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h2 className="font-extrabold text-slate-900 text-lg">
-                  {serviceType === "TRAIN" && "IRCTC Train Ticket Booking"}
-                  {serviceType === "BUS" && "Bus Ticket Booking Assistance"}
-                  {serviceType === "FLIGHT" && "Domestic & International Flight Booking"}
-                  {serviceType === "TOUR" && "Holiday Tour Packages"}
-                </h2>
+                <div>
+                  <h2 className="font-extrabold text-slate-900 text-lg">
+                    {serviceType === "TRAIN" && "IRCTC Train Ticket Booking"}
+                    {serviceType === "BUS" && "Bus Ticket Booking Assistance"}
+                    {serviceType === "FLIGHT" && "Domestic & International Flight Booking"}
+                    {serviceType === "TOUR" && "Holiday Tour Packages"}
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    {serviceType !== "TOUR"
+                      ? "Assisted Ticket Booking with Live PNR & Confirmation Voucher"
+                      : "Curated holiday itineraries across South India"}
+                  </p>
+                </div>
                 <button
                   type="button"
                   onClick={() => setStep(0)}
                   className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" /> Back
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Services
                 </button>
               </div>
 
+              {/* 3 Ticket Switcher Tabs (Train, Flight, Bus) */}
+              {serviceType !== "TOUR" && (
+                <div className="flex justify-center pb-2">
+                  <div className="inline-flex rounded-xl border border-slate-300 overflow-hidden bg-slate-100 p-1 gap-1 shadow-2xs">
+                    <button
+                      type="button"
+                      onClick={() => setServiceType("TRAIN")}
+                      className={`px-4 py-2 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                        serviceType === "TRAIN"
+                          ? "bg-[#0E6B50] text-white shadow-sm font-extrabold"
+                          : "text-slate-700 hover:bg-slate-200"
+                      }`}
+                    >
+                      <TrainFront className="w-4 h-4" /> Train Booking
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setServiceType("FLIGHT")}
+                      className={`px-4 py-2 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                        serviceType === "FLIGHT"
+                          ? "bg-[#0E6B50] text-white shadow-sm font-extrabold"
+                          : "text-slate-700 hover:bg-slate-200"
+                      }`}
+                    >
+                      <Plane className="w-4 h-4" /> Flight Booking
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setServiceType("BUS")}
+                      className={`px-4 py-2 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                        serviceType === "BUS"
+                          ? "bg-[#0E6B50] text-white shadow-sm font-extrabold"
+                          : "text-slate-700 hover:bg-slate-200"
+                      }`}
+                    >
+                      <Bus className="w-4 h-4" /> Bus Booking
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4">
                 {serviceType === "TRAIN" && (
-                  <TrainBookingForm formData={otherFormData} onChange={onOtherChange} errors={errors} />
+                  <TrainBookingForm
+                    formData={otherFormData}
+                    onChange={onOtherChange}
+                    errors={errors}
+                    onCompleteBooking={handleCompleteTicketBooking}
+                    isSubmitting={isSubmitting}
+                  />
                 )}
                 {serviceType === "BUS" && (
                   <BusBookingForm formData={otherFormData} onChange={onOtherChange} errors={errors} />
@@ -943,18 +1079,18 @@ function BookingPage() {
                 )}
               </div>
 
-              <div className="flex justify-end pt-4 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep(3);
-                    window.scrollTo({ top: 80, behavior: "smooth" });
-                  }}
-                  className="bg-[#f97316] hover:bg-[#ea580c] text-white font-black px-8 py-3 rounded-xl uppercase text-sm shadow-md transition-all"
-                >
-                  Continue to Booking →
-                </button>
-              </div>
+              {serviceType !== "TRAIN" && (
+                <div className="flex justify-end pt-4 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={handleCompleteTicketBooking}
+                    disabled={isSubmitting}
+                    className="bg-[#f97316] hover:bg-[#ea580c] text-white font-black px-8 py-3.5 rounded-xl uppercase text-sm shadow-md transition-all hover:scale-105 disabled:opacity-60"
+                  >
+                    {isSubmitting ? "Generating Ticket..." : "CONTINUE TO BOOKING →"}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -1502,7 +1638,7 @@ function BookingPage() {
                           Passenger Name:
                         </td>
                         <td className="p-2.5 font-black text-slate-900 uppercase">
-                          {passengerName || "GUEST"}
+                          {primaryPassengerName}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 bg-slate-50 w-40 whitespace-nowrap">
                           Passenger Phone No.:

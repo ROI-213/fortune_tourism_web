@@ -1,7 +1,7 @@
 import React from "react";
 import { Car, TrainFront, Bus, Plane, Palmtree, CheckCircle2 } from "lucide-react";
 
-export type ServiceType = "CAB" | "TRAIN" | "BUS" | "FLIGHT" | "TOUR";
+export type ServiceType = "CAB" | "TICKET" | "TRAIN" | "BUS" | "FLIGHT" | "TOUR";
 
 interface MultiServiceTypeCardsProps {
   selectedService: ServiceType | null;
@@ -29,34 +29,14 @@ const SERVICES: {
     highlight: "Transparent km/hr fare with live breakdown",
   },
   {
-    id: "TRAIN",
-    name: "Train Booking",
-    badge: "Assisted IRCTC",
+    id: "TICKET",
+    name: "Ticket Booking",
+    badge: "Train · Flight · Bus",
     icon: TrainFront,
     iconBg: "bg-amber-50 border-amber-200",
     iconColor: "text-amber-700",
-    description: "IRCTC train ticket booking assistance with tatkal & berth preferences.",
-    highlight: "Multi-passenger & quota support",
-  },
-  {
-    id: "BUS",
-    name: "Bus Booking",
-    badge: "Multi-Operator",
-    icon: Bus,
-    iconBg: "bg-orange-50 border-orange-200",
-    iconColor: "text-orange-700",
-    description: "AC Sleeper, Non-AC Seater, Volvo bus ticket booking assistance.",
-    highlight: "Boarding point & seat selection",
-  },
-  {
-    id: "FLIGHT",
-    name: "Flight Booking",
-    badge: "Best Airfares",
-    icon: Plane,
-    iconBg: "bg-sky-50 border-sky-200",
-    iconColor: "text-sky-700",
-    description: "Domestic & international flights with round-trip and multi-city search.",
-    highlight: "Airline & cabin class options",
+    description: "IRCTC Train tickets, Domestic & International Flights, and Bus ticket bookings.",
+    highlight: "Fast booking assistance & instant ticket copy",
   },
   {
     id: "TOUR",
@@ -82,17 +62,17 @@ export function MultiServiceTypeCards({ selectedService, onSelect }: MultiServic
         </p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
         {SERVICES.map((s) => {
           const Icon = s.icon;
-          const isSelected = selectedService === s.id;
+          const isSelected = selectedService === s.id || (s.id === "TICKET" && (selectedService === "TRAIN" || selectedService === "FLIGHT" || selectedService === "BUS"));
 
           return (
             <button
               key={s.id}
               type="button"
-              onClick={() => onSelect(s.id)}
-              className={`relative text-left p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between group overflow-hidden ${
+              onClick={() => onSelect(s.id === "TICKET" ? "TRAIN" : s.id)}
+              className={`relative text-left p-5 rounded-2xl border transition-all duration-200 flex flex-col justify-between group overflow-hidden ${
                 isSelected
                   ? "bg-amber-50/70 border-amber-500 ring-2 ring-amber-500/30 shadow-md scale-[1.02]"
                   : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/60 shadow-xs"
@@ -108,7 +88,7 @@ export function MultiServiceTypeCards({ selectedService, onSelect }: MultiServic
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div
-                    className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${
+                    className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all ${
                       isSelected
                         ? "bg-white shadow-xs " + s.iconColor + " border-amber-200"
                         : s.iconBg + " " + s.iconColor
@@ -119,21 +99,21 @@ export function MultiServiceTypeCards({ selectedService, onSelect }: MultiServic
                 </div>
 
                 <div>
-                  <div className="font-extrabold text-slate-900 text-sm sm:text-base leading-tight">
+                  <div className="font-extrabold text-slate-900 text-base leading-tight">
                     {s.name}
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed font-normal">
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed font-normal">
                     {s.description}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[10px] font-bold text-slate-600">
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[11px] font-bold text-slate-600">
                   {s.badge}
                 </span>
                 <span
-                  className={`text-[10px] font-extrabold uppercase tracking-wider ${
+                  className={`text-xs font-extrabold uppercase tracking-wider ${
                     isSelected ? "text-amber-700" : "text-slate-400 group-hover:text-slate-600"
                   }`}
                 >
