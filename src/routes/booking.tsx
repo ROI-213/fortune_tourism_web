@@ -305,16 +305,17 @@ function BookingPage() {
   }, [cabTripType, airportTripType, airportName, cabFrom]);
 
   const toLocationDisplay = useMemo(() => {
-    if (cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") {
-      if (localPackage === "8hr_80km") return "BANGALORE LOCAL (8 HRS / 80 KM)";
-      if (localPackage === "12hr_120km") return "BANGALORE LOCAL (12 HRS / 120 KM)";
-      return "BANGALORE LOCAL (4 HRS / 40 KM)";
-    }
     if (cabTripType === "AIRPORT" && airportTripType === "Drop to Airport") {
       return airportName.split(",")[0].toUpperCase();
     }
+    if (cabTo && cabTo.trim()) {
+      return cabTo.trim().toUpperCase();
+    }
+    if (cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") {
+      return (cabFrom || "BANGALORE LOCAL").toUpperCase();
+    }
     return (cabTo || "MYSORE").toUpperCase();
-  }, [cabTripType, localPackage, airportTripType, airportName, cabTo]);
+  }, [cabTripType, airportTripType, airportName, cabTo, cabFrom]);
 
   const tourTypeDisplay = useMemo(() => {
     if (cabTripType === "LOCAL" || cabTripType === "HOURLY PACKAGE") {
@@ -1475,15 +1476,19 @@ function BookingPage() {
                   </div>
                 </div>
 
-                <div className="space-y-1 text-slate-900 font-sans text-xs">
-                  <div className="text-slate-600 font-medium text-xs">
-                    This copy For Passengers Who Travelling
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-0.5 font-bold text-sm">
-                    <div className="text-slate-950 font-black tracking-wide text-base">
+                <div className="space-y-1.5 text-slate-900 font-sans text-xs">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-1 font-bold text-sm">
+                    <div className="text-slate-950 font-black tracking-wide text-base sm:text-lg">
                       Ticket Copy For Your Journey
                     </div>
+                  </div>
+                  <div className="pt-0.5 pb-1">
+                    <span className="text-xs font-black text-slate-800">
+                      TICKET NUMBER :{" "}
+                      <strong className="font-mono font-black text-amber-700 text-sm sm:text-base tracking-wider bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-300 shadow-2xs">
+                        {ticketNumber}
+                      </strong>
+                    </span>
                   </div>
                 </div>
 

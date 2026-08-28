@@ -22,44 +22,50 @@ export function downloadTicketCopyPDF(data: TicketCopyData) {
   const doc = new jsPDF("p", "mm", "a4");
   const pageWidth = doc.internal.pageSize.getWidth();
 
-  // Top Box Border
-  doc.setDrawColor(20, 20, 20);
-  doc.setLineWidth(0.8);
-  doc.roundedRect(12, 10, pageWidth - 24, 125, 2, 2, "S");
+  const generateAndSave = (imgElement?: HTMLImageElement) => {
+    // Top Box Border
+    doc.setDrawColor(20, 20, 20);
+    doc.setLineWidth(0.8);
+    doc.roundedRect(12, 10, pageWidth - 24, 120, 2, 2, "S");
 
-  // Company Brand Name & Logo Placeholder
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.setTextColor(14, 107, 80); // Emerald brand color
-  doc.text("FORTUNE Tourism", 16, 17);
+    // Company Brand Logo
+    if (imgElement) {
+      try {
+        doc.addImage(imgElement, "PNG", 16, 12, 46, 9);
+      } catch {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(14, 107, 80);
+        doc.text("FORTUNE Tourism", 16, 17);
+      }
+    } else {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.setTextColor(14, 107, 80);
+      doc.text("FORTUNE Tourism", 16, 17);
+    }
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(7.5);
-  doc.setTextColor(50, 50, 50);
-  doc.text(
-    "Address: No.256/A next To Narayana Hospital, Health City, Bommasandra Bangalore. 560099 | Phone: +91 9740463404",
-    16,
-    22,
-  );
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(50, 50, 50);
+    doc.text(
+      "Address: No.256/A next To Narayana Hospital, Health City, Bommasandra Bangalore. 560099 | Phone: +91 9740463404",
+      16,
+      23,
+    );
 
-  // Subheader
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-  doc.setTextColor(90, 90, 90);
-  doc.text("This copy For Passengers Who Travelling", 16, 28);
+    // Main Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(10, 10, 10);
+    doc.text("Ticket Copy For Your Journey", 16, 29);
 
-  // Main Header
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.setTextColor(10, 10, 10);
-  doc.text("Ticket Copy For Your Journey", 16, 34);
+    doc.setFontSize(8.5);
+    doc.text(`BOOKING DATE : ${data.bookingDate}`, pageWidth - 16, 29, { align: "right" });
 
-  doc.setFontSize(8.5);
-  doc.text(`BOOKING DATE : ${data.bookingDate}`, pageWidth - 16, 34, { align: "right" });
-
-  // Main Grid Table
-  autoTable(doc, {
-    startY: 38,
+    // Main Grid Table
+    autoTable(doc, {
+      startY: 33,
     margin: { left: 16, right: 16 },
     theme: "grid",
     styles: {
@@ -148,5 +154,16 @@ export function downloadTicketCopyPDF(data: TicketCopyData) {
     { align: "center" }
   );
 
-  doc.save(`Fortune-Tourism-Ticket-${data.ticketNumber}.pdf`);
+    doc.save(`Fortune-Tourism-Ticket-${data.ticketNumber}.pdf`);
+  };
+
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = () => {
+    generateAndSave(img);
+  };
+  img.onerror = () => {
+    generateAndSave();
+  };
+  img.src = "/fortune-tourism-full-logo.png";
 }
