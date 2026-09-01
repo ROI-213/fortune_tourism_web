@@ -1072,17 +1072,29 @@ function BookingPage() {
                   />
                 )}
                 {serviceType === "BUS" && (
-                  <BusBookingForm formData={otherFormData} onChange={onOtherChange} errors={errors} />
+                  <BusBookingForm
+                    formData={otherFormData}
+                    onChange={onOtherChange}
+                    errors={errors}
+                    onCompleteBooking={handleCompleteTicketBooking}
+                    isSubmitting={isSubmitting}
+                  />
                 )}
                 {serviceType === "FLIGHT" && (
-                  <FlightBookingForm formData={otherFormData} onChange={onOtherChange} errors={errors} />
+                  <FlightBookingForm
+                    formData={otherFormData}
+                    onChange={onOtherChange}
+                    errors={errors}
+                    onCompleteBooking={handleCompleteTicketBooking}
+                    isSubmitting={isSubmitting}
+                  />
                 )}
                 {serviceType === "TOUR" && (
                   <TourBookingForm formData={otherFormData} onChange={onOtherChange} errors={errors} />
                 )}
               </div>
 
-              {serviceType !== "TRAIN" && (
+              {serviceType === "TOUR" && (
                 <div className="flex justify-end pt-4 border-t border-slate-100">
                   <button
                     type="button"
