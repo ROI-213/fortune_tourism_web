@@ -139,6 +139,40 @@ function AdminPage() {
   const [activeService, setActiveService] = useState<ServiceNavKey>("home");
   const [bookingDropdownOpen, setBookingDropdownOpen] = useState(false);
   const bookingDropdownRef = useRef<HTMLDivElement>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnterBooking = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setBookingDropdownOpen(true);
+  };
+
+  const handleMouseLeaveBooking = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setBookingDropdownOpen(false);
+    }, 250);
+  };
+
+  const handleToggleBookingDropdown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setBookingDropdownOpen((prev) => !prev);
+  };
+
+  const handleSelectBookingOption = (key: ServiceNavKey) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setActiveService(key);
+    setBookingDropdownOpen(false);
+  };
+
   const [accountsTab, setAccountsTab] = useState<
     "business" | "statements" | "daily_expenses" | "payment_history" | "pending_payments"
   >("business");
@@ -160,6 +194,9 @@ function AdminPage() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -918,34 +955,34 @@ function AdminPage() {
       </header>
 
       {/* Second Navigation Bar - Sticky Service Management Menu */}
-      <nav className="sticky top-14 sm:top-16 z-40 w-full bg-[#0f1b3d] border-b border-slate-800/90 shadow-sm backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-          <div className="flex items-center md:grid md:grid-cols-5 gap-1.5 sm:gap-2 overflow-x-auto py-2 scrollbar-none">
+      <nav className="sticky top-14 sm:top-16 z-40 w-full bg-[#0f1b3d] border-b border-slate-800/90 shadow-sm backdrop-blur-md overflow-visible">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 overflow-visible">
+          <div className="grid grid-cols-5 gap-1 sm:gap-2 py-2 overflow-visible items-center">
             {/* 1. Home */}
             <button
               type="button"
               onClick={() => setActiveService("home")}
-              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 md:shrink ${
+              className={`w-full flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                 activeService === "home"
                   ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
                   : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
               }`}
             >
-              <Home className={`w-4 h-4 shrink-0 transition-transform ${activeService === "home" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-              <span>Home</span>
+              <Home className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${activeService === "home" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+              <span className="truncate">Home</span>
             </button>
 
             {/* 2. Booking (with Dropdown) */}
             <div
               ref={bookingDropdownRef}
-              className="relative shrink-0 md:shrink"
-              onMouseEnter={() => setBookingDropdownOpen(true)}
-              onMouseLeave={() => setBookingDropdownOpen(false)}
+              className="relative w-full overflow-visible"
+              onMouseEnter={handleMouseEnterBooking}
+              onMouseLeave={handleMouseLeaveBooking}
             >
               <button
                 type="button"
-                onClick={() => setBookingDropdownOpen((prev) => !prev)}
-                className={`w-full flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer ${
+                onClick={handleToggleBookingDropdown}
+                className={`w-full flex items-center justify-center gap-1 sm:gap-1.5 px-1 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                   isBookingActive
                     ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
                     : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
@@ -953,11 +990,11 @@ function AdminPage() {
                 aria-expanded={bookingDropdownOpen}
                 aria-haspopup="true"
               >
-                <Ticket className={`w-4 h-4 shrink-0 transition-transform ${isBookingActive ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-                <span>Booking</span>
+                <Ticket className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${isBookingActive ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+                <span className="truncate">Booking</span>
                 {totalBookingCount > 0 && (
                   <span
-                    className={`text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
+                    className={`hidden sm:inline-block text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
                       isBookingActive ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
                     }`}
                   >
@@ -965,7 +1002,7 @@ function AdminPage() {
                   </span>
                 )}
                 <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                  className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 transition-transform duration-200 ${
                     bookingDropdownOpen ? "rotate-180 text-amber-400" : "text-slate-400"
                   }`}
                 />
@@ -974,46 +1011,48 @@ function AdminPage() {
               {/* Dropdown Menu */}
               {bookingDropdownOpen && (
                 <div
-                  className="absolute left-0 top-full mt-1.5 w-56 rounded-2xl bg-[#0b1329] border border-slate-700/90 shadow-2xl backdrop-blur-md p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 top-full pt-1.5 w-56 sm:w-60 z-50 animate-in fade-in zoom-in-95 duration-150"
                   role="menu"
                 >
-                  <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-800/80 mb-1">
-                    Select Booking Service
+                  <div className="rounded-2xl bg-[#0b1329] border border-slate-700/90 shadow-2xl backdrop-blur-xl p-1.5 ring-1 ring-black/40">
+                    <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-800/80 mb-1">
+                      Select Booking Service
+                    </div>
+                    {bookingDropdownItems.map((item) => {
+                      const Icon = item.icon;
+                      const isItemActive = activeService === item.key;
+                      return (
+                        <button
+                          key={item.key}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectBookingOption(item.key);
+                          }}
+                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-left cursor-pointer ${
+                            isItemActive
+                              ? "bg-amber-500/20 text-amber-400 font-extrabold border border-amber-400/30"
+                              : "text-slate-200 hover:text-amber-300 hover:bg-slate-800/80 border border-transparent"
+                          }`}
+                          role="menuitem"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <Icon className={`w-4 h-4 shrink-0 ${isItemActive ? "text-amber-400" : "text-slate-400"}`} />
+                            <span>{item.label}</span>
+                          </div>
+                          {item.count !== undefined && item.count > 0 && (
+                            <span
+                              className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
+                                isItemActive ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
+                              }`}
+                            >
+                              {item.count}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
-                  {bookingDropdownItems.map((item) => {
-                    const Icon = item.icon;
-                    const isItemActive = activeService === item.key;
-                    return (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => {
-                          setActiveService(item.key);
-                          setBookingDropdownOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-left cursor-pointer ${
-                          isItemActive
-                            ? "bg-amber-500/20 text-amber-400 font-extrabold border border-amber-400/30"
-                            : "text-slate-200 hover:text-amber-300 hover:bg-slate-800/80"
-                        }`}
-                        role="menuitem"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <Icon className={`w-4 h-4 ${isItemActive ? "text-amber-400" : "text-slate-400"}`} />
-                          <span>{item.label}</span>
-                        </div>
-                        {item.count !== undefined && item.count > 0 && (
-                          <span
-                            className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
-                              isItemActive ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
-                            }`}
-                          >
-                            {item.count}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
                 </div>
               )}
             </div>
@@ -1022,31 +1061,33 @@ function AdminPage() {
             <button
               type="button"
               onClick={() => setActiveService("hotel")}
-              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 md:shrink ${
+              className={`w-full flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                 activeService === "hotel"
                   ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
                   : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
               }`}
             >
-              <Hotel className={`w-4 h-4 shrink-0 transition-transform ${activeService === "hotel" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-              <span>Hotel</span>
+              <Hotel className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${activeService === "hotel" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+              <span className="truncate">Hotel</span>
             </button>
 
             {/* 4. Tourism Packages */}
             <button
               type="button"
               onClick={() => setActiveService("packages")}
-              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 md:shrink ${
+              className={`w-full flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                 activeService === "packages"
                   ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
                   : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
               }`}
             >
-              <Package className={`w-4 h-4 shrink-0 transition-transform ${activeService === "packages" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-              <span>Tourism Packages</span>
+              <Package className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${activeService === "packages" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+              <span className="truncate">
+                <span className="hidden sm:inline">Tourism </span>Packages
+              </span>
               {packagesList.length > 0 && (
                 <span
-                  className={`text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
+                  className={`hidden md:inline-block text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
                     activeService === "packages" ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
                   }`}
                 >
@@ -1059,14 +1100,14 @@ function AdminPage() {
             <button
               type="button"
               onClick={() => setActiveService("accounts")}
-              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 md:shrink ${
+              className={`w-full flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                 activeService === "accounts"
                   ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
                   : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
               }`}
             >
-              <IndianRupee className={`w-4 h-4 shrink-0 transition-transform ${activeService === "accounts" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-              <span>Accounts</span>
+              <IndianRupee className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${activeService === "accounts" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+              <span className="truncate">Accounts</span>
             </button>
           </div>
         </div>
