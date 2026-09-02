@@ -44,6 +44,7 @@ import {
   Smartphone,
   Receipt,
   Ticket,
+  ChevronDown,
   AlertCircle,
   History,
   Lock,
@@ -124,8 +125,43 @@ interface VehicleItem {
 }
 
 function AdminPage() {
-  type ServiceNavKey = "home" | "flight" | "bus" | "hotel" | "recharge" | "bill_payment" | "train";
+  type ServiceNavKey =
+    | "home"
+    | "flight"
+    | "bus"
+    | "train"
+    | "cars"
+    | "hotel"
+    | "packages"
+    | "accounts"
+    | "recharge"
+    | "bill_payment";
   const [activeService, setActiveService] = useState<ServiceNavKey>("home");
+  const [bookingDropdownOpen, setBookingDropdownOpen] = useState(false);
+  const bookingDropdownRef = useRef<HTMLDivElement>(null);
+  const [accountsTab, setAccountsTab] = useState<
+    "business" | "statements" | "daily_expenses" | "payment_history" | "pending_payments"
+  >("business");
+
+  // Close booking dropdown on outside click or Escape key
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (bookingDropdownRef.current && !bookingDropdownRef.current.contains(event.target as Node)) {
+        setBookingDropdownOpen(false);
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setBookingDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const [activeTab, setActiveTab] = useState<
     "bookings" | "business" | "statements" | "daily_expenses" | "drivers" | "enquiries" | "packages" | "vehicles" | "storage" | "day_bookings" | "all_bookings" | "pending_payments" | "payment_history"
@@ -799,14 +835,19 @@ function AdminPage() {
     );
   }
 
-  const serviceNavItems = [
-    { key: "home" as const, label: "Home", icon: Home },
+  const totalBookingCount =
+    (bookingStats.flightBookings || 0) +
+    (bookingStats.busBookings || 0) +
+    (bookingStats.trainBookings || 0) +
+    (bookingStats.taxiBookings || 0);
+
+  const isBookingActive = ["flight", "bus", "train", "cars"].includes(activeService);
+
+  const bookingDropdownItems = [
     { key: "flight" as const, label: "Flight", icon: Plane, count: bookingStats.flightBookings },
     { key: "bus" as const, label: "Bus", icon: Bus, count: bookingStats.busBookings },
-    { key: "hotel" as const, label: "Hotel", icon: Hotel },
-    { key: "recharge" as const, label: "Recharge", icon: Smartphone },
-    { key: "bill_payment" as const, label: "Bill Payment", icon: Receipt },
     { key: "train" as const, label: "Train", icon: TrainFront, count: bookingStats.trainBookings },
+    { key: "cars" as const, label: "Cars", icon: Car, count: bookingStats.taxiBookings },
   ];
 
   return (
@@ -879,35 +920,154 @@ function AdminPage() {
       {/* Second Navigation Bar - Sticky Service Management Menu */}
       <nav className="sticky top-14 sm:top-16 z-40 w-full bg-[#0f1b3d] border-b border-slate-800/90 shadow-sm backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-          <div className="flex items-center md:grid md:grid-cols-7 gap-1 sm:gap-2 overflow-x-auto py-2 scrollbar-none">
-            {serviceNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeService === item.key;
-              return (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() => setActiveService(item.key)}
-                  className={`flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 md:shrink ${
-                    isActive
-                      ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
-                      : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
+          <div className="flex items-center md:grid md:grid-cols-5 gap-1.5 sm:gap-2 overflow-x-auto py-2 scrollbar-none">
+            {/* 1. Home */}
+            <button
+              type="button"
+              onClick={() => setActiveService("home")}
+              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 md:shrink ${
+                activeService === "home"
+                  ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
+                  : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
+              }`}
+            >
+              <Home className={`w-4 h-4 shrink-0 transition-transform ${activeService === "home" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+              <span>Home</span>
+            </button>
+
+            {/* 2. Booking (with Dropdown) */}
+            <div
+              ref={bookingDropdownRef}
+              className="relative shrink-0 md:shrink"
+              onMouseEnter={() => setBookingDropdownOpen(true)}
+              onMouseLeave={() => setBookingDropdownOpen(false)}
+            >
+              <button
+                type="button"
+                onClick={() => setBookingDropdownOpen((prev) => !prev)}
+                className={`w-full flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer ${
+                  isBookingActive
+                    ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
+                    : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
+                }`}
+                aria-expanded={bookingDropdownOpen}
+                aria-haspopup="true"
+              >
+                <Ticket className={`w-4 h-4 shrink-0 transition-transform ${isBookingActive ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+                <span>Booking</span>
+                {totalBookingCount > 0 && (
+                  <span
+                    className={`text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
+                      isBookingActive ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
+                    }`}
+                  >
+                    {totalBookingCount}
+                  </span>
+                )}
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    bookingDropdownOpen ? "rotate-180 text-amber-400" : "text-slate-400"
+                  }`}
+                />
+              </button>
+
+              {/* Dropdown Menu */}
+              {bookingDropdownOpen && (
+                <div
+                  className="absolute left-0 top-full mt-1.5 w-56 rounded-2xl bg-[#0b1329] border border-slate-700/90 shadow-2xl backdrop-blur-md p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  role="menu"
+                >
+                  <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-800/80 mb-1">
+                    Select Booking Service
+                  </div>
+                  {bookingDropdownItems.map((item) => {
+                    const Icon = item.icon;
+                    const isItemActive = activeService === item.key;
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => {
+                          setActiveService(item.key);
+                          setBookingDropdownOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-left cursor-pointer ${
+                          isItemActive
+                            ? "bg-amber-500/20 text-amber-400 font-extrabold border border-amber-400/30"
+                            : "text-slate-200 hover:text-amber-300 hover:bg-slate-800/80"
+                        }`}
+                        role="menuitem"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Icon className={`w-4 h-4 ${isItemActive ? "text-amber-400" : "text-slate-400"}`} />
+                          <span>{item.label}</span>
+                        </div>
+                        {item.count !== undefined && item.count > 0 && (
+                          <span
+                            className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
+                              isItemActive ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
+                            }`}
+                          >
+                            {item.count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* 3. Hotel */}
+            <button
+              type="button"
+              onClick={() => setActiveService("hotel")}
+              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 md:shrink ${
+                activeService === "hotel"
+                  ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
+                  : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
+              }`}
+            >
+              <Hotel className={`w-4 h-4 shrink-0 transition-transform ${activeService === "hotel" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+              <span>Hotel</span>
+            </button>
+
+            {/* 4. Tourism Packages */}
+            <button
+              type="button"
+              onClick={() => setActiveService("packages")}
+              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 md:shrink ${
+                activeService === "packages"
+                  ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
+                  : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
+              }`}
+            >
+              <Package className={`w-4 h-4 shrink-0 transition-transform ${activeService === "packages" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+              <span>Tourism Packages</span>
+              {packagesList.length > 0 && (
+                <span
+                  className={`text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
+                    activeService === "packages" ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 shrink-0 transition-transform ${isActive ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-                  <span>{item.label}</span>
-                  {item.count !== undefined && item.count > 0 && (
-                    <span
-                      className={`text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
-                        isActive ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
-                      }`}
-                    >
-                      {item.count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+                  {packagesList.length}
+                </span>
+              )}
+            </button>
+
+            {/* 5. Accounts */}
+            <button
+              type="button"
+              onClick={() => setActiveService("accounts")}
+              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 md:shrink ${
+                activeService === "accounts"
+                  ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
+                  : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
+              }`}
+            >
+              <IndianRupee className={`w-4 h-4 shrink-0 transition-transform ${activeService === "accounts" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+              <span>Accounts</span>
+            </button>
           </div>
         </div>
       </nav>
@@ -2038,6 +2198,393 @@ function AdminPage() {
               </div>
 
               <BookingsManager initialTab="TRAIN" />
+            </div>
+          )}
+
+          {/* CARS BOOKING MANAGEMENT SECTION */}
+          {activeService === "cars" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-[#0b1329] via-[#101e46] to-[#0b1329] rounded-2xl p-6 text-white border border-slate-800 shadow-md">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold mb-2">
+                      <Car className="w-3.5 h-3.5" />
+                      CAR RENTALS, TAXIS &amp; FLEET MANAGEMENT
+                    </div>
+                    <h2 className="text-2xl font-black text-white">Car Booking Management</h2>
+                    <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                      Manage local city cabs, outstation trips, airport transfers, chauffeur allotments, and fleet vehicle status.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-emerald-900/60 border border-emerald-500/40 text-emerald-200 text-xs font-bold px-3.5 py-2 rounded-xl">
+                      Sedan · SUV · Innova Crysta · Tempo Traveller
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cars Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Taxi / Car Bookings</p>
+                  <p className="text-2xl font-black text-amber-600 mt-1">{bookingStats.taxiBookings}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Active &amp; completed car rentals</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Fleet Vehicles</p>
+                  <p className="text-2xl font-black text-slate-900 mt-1">{vehiclesList.length}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Commercial fleet ready</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Today's Day Trips</p>
+                  <p className="text-2xl font-black text-blue-600 mt-1">{bookingStats.todayBookings}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Assigned &amp; on road</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Fleet Status</p>
+                  <p className="text-2xl font-black text-emerald-600 mt-1">Operational</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Live GPS &amp; driver dispatch</p>
+                </div>
+              </div>
+
+              <BookingsManager initialTab="CAR" />
+            </div>
+          )}
+
+          {/* TOURISM PACKAGES MANAGEMENT SECTION */}
+          {activeService === "packages" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-[#0b1329] via-[#101e46] to-[#0b1329] rounded-2xl p-6 text-white border border-slate-800 shadow-md">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold mb-2">
+                      <Package className="w-3.5 h-3.5" />
+                      HOLIDAY TOURS &amp; ITINERARIES
+                    </div>
+                    <h2 className="text-2xl font-black text-white">Tourism Packages Management</h2>
+                    <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                      Create, customize, price, and manage tour packages across Karnataka, Kerala, Tamil Nadu, Andhra Pradesh, and Goa.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingPkg(null);
+                        setNewPkg({
+                          slug: "",
+                          title: "",
+                          duration: "3 Days · 2 Nights",
+                          from_city: "Bengaluru",
+                          starting_price: 12000,
+                          summary: "",
+                          image: "",
+                        });
+                        setShowPackageForm(true);
+                      }}
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow-md shadow-amber-500/20 transition-all cursor-pointer hover:scale-105"
+                    >
+                      <Plus className="w-4 h-4" /> Add New Package
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Package Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Total Tour Packages</p>
+                  <p className="text-2xl font-black text-slate-900 mt-1">{packagesList.length}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Published on website</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Popular Destinations</p>
+                  <p className="text-2xl font-black text-amber-600 mt-1">Ooty · Coorg · Munnar</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">South India circuits</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Package Enquiries</p>
+                  <p className="text-2xl font-black text-blue-600 mt-1">
+                    {enquiries.filter((e) => (e.service || "").toUpperCase().includes("TOUR") || (e.service || "").toUpperCase().includes("PACKAGE")).length}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Holiday quote requests</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Hub City</p>
+                  <p className="text-2xl font-black text-emerald-600 mt-1">Bengaluru</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Primary departure origin</p>
+                </div>
+              </div>
+
+              {/* Add / Edit Package Modal */}
+              {showPackageForm && (
+                <form
+                  onSubmit={handleSavePackage}
+                  className="mb-6 rounded-2xl border border-slate-300 bg-white p-6 shadow-xl grid gap-4 sm:grid-cols-2 animate-in fade-in duration-200"
+                >
+                  <h3 className="sm:col-span-2 font-black text-base border-b pb-2 text-slate-900 flex items-center justify-between">
+                    <span>{editingPkg ? `Edit Package: ${editingPkg.title}` : "Add New Tour Package"}</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowPackageForm(false)}
+                      className="text-slate-400 hover:text-slate-600 text-sm font-bold"
+                    >
+                      ✕ Cancel
+                    </button>
+                  </h3>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 uppercase">Title *</label>
+                    <input
+                      value={newPkg.title}
+                      onChange={(e) =>
+                        setNewPkg({
+                          ...newPkg,
+                          title: e.target.value,
+                          slug: editingPkg
+                            ? newPkg.slug
+                            : e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+                        })
+                      }
+                      placeholder="e.g. Bengaluru → Coorg Hill Station Special"
+                      className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:ring-2 focus:ring-amber-500 outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 uppercase">Slug *</label>
+                    <input
+                      value={newPkg.slug}
+                      onChange={(e) => setNewPkg({ ...newPkg, slug: e.target.value })}
+                      placeholder="e.g. bengaluru-coorg-hill-station"
+                      className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono focus:ring-2 focus:ring-amber-500 outline-none"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 uppercase">Duration</label>
+                    <input
+                      value={newPkg.duration}
+                      onChange={(e) => setNewPkg({ ...newPkg, duration: e.target.value })}
+                      placeholder="3 Days · 2 Nights"
+                      className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:ring-2 focus:ring-amber-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 uppercase">From City</label>
+                    <input
+                      value={newPkg.from_city}
+                      onChange={(e) => setNewPkg({ ...newPkg, from_city: e.target.value })}
+                      placeholder="Bengaluru"
+                      className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:ring-2 focus:ring-amber-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 uppercase">Starting Price (₹)</label>
+                    <input
+                      type="number"
+                      value={newPkg.starting_price}
+                      onChange={(e) => setNewPkg({ ...newPkg, starting_price: Number(e.target.value) })}
+                      className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-amber-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 uppercase">Image URL</label>
+                    <input
+                      value={newPkg.image}
+                      onChange={(e) => setNewPkg({ ...newPkg, image: e.target.value })}
+                      placeholder="/images/packages/coorg.jpg"
+                      className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:ring-2 focus:ring-amber-500 outline-none"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-semibold text-slate-600 uppercase">Summary / Highlights</label>
+                    <textarea
+                      value={newPkg.summary}
+                      onChange={(e) => setNewPkg({ ...newPkg, summary: e.target.value })}
+                      rows={3}
+                      placeholder="Detailed itinerary overview, inclusions, sightseeing points..."
+                      className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:ring-2 focus:ring-amber-500 outline-none"
+                    />
+                  </div>
+                  <div className="sm:col-span-2 flex justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowPackageForm(false)}
+                      className="px-4 py-2 border rounded-xl font-bold text-slate-600 hover:bg-slate-50 text-xs"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-xl shadow-md hover:from-amber-600 hover:to-amber-700 text-xs"
+                    >
+                      {editingPkg ? "Update Package in Database" : "Save Package to Database"}
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Packages Cards Grid */}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {packagesList.map((pkg) => (
+                  <div key={pkg.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition">
+                    <div>
+                      {pkg.image && (
+                        <img
+                          src={pkg.image}
+                          alt={pkg.title}
+                          className="h-36 w-full rounded-xl object-cover mb-3 bg-slate-100"
+                        />
+                      )}
+                      <h3 className="font-extrabold text-slate-900 text-sm">{pkg.title}</h3>
+                      <p className="text-xs font-medium text-amber-700 mt-1">
+                        {pkg.duration} · From {pkg.from_city}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-2 line-clamp-2">{pkg.summary}</p>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400">Starting from</span>
+                        <p className="text-base font-black text-slate-900">
+                          ₹{Number(pkg.starting_price || 0).toLocaleString("en-IN")}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleEditPackageClick(pkg)}
+                          className="p-2 text-slate-600 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
+                          title="Edit Package"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeletePackage(pkg.id)}
+                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
+                          title="Delete Package"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ACCOUNTS & FINANCIAL OPERATIONS SECTION */}
+          {activeService === "accounts" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-[#0b1329] via-[#101e46] to-[#0b1329] rounded-2xl p-6 text-white border border-slate-800 shadow-md">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold mb-2">
+                      <IndianRupee className="w-3.5 h-3.5" />
+                      ACCOUNTS &amp; FINANCIAL OPERATIONS
+                    </div>
+                    <h2 className="text-2xl font-black text-white">Accounts &amp; Ledger Hub</h2>
+                    <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                      Manage business ledger records, corporate client statements, daily vehicle &amp; office expense reports, and live payment settlements.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-emerald-900/60 border border-emerald-500/40 text-emerald-200 text-xs font-bold px-3.5 py-2 rounded-xl">
+                      GST Invoices · Client Statements · Ledger Book
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accounts Financial Overview */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Total Lifetime Collections</p>
+                  <p className="text-2xl font-black text-slate-900 mt-1">
+                    ₹{Number(bookingStats.totalRevenue || 0).toLocaleString("en-IN")}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Net receipts across all services</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Advance Collected Today</p>
+                  <p className="text-2xl font-black text-blue-600 mt-1">
+                    ₹{Number(bookingStats.todayAdvanceCollected || 0).toLocaleString("en-IN")}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Today's received payments</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Pending Balances Today</p>
+                  <p className="text-2xl font-black text-rose-600 mt-1">
+                    ₹{Number(bookingStats.todayPending || 0).toLocaleString("en-IN")}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Balance receivable on completion</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Unsettled Invoices</p>
+                  <p className="text-2xl font-black text-amber-600 mt-1">{bookingStats.pendingPayments}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Pending collection tickets</p>
+                </div>
+              </div>
+
+              {/* Accounts Sub-Navigation Tabs */}
+              <div className="flex border-b border-border gap-2 overflow-x-auto">
+                <button
+                  onClick={() => setAccountsTab("business")}
+                  className={`pb-3 px-4 font-semibold text-xs sm:text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    accountsTab === "business"
+                      ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)] font-extrabold"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <ClipboardList className="h-4 w-4" /> Business Records
+                </button>
+                <button
+                  onClick={() => setAccountsTab("statements")}
+                  className={`pb-3 px-4 font-semibold text-xs sm:text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    accountsTab === "statements"
+                      ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)] font-extrabold"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <FileSpreadsheet className="h-4 w-4 text-amber-600" /> Client Statements
+                </button>
+                <button
+                  onClick={() => setAccountsTab("daily_expenses")}
+                  className={`pb-3 px-4 font-semibold text-xs sm:text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    accountsTab === "daily_expenses"
+                      ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)] font-extrabold"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <TrendingDown className="h-4 w-4 text-red-600" /> Daily Expense Report
+                </button>
+                <button
+                  onClick={() => setAccountsTab("payment_history")}
+                  className={`pb-3 px-4 font-semibold text-xs sm:text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    accountsTab === "payment_history"
+                      ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)] font-extrabold"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <History className="h-4 w-4 text-emerald-600" /> Payment History
+                </button>
+                <button
+                  onClick={() => setAccountsTab("pending_payments")}
+                  className={`pb-3 px-4 font-semibold text-xs sm:text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    accountsTab === "pending_payments"
+                      ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)] font-extrabold"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <IndianRupee className="h-4 w-4 text-rose-600" /> Remaining Payments ({bookingStats.pendingPayments})
+                </button>
+              </div>
+
+              {/* Sub-tab content */}
+              {accountsTab === "business" && <BusinessDashboard />}
+              {accountsTab === "statements" && <ClientStatementsManager />}
+              {accountsTab === "daily_expenses" && <DailyExpenseReport />}
+              {accountsTab === "payment_history" && <PaymentHistoryManager />}
+              {accountsTab === "pending_payments" && <PendingPaymentsManager />}
             </div>
           )}
         </div>
