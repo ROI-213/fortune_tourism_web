@@ -32,6 +32,7 @@ async function adminApiFetch(url: string, options: RequestInit = {}): Promise<Re
 interface BookingRow {
   id: number;
   booking_number?: string;
+  booking_reference?: string;
   enquiry_number?: string;
   enquiry_id?: number | null;
   category?: string;
@@ -160,8 +161,14 @@ function bookBadge(status?: string): { label: string; cls: string } {
   };
 }
 
-export function BookingsManager() {
-  const [tab, setTab] = useState<TabKey>("all");
+export function BookingsManager({ initialTab = "all" }: { initialTab?: TabKey } = {}) {
+  const [tab, setTab] = useState<TabKey>(initialTab);
+
+  useEffect(() => {
+    if (initialTab) {
+      setTab(initialTab);
+    }
+  }, [initialTab]);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [bookings, setBookings] = useState<BookingRow[]>([]);

@@ -10,6 +10,10 @@ import { DailyExpenseReport } from "@/components/business/DailyExpenseReport";
 import { DayBookingsManager, BookingListManager, PendingPaymentsManager } from "@/components/admin/BookingManager";
 import { BookingsManager } from "@/components/admin/BookingsManager";
 import { PaymentHistoryManager } from "@/components/admin/PaymentHistoryManager";
+import { HotelAdminManager } from "@/components/admin/HotelAdminManager";
+import { RechargeAdminManager } from "@/components/admin/RechargeAdminManager";
+import { BillPaymentAdminManager } from "@/components/admin/BillPaymentAdminManager";
+import logoAsset from "@/assets/fortune-tourism-logo.png";
 import { BUSINESS_RESOURCES } from "@/lib/business-schema";
 import {
   Users,
@@ -20,6 +24,7 @@ import {
   Plus,
   Trash2,
   CheckCircle,
+  CheckCircle2,
   Clock,
   Upload,
   ExternalLink,
@@ -35,6 +40,9 @@ import {
   Bus,
   TrainFront,
   Plane,
+  Hotel,
+  Smartphone,
+  Receipt,
   Ticket,
   AlertCircle,
   History,
@@ -52,6 +60,7 @@ import {
   CreditCard,
   TrendingUp,
   Wallet,
+  Zap,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -115,6 +124,9 @@ interface VehicleItem {
 }
 
 function AdminPage() {
+  type ServiceNavKey = "home" | "flight" | "bus" | "hotel" | "recharge" | "bill_payment" | "train";
+  const [activeService, setActiveService] = useState<ServiceNavKey>("home");
+
   const [activeTab, setActiveTab] = useState<
     "bookings" | "business" | "statements" | "daily_expenses" | "drivers" | "enquiries" | "packages" | "vehicles" | "storage" | "day_bookings" | "all_bookings" | "pending_payments" | "payment_history"
   >("business");
@@ -787,50 +799,145 @@ function AdminPage() {
     );
   }
 
-  return (
-    <SiteLayout transparentHeader>
-      <PageHero
-        eyebrow="FORTUNE TOURISM · OPERATIONAL DASHBOARD"
-        title="Fortune Tourism Admin Operations"
-        blurb="Complete administration portal for managing customer enquiries, tour packages, fleet vehicles, driver accounts, and business operations."
-      />
+  const serviceNavItems = [
+    { key: "home" as const, label: "Home", icon: Home },
+    { key: "flight" as const, label: "Flight", icon: Plane, count: bookingStats.flightBookings },
+    { key: "bus" as const, label: "Bus", icon: Bus, count: bookingStats.busBookings },
+    { key: "hotel" as const, label: "Hotel", icon: Hotel },
+    { key: "recharge" as const, label: "Recharge", icon: Smartphone },
+    { key: "bill_payment" as const, label: "Bill Payment", icon: Receipt },
+    { key: "train" as const, label: "Train", icon: TrainFront, count: bookingStats.trainBookings },
+  ];
 
-      <section className="py-10 bg-slate-50/50 min-h-screen">
-        <div className="container-fortune">
-          {/* Status badge, logged-in admin & actions */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/80 px-4 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm">
-                <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                Connected: Fortune Tourism Admin (Live & Operational)
-              </div>
-              <div className="text-xs text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-full font-medium shadow-xs flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-amber-600" />
-                <span>{adminUser?.email || "adminfortunetourism@gmail.com"}</span>
+  return (
+    <SiteLayout transparentHeader hideFooter>
+      {/* First Navigation Bar - Sticky Admin Header */}
+      <header className="sticky top-0 z-50 w-full bg-[#0b1329] border-b border-slate-800 shadow-md backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16 gap-3">
+            {/* Left: Company Logo & Welcome text */}
+            <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+              <button
+                type="button"
+                onClick={() => setActiveService("home")}
+                className="shrink-0 flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 rounded-lg p-0.5 transition"
+                title="Fortune Tourism Admin Home"
+              >
+                <img
+                  src={logoAsset}
+                  alt="Fortune Tourism Logo"
+                  className="h-8 sm:h-10 w-auto object-contain rounded-md"
+                />
+              </button>
+              <div className="min-w-0">
+                <h1 className="text-xs sm:text-sm md:text-base font-extrabold text-white tracking-tight truncate flex items-center gap-1 sm:gap-1.5">
+                  <span className="font-semibold text-slate-300">Welcome to</span>
+                  <span className="text-amber-400 font-black">Fortune Tourism</span>
+                  <span className="text-white">Admin Page</span>
+                </h1>
+                <p className="text-[10px] text-slate-400 hidden sm:block font-medium">
+                  Live Operations, Booking Lifecycle &amp; Utility Services
+                </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Right: Logged-in admin email, Refresh Data, Sign Out */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <div className="hidden lg:flex items-center gap-2 bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-1.5 shadow-inner">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <Mail className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-xs font-semibold text-slate-200 max-w-[200px] truncate">
+                  {adminUser?.email || "adminfortunetourism@gmail.com"}
+                </span>
+              </div>
+
               <button
+                type="button"
                 onClick={fetchData}
                 disabled={loading}
-                className="inline-flex items-center gap-2 rounded-xl border border-border bg-white px-4 py-2 text-sm font-medium shadow-sm transition hover:bg-slate-50 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-slate-100 hover:text-white px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs font-bold shadow-xs transition-all disabled:opacity-50 cursor-pointer focus:ring-2 focus:ring-amber-400"
+                title="Refresh All Database Records"
               >
-                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-                Refresh Data
+                <RefreshCw className={`h-3.5 w-3.5 text-amber-400 ${loading ? "animate-spin" : ""}`} />
+                <span className="hidden sm:inline">Refresh Data</span>
               </button>
+
               <button
+                type="button"
                 onClick={handleLogout}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 px-3.5 py-2 text-sm font-bold shadow-xs transition"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-xl border border-red-900/40 bg-red-950/50 hover:bg-red-900/70 text-red-300 hover:text-red-100 px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs font-extrabold shadow-xs transition-all cursor-pointer focus:ring-2 focus:ring-red-400"
                 title="Sign out of Admin Portal"
               >
-                <LogOut className="h-4 w-4" /> Sign Out
+                <LogOut className="h-3.5 w-3.5 text-red-400" />
+                <span className="hidden xs:inline">Sign Out</span>
               </button>
             </div>
           </div>
+        </div>
+      </header>
 
-          {/* Stats Bar */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-8">
+      {/* Second Navigation Bar - Sticky Service Management Menu */}
+      <nav className="sticky top-14 sm:top-16 z-40 w-full bg-[#0f1b3d] border-b border-slate-800/90 shadow-sm backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+          <div className="flex items-center md:grid md:grid-cols-7 gap-1 sm:gap-2 overflow-x-auto py-2 scrollbar-none">
+            {serviceNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeService === item.key;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setActiveService(item.key)}
+                  className={`flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 md:shrink ${
+                    isActive
+                      ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
+                      : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 shrink-0 transition-transform ${isActive ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+                  <span>{item.label}</span>
+                  {item.count !== undefined && item.count > 0 && (
+                    <span
+                      className={`text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
+                        isActive ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
+                      }`}
+                    >
+                      {item.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content Area */}
+      <section className="py-6 sm:py-8 bg-slate-50/70 min-h-screen">
+        <div className="container-fortune">
+          {/* Sub-header status bar */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 bg-white border border-slate-200/90 rounded-2xl px-4 py-3 shadow-xs">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 shadow-2xs">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+                Live PostgreSQL Connected
+              </div>
+              <span className="text-xs text-slate-500 font-medium">
+                Active View: <span className="font-bold text-amber-700 uppercase">{activeService.replace("_", " ")}</span>
+              </span>
+            </div>
+
+            <div className="text-xs text-slate-500 font-medium flex items-center gap-2">
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
+              <span>Auto-synced: {new Date().toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}</span>
+            </div>
+          </div>
+
+          {/* HOME SERVICE VIEW: EXISTING FULL DASHBOARD */}
+          {activeService === "home" && (
+            <>
+              {/* Stats Bar */}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-8">
             {stats.map((s) => {
               const Icon = s.icon;
               return (
@@ -1760,6 +1867,177 @@ function AdminPage() {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+        </>
+      )}
+      {/* END HOME SERVICE VIEW */}
+
+          {/* FLIGHT MANAGEMENT SECTION */}
+          {activeService === "flight" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-[#0b1329] via-[#101e46] to-[#0b1329] rounded-2xl p-6 text-white border border-slate-800 shadow-md">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold mb-2">
+                      <Plane className="w-3.5 h-3.5" />
+                      AIRLINE TICKETING &amp; FLIGHT OPERATIONS
+                    </div>
+                    <h2 className="text-2xl font-black text-white">Flight Management Section</h2>
+                    <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                      Manage domestic &amp; international flight bookings, PNR issues, ticket copy PDF generation, and passenger manifests.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-blue-900/60 border border-blue-500/40 text-blue-200 text-xs font-bold px-3.5 py-2 rounded-xl">
+                      IndiGo · Air India · Akasa · SpiceJet
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Flight Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Flight Bookings</p>
+                  <p className="text-2xl font-black text-blue-700 mt-1">{bookingStats.flightBookings}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Confirmed air reservations</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Flight Enquiries</p>
+                  <p className="text-2xl font-black text-amber-600 mt-1">
+                    {enquiries.filter((e) => (e.service || "").toUpperCase().includes("FLIGHT")).length}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Airfare quote requests</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Tickets Pending</p>
+                  <p className="text-2xl font-black text-rose-600 mt-1">{bookingStats.ticketsPending}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Requires PDF dispatch</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Payment Status</p>
+                  <p className="text-2xl font-black text-emerald-600 mt-1">Live Gateway</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Connected to PostgreSQL</p>
+                </div>
+              </div>
+
+              <BookingsManager initialTab="FLIGHT" />
+            </div>
+          )}
+
+          {/* BUS MANAGEMENT SECTION */}
+          {activeService === "bus" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-[#0b1329] via-[#101e46] to-[#0b1329] rounded-2xl p-6 text-white border border-slate-800 shadow-md">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold mb-2">
+                      <Bus className="w-3.5 h-3.5" />
+                      INTERCITY &amp; PRIVATE BUS FLEET
+                    </div>
+                    <h2 className="text-2xl font-black text-white">Bus Management Section</h2>
+                    <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                      Manage AC Sleeper, Semi-Sleeper, KSRTC/SETC and private bus passenger manifests, boarding points, and seat allotments.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-orange-900/60 border border-orange-500/40 text-orange-200 text-xs font-bold px-3.5 py-2 rounded-xl">
+                      Multi-Axle · AC Sleeper · Volvo
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bus Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Bus Bookings</p>
+                  <p className="text-2xl font-black text-orange-600 mt-1">{bookingStats.busBookings}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Confirmed bus seats</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Bus Enquiries</p>
+                  <p className="text-2xl font-black text-amber-600 mt-1">
+                    {enquiries.filter((e) => (e.service || "").toUpperCase().includes("BUS")).length}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Route &amp; timing requests</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Day Trips &amp; Routes</p>
+                  <p className="text-2xl font-black text-sky-600 mt-1">{bookingStats.todayBookings}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Active departures today</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Fleet Operations</p>
+                  <p className="text-2xl font-black text-emerald-600 mt-1">Operational</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Live fleet dispatcher</p>
+                </div>
+              </div>
+
+              <BookingsManager initialTab="BUS" />
+            </div>
+          )}
+
+          {/* HOTEL MANAGEMENT SECTION */}
+          {activeService === "hotel" && <HotelAdminManager />}
+
+          {/* RECHARGE MANAGEMENT SECTION */}
+          {activeService === "recharge" && <RechargeAdminManager />}
+
+          {/* BILL PAYMENT MANAGEMENT SECTION */}
+          {activeService === "bill_payment" && <BillPaymentAdminManager />}
+
+          {/* TRAIN MANAGEMENT SECTION */}
+          {activeService === "train" && (
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-[#0b1329] via-[#101e46] to-[#0b1329] rounded-2xl p-6 text-white border border-slate-800 shadow-md">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold mb-2">
+                      <TrainFront className="w-3.5 h-3.5" />
+                      IRCTC RAILWAY RESERVATIONS &amp; PNR
+                    </div>
+                    <h2 className="text-2xl font-black text-white">Train Management Section</h2>
+                    <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                      Monitor Tatkal requests, General quota PNR confirmations, Berth allotments (up to 6 passengers per ticket copy), and refund tracking.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-indigo-900/60 border border-indigo-500/40 text-indigo-200 text-xs font-bold px-3.5 py-2 rounded-xl">
+                      1A · 2A · 3A · SL · Tatkal Quota
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Train Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Train Bookings</p>
+                  <p className="text-2xl font-black text-indigo-600 mt-1">{bookingStats.trainBookings}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">IRCTC confirmed tickets</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Train Enquiries</p>
+                  <p className="text-2xl font-black text-amber-600 mt-1">
+                    {enquiries.filter((e) => (e.service || "").toUpperCase().includes("TRAIN")).length}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Tatkal &amp; waitlist checks</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Ticket Copy Pending</p>
+                  <p className="text-2xl font-black text-yellow-600 mt-1">{bookingStats.ticketsPending}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Requires client dispatch</p>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                  <p className="text-xs font-bold uppercase text-slate-500">Berth Optimization</p>
+                  <p className="text-2xl font-black text-emerald-600 mt-1">Active</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Auto coach/berth generator</p>
+                </div>
+              </div>
+
+              <BookingsManager initialTab="TRAIN" />
             </div>
           )}
         </div>
