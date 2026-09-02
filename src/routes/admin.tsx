@@ -13,6 +13,7 @@ import { PaymentHistoryManager } from "@/components/admin/PaymentHistoryManager"
 import { HotelAdminManager } from "@/components/admin/HotelAdminManager";
 import { RechargeAdminManager } from "@/components/admin/RechargeAdminManager";
 import { BillPaymentAdminManager } from "@/components/admin/BillPaymentAdminManager";
+import { AccountsReportsHub, type AccountReportKey, REPORT_DEFINITIONS } from "@/components/admin/AccountsReportsHub";
 import logoAsset from "@/assets/fortune-tourism-logo.png";
 import { BUSINESS_RESOURCES } from "@/lib/business-schema";
 import {
@@ -173,20 +174,63 @@ function AdminPage() {
     setBookingDropdownOpen(false);
   };
 
+  // Accounts Dropdown states & handlers
+  const [accountsDropdownOpen, setAccountsDropdownOpen] = useState(false);
+  const accountsDropdownRef = useRef<HTMLDivElement>(null);
+  const accountsHoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [activeAccountReport, setActiveAccountReport] = useState<AccountReportKey>("reports");
+
+  const handleMouseEnterAccounts = () => {
+    if (accountsHoverTimeoutRef.current) {
+      clearTimeout(accountsHoverTimeoutRef.current);
+      accountsHoverTimeoutRef.current = null;
+    }
+    setAccountsDropdownOpen(true);
+  };
+
+  const handleMouseLeaveAccounts = () => {
+    accountsHoverTimeoutRef.current = setTimeout(() => {
+      setAccountsDropdownOpen(false);
+    }, 250);
+  };
+
+  const handleToggleAccountsDropdown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (accountsHoverTimeoutRef.current) {
+      clearTimeout(accountsHoverTimeoutRef.current);
+      accountsHoverTimeoutRef.current = null;
+    }
+    setAccountsDropdownOpen((prev) => !prev);
+  };
+
+  const handleSelectAccountOption = (reportKey: AccountReportKey) => {
+    if (accountsHoverTimeoutRef.current) {
+      clearTimeout(accountsHoverTimeoutRef.current);
+      accountsHoverTimeoutRef.current = null;
+    }
+    setActiveAccountReport(reportKey);
+    setActiveService("accounts");
+    setAccountsDropdownOpen(false);
+  };
+
   const [accountsTab, setAccountsTab] = useState<
     "business" | "statements" | "daily_expenses" | "payment_history" | "pending_payments"
   >("business");
 
-  // Close booking dropdown on outside click or Escape key
+  // Close dropdowns on outside click or Escape key
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (bookingDropdownRef.current && !bookingDropdownRef.current.contains(event.target as Node)) {
         setBookingDropdownOpen(false);
       }
+      if (accountsDropdownRef.current && !accountsDropdownRef.current.contains(event.target as Node)) {
+        setAccountsDropdownOpen(false);
+      }
     }
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setBookingDropdownOpen(false);
+        setAccountsDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -196,6 +240,9 @@ function AdminPage() {
       document.removeEventListener("keydown", handleKeyDown);
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
+      }
+      if (accountsHoverTimeoutRef.current) {
+        clearTimeout(accountsHoverTimeoutRef.current);
       }
     };
   }, []);
@@ -1071,7 +1118,7 @@ function AdminPage() {
               <span className="truncate">Hotel</span>
             </button>
 
-            {/* 4. Tourism Packages */}
+            {/* 4. Tour Package */}
             <button
               type="button"
               onClick={() => setActiveService("packages")}
@@ -1082,9 +1129,7 @@ function AdminPage() {
               }`}
             >
               <Package className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${activeService === "packages" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-              <span className="truncate">
-                <span className="hidden sm:inline">Tourism </span>Packages
-              </span>
+              <span className="truncate">Tour Package</span>
               {packagesList.length > 0 && (
                 <span
                   className={`hidden md:inline-block text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
@@ -1096,19 +1141,81 @@ function AdminPage() {
               )}
             </button>
 
-            {/* 5. Accounts */}
-            <button
-              type="button"
-              onClick={() => setActiveService("accounts")}
-              className={`w-full flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
-                activeService === "accounts"
-                  ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
-                  : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
-              }`}
+            {/* 5. Accounts (with Dropdown) */}
+            <div
+              ref={accountsDropdownRef}
+              className="relative w-full overflow-visible"
+              onMouseEnter={handleMouseEnterAccounts}
+              onMouseLeave={handleMouseLeaveAccounts}
             >
-              <IndianRupee className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${activeService === "accounts" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-              <span className="truncate">Accounts</span>
-            </button>
+              <button
+                type="button"
+                onClick={handleToggleAccountsDropdown}
+                className={`w-full flex items-center justify-center gap-1 sm:gap-1.5 px-1 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
+                  activeService === "accounts"
+                    ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
+                    : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
+                }`}
+                aria-expanded={accountsDropdownOpen}
+                aria-haspopup="true"
+              >
+                <IndianRupee className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${activeService === "accounts" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
+                <span className="truncate">Accounts</span>
+                <ChevronDown
+                  className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 transition-transform duration-200 ${
+                    accountsDropdownOpen ? "rotate-180 text-amber-400" : "text-slate-400"
+                  }`}
+                />
+              </button>
+
+              {/* Accounts Dropdown Menu */}
+              {accountsDropdownOpen && (
+                <div
+                  className="absolute right-0 top-full pt-1.5 w-72 sm:w-80 md:w-[560px] z-50 animate-in fade-in zoom-in-95 duration-150"
+                  role="menu"
+                >
+                  <div className="rounded-2xl bg-[#0b1329] border border-slate-700/90 shadow-2xl backdrop-blur-xl p-2 ring-1 ring-black/40">
+                    <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-800/80 mb-2 flex items-center justify-between">
+                      <span>Accounts &amp; Financial Reports</span>
+                      <span className="text-[9px] text-amber-400/80 font-bold hidden sm:inline">10 Specialized Ledgers</span>
+                    </div>
+
+                    {/* Desktop: 2-column grid, Mobile: 1-column scrollable */}
+                    <div className="max-h-[68vh] overflow-y-auto pr-1 md:grid md:grid-cols-2 gap-1.5 scrollbar-thin">
+                      {REPORT_DEFINITIONS.map((r) => {
+                        const Icon = r.icon;
+                        const isOptActive = activeService === "accounts" && activeAccountReport === r.key;
+                        return (
+                          <button
+                            key={r.key}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectAccountOption(r.key);
+                            }}
+                            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-left cursor-pointer ${
+                              isOptActive
+                                ? "bg-amber-500/20 text-amber-400 font-extrabold border border-amber-400/40 shadow-xs"
+                                : "text-slate-200 hover:text-amber-300 hover:bg-slate-800/80 border border-transparent"
+                            }`}
+                            role="menuitem"
+                          >
+                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                              isOptActive ? "bg-amber-400/20 text-amber-400" : "bg-slate-800 text-slate-300"
+                            }`}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-xs">{r.title}</p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>
@@ -2515,118 +2622,10 @@ function AdminPage() {
 
           {/* ACCOUNTS & FINANCIAL OPERATIONS SECTION */}
           {activeService === "accounts" && (
-            <div className="space-y-6">
-              <div className="bg-gradient-to-r from-[#0b1329] via-[#101e46] to-[#0b1329] rounded-2xl p-6 text-white border border-slate-800 shadow-md">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold mb-2">
-                      <IndianRupee className="w-3.5 h-3.5" />
-                      ACCOUNTS &amp; FINANCIAL OPERATIONS
-                    </div>
-                    <h2 className="text-2xl font-black text-white">Accounts &amp; Ledger Hub</h2>
-                    <p className="text-xs text-slate-300 mt-1 max-w-xl">
-                      Manage business ledger records, corporate client statements, daily vehicle &amp; office expense reports, and live payment settlements.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="bg-emerald-900/60 border border-emerald-500/40 text-emerald-200 text-xs font-bold px-3.5 py-2 rounded-xl">
-                      GST Invoices · Client Statements · Ledger Book
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Accounts Financial Overview */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-                  <p className="text-xs font-bold uppercase text-slate-500">Total Lifetime Collections</p>
-                  <p className="text-2xl font-black text-slate-900 mt-1">
-                    ₹{Number(bookingStats.totalRevenue || 0).toLocaleString("en-IN")}
-                  </p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Net receipts across all services</p>
-                </div>
-                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-                  <p className="text-xs font-bold uppercase text-slate-500">Advance Collected Today</p>
-                  <p className="text-2xl font-black text-blue-600 mt-1">
-                    ₹{Number(bookingStats.todayAdvanceCollected || 0).toLocaleString("en-IN")}
-                  </p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Today's received payments</p>
-                </div>
-                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-                  <p className="text-xs font-bold uppercase text-slate-500">Pending Balances Today</p>
-                  <p className="text-2xl font-black text-rose-600 mt-1">
-                    ₹{Number(bookingStats.todayPending || 0).toLocaleString("en-IN")}
-                  </p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Balance receivable on completion</p>
-                </div>
-                <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-                  <p className="text-xs font-bold uppercase text-slate-500">Unsettled Invoices</p>
-                  <p className="text-2xl font-black text-amber-600 mt-1">{bookingStats.pendingPayments}</p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Pending collection tickets</p>
-                </div>
-              </div>
-
-              {/* Accounts Sub-Navigation Tabs */}
-              <div className="flex border-b border-border gap-2 overflow-x-auto">
-                <button
-                  onClick={() => setAccountsTab("business")}
-                  className={`pb-3 px-4 font-semibold text-xs sm:text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-                    accountsTab === "business"
-                      ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)] font-extrabold"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <ClipboardList className="h-4 w-4" /> Business Records
-                </button>
-                <button
-                  onClick={() => setAccountsTab("statements")}
-                  className={`pb-3 px-4 font-semibold text-xs sm:text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-                    accountsTab === "statements"
-                      ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)] font-extrabold"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <FileSpreadsheet className="h-4 w-4 text-amber-600" /> Client Statements
-                </button>
-                <button
-                  onClick={() => setAccountsTab("daily_expenses")}
-                  className={`pb-3 px-4 font-semibold text-xs sm:text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-                    accountsTab === "daily_expenses"
-                      ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)] font-extrabold"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <TrendingDown className="h-4 w-4 text-red-600" /> Daily Expense Report
-                </button>
-                <button
-                  onClick={() => setAccountsTab("payment_history")}
-                  className={`pb-3 px-4 font-semibold text-xs sm:text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-                    accountsTab === "payment_history"
-                      ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)] font-extrabold"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <History className="h-4 w-4 text-emerald-600" /> Payment History
-                </button>
-                <button
-                  onClick={() => setAccountsTab("pending_payments")}
-                  className={`pb-3 px-4 font-semibold text-xs sm:text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-                    accountsTab === "pending_payments"
-                      ? "border-[color:var(--color-navy)] text-[color:var(--color-navy)] font-extrabold"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <IndianRupee className="h-4 w-4 text-rose-600" /> Remaining Payments ({bookingStats.pendingPayments})
-                </button>
-              </div>
-
-              {/* Sub-tab content */}
-              {accountsTab === "business" && <BusinessDashboard />}
-              {accountsTab === "statements" && <ClientStatementsManager />}
-              {accountsTab === "daily_expenses" && <DailyExpenseReport />}
-              {accountsTab === "payment_history" && <PaymentHistoryManager />}
-              {accountsTab === "pending_payments" && <PendingPaymentsManager />}
-            </div>
+            <AccountsReportsHub
+              initialReport={activeAccountReport}
+              onSelectReport={(k) => setActiveAccountReport(k)}
+            />
           )}
         </div>
       </section>
