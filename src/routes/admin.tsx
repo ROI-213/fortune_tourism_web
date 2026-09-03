@@ -828,9 +828,8 @@ function AdminPage() {
                 alt="Fortune Tourism Logo"
                 className="h-14 sm:h-16 w-auto object-contain rounded-xl shadow-md shrink-0"
               />
-              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-                <span className="font-semibold text-white">Welcome to </span>
-                <span className="text-[color:var(--color-gold)] font-bold">Fortune Tourism</span>
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[color:var(--color-gold)]">
+                Fortune Tourism
               </h1>
             </div>
 
