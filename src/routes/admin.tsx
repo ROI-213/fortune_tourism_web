@@ -1061,21 +1061,12 @@ function AdminPage() {
                       </>
                     ) : (
                       <>
-                        <Shield className="w-4 h-4" /> Sign In to Admin Operations
+                        <Shield className="w-4 h-4" /> Sign In
                       </>
                     )}
                   </button>
                 </div>
               </form>
-
-              <div className="pt-4 border-t border-slate-100 text-center space-y-1">
-                <div className="text-[11px] text-slate-400">
-                  Authorized Personnel Only · Fortune Tourism &copy; 2026
-                </div>
-                <div className="text-[10px] text-slate-400 font-mono">
-                  adminfortunetourism@gmail.com
-                </div>
-              </div>
             </div>
           </div>
         </section>
