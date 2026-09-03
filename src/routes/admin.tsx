@@ -820,14 +820,14 @@ function AdminPage() {
   if (!isAuthenticated) {
     return (
       <SiteLayout transparentHeader>
-        {/* Top Half: Clean White Header Section with Official Fortune Tourism Logo Font */}
-        <section className="relative overflow-hidden bg-white border-b border-slate-200/80 text-slate-900 py-8 sm:py-10 flex items-center justify-center shadow-xs">
-          <div className="relative container-fortune flex items-center justify-center text-center">
+        {/* Top Header: Clean White Section with Large Official Fortune Tourism Brand Logo */}
+        <section className="relative overflow-hidden bg-white border-b border-slate-200/90 text-slate-900 py-6 sm:py-8 md:py-10 flex items-center justify-center shadow-sm">
+          <div className="relative container-fortune flex items-center justify-center text-center px-4">
             <h1 className="sr-only">Fortune Tourism</h1>
             <img
               src={fullLogoAsset}
               alt="Fortune Tourism"
-              className="h-12 sm:h-16 md:h-18 w-auto max-w-[85vw] object-contain mx-auto drop-shadow-xs"
+              className="h-20 sm:h-28 md:h-36 lg:h-40 w-auto max-w-[92vw] sm:max-w-[80vw] md:max-w-[70vw] object-contain mx-auto"
             />
           </div>
         </section>
