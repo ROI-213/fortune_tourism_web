@@ -820,15 +820,21 @@ function AdminPage() {
   if (!isAuthenticated) {
     return (
       <SiteLayout transparentHeader>
-        {/* Top Header: Compact White Section with 15px Padding */}
+        {/* Top Header: Compact White Section with Tagline aligned under TUNE */}
         <header className="relative w-full h-auto bg-white border-b border-slate-200/90 text-slate-900 py-[15px] flex items-center justify-center shadow-xs">
           <div className="w-full flex items-center justify-center text-center px-4">
-            <h1 className="sr-only">Fortune Tourism</h1>
-            <img
-              src={fullLogoAsset}
-              alt="Fortune Tourism"
-              className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto max-w-[90vw] sm:max-w-[75vw] md:max-w-[65vw] object-contain mx-auto block"
-            />
+            <div className="relative inline-flex flex-col items-start max-w-full">
+              <h1 className="sr-only">Fortune Tourism</h1>
+              <img
+                src={fullLogoAsset}
+                alt="Fortune Tourism"
+                className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto max-w-[90vw] sm:max-w-[75vw] md:max-w-[65vw] object-contain block"
+              />
+              {/* Tagline aligned directly under the 'T' of FORTUNE */}
+              <p className="pl-[36.6%] -mt-1 sm:-mt-1.5 md:-mt-2 text-[#006837] font-serif italic font-medium tracking-wide text-[10px] sm:text-xs md:text-sm whitespace-nowrap select-none">
+                Meets all your travel needs...
+              </p>
+            </div>
           </div>
         </header>
 
