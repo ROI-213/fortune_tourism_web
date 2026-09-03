@@ -21,6 +21,10 @@ import karnatakaHeroImg from "@/assets/karnataka-hero.jpg";
 import pondicherryHeroImg from "@/assets/pondicherry-hero.jpg";
 import andhraHeroImg from "@/assets/andhra-hero.jpg";
 import tamilnaduHeroImg from "@/assets/tamilnadu-hero.jpg";
+import fleetInnovaImg from "@/assets/fleet-innova-hero.jpg";
+import fleetTempoImg from "@/assets/fleet-tempo-hero.jpg";
+import fleetDzireImg from "@/assets/fleet-dzire-hero.jpg";
+import fleetHondaImg from "@/assets/fleet-honda-hero.jpg";
 import { BUSINESS_RESOURCES } from "@/lib/business-schema";
 
 const LOGIN_DESTINATION_SLIDES = [
@@ -63,6 +67,38 @@ const LOGIN_DESTINATION_SLIDES = [
     quote: "\u201CTemples, coastlines and cool hill escapes \u2014 a journey of culture in every direction.\u201D",
     image: tamilnaduHeroImg,
     alt: "Explore Tamil Nadu - Land of Heritage, Nature & Spirituality.",
+  },
+  {
+    eyebrow: "PREMIUM FLEET",
+    title: "TOYOTA INNOVA",
+    tagline: "COMFORT. LUXURY. RELIABILITY.",
+    quote: "\u201CSpacious executive travel crafted for long journeys, family tours and highway comfort.\u201D",
+    image: fleetInnovaImg,
+    alt: "Toyota Innova - Fortune Tourism Fleet",
+  },
+  {
+    eyebrow: "GROUP TRAVEL",
+    title: "TEMPO TRAVELLER",
+    tagline: "SPACE. TOGETHERNESS. ADVENTURE.",
+    quote: "\u201CComfortable luxury group touring for family outings, pilgrimages and corporate events.\u201D",
+    image: fleetTempoImg,
+    alt: "Force Tempo Traveller - Fortune Tourism Fleet",
+  },
+  {
+    eyebrow: "CITY & OUTSTATION",
+    title: "SWIFT DZIRE",
+    tagline: "SMOOTH. EFFICIENT. ACCESSIBLE.",
+    quote: "\u201CThe ideal sedan for fast airport transfers, business commutes and seamless city travel.\u201D",
+    image: fleetDzireImg,
+    alt: "Maruti Suzuki Dzire - Fortune Tourism Fleet",
+  },
+  {
+    eyebrow: "EXECUTIVE SEDAN",
+    title: "HONDA CITY",
+    tagline: "ELEGANCE. COMFORT. PRESTIGE.",
+    quote: "\u201CRefined luxury journeys and executive travel experiences with unmatched sophistication.\u201D",
+    image: fleetHondaImg,
+    alt: "Honda City - Fortune Tourism Fleet",
   },
 ];
 import {
