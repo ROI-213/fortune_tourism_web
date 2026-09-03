@@ -17,7 +17,54 @@ import { AccountsReportsHub, type AccountReportKey, REPORT_DEFINITIONS } from "@
 import logoAsset from "@/assets/fortune-tourism-logo.png";
 import fullLogoAsset from "@/assets/fortune-tourism-full-logo.png";
 import keralaHeroImg from "@/assets/kerala-hero.jpg";
+import karnatakaHeroImg from "@/assets/karnataka-hero.jpg";
+import pondicherryHeroImg from "@/assets/pondicherry-hero.jpg";
+import andhraHeroImg from "@/assets/andhra-hero.jpg";
+import tamilnaduHeroImg from "@/assets/tamilnadu-hero.jpg";
 import { BUSINESS_RESOURCES } from "@/lib/business-schema";
+
+const LOGIN_DESTINATION_SLIDES = [
+  {
+    eyebrow: "EXPLORE",
+    title: "KERALA",
+    tagline: "GOD'S OWN COUNTRY.",
+    quote: "\u201CBackwaters, misty hills and coconut coasts \u2014 where nature slows time down.\u201D",
+    image: keralaHeroImg,
+    alt: "Explore Kerala - God's Own Country",
+  },
+  {
+    eyebrow: "EXPLORE",
+    title: "KARNATAKA",
+    tagline: "ONE STATE. ENDLESS EXPERIENCES.",
+    quote: "\u201CFrom royal palaces to whispering waterfalls \u2014 every road here tells a story.\u201D",
+    image: karnatakaHeroImg,
+    alt: "Explore Karnataka - One State. Endless Experiences.",
+  },
+  {
+    eyebrow: "EXPLORE",
+    title: "PONDICHERRY",
+    tagline: "A FRENCH SOUL BY THE SEA.",
+    quote: "\u201CCobbled lanes, caf\u00E9 mornings and turquoise waters \u2014 a little Europe on Indian shores.\u201D",
+    image: pondicherryHeroImg,
+    alt: "Explore Pondicherry - A French Soul By The Sea.",
+  },
+  {
+    eyebrow: "EXPLORE",
+    title: "ANDHRA PRADESH",
+    tagline: "SPIRITUAL. SCENIC. UNFORGETTABLE.",
+    quote: "\u201CTemple bells, hill trains and golden shores \u2014 the soul of the south awaits.\u201D",
+    image: andhraHeroImg,
+    alt: "Explore Andhra Pradesh - Spiritual. Scenic. Unforgettable.",
+  },
+  {
+    eyebrow: "EXPLORE",
+    title: "TAMIL NADU",
+    tagline: "LAND OF HERITAGE, NATURE & SPIRITUALITY.",
+    quote: "\u201CTemples, coastlines and cool hill escapes \u2014 a journey of culture in every direction.\u201D",
+    image: tamilnaduHeroImg,
+    alt: "Explore Tamil Nadu - Land of Heritage, Nature & Spirituality.",
+  },
+];
 import {
   Users,
   Car,
@@ -262,6 +309,16 @@ function AdminPage() {
   const [loginLoading, setLoginLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+
+  // Login destination background slides auto-cycle (5s interval)
+  const [activeSlide, setActiveSlide] = useState(0);
+  useEffect(() => {
+    if (isAuthenticated) return;
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % LOGIN_DESTINATION_SLIDES.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
 
   // Data states
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
@@ -840,44 +897,69 @@ function AdminPage() {
           </div>
         </header>
 
-        {/* Bottom Half: Kerala Background Section with Words Content & Login Card */}
+        {/* Bottom Half: Destination Slider Background Section with Words Content & Login Card */}
         <section className="relative overflow-hidden py-14 sm:py-18 px-4 min-h-[75vh] flex flex-col items-center justify-center">
-          {/* Panoramic Kerala Background applied ONLY to this bottom half */}
+          {/* Automatic Moving Background Images with Cross-Fade */}
           <div className="absolute inset-0 z-0">
-            <img
-              src={keralaHeroImg}
-              alt="Explore Kerala - God's Own Country"
-              className="w-full h-full object-cover object-center"
-            />
+            {LOGIN_DESTINATION_SLIDES.map((slide, idx) => (
+              <div
+                key={slide.title}
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                  idx === activeSlide ? "opacity-100 z-1" : "opacity-0 z-0 pointer-events-none"
+                }`}
+              >
+                <img
+                  src={slide.image}
+                  alt={slide.alt}
+                  className="w-full h-full object-cover object-center"
+                />
+              </div>
+            ))}
             {/* Cinematic Gradient Overlays for high contrast */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0b1329]/95 via-[#0b1329]/75 to-[#0b1329]/85" />
-            <div className="absolute inset-0 bg-black/35 backdrop-blur-[0.5px]" />
+            <div className="absolute inset-0 z-2 bg-gradient-to-t from-[#0b1329]/95 via-[#0b1329]/75 to-[#0b1329]/85" />
+            <div className="absolute inset-0 z-2 bg-black/35 backdrop-blur-[0.5px]" />
           </div>
 
           <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center text-center">
-            {/* Words Content: EXPLORE */}
-            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.35em] text-amber-300/95 drop-shadow">
-              EXPLORE
-            </p>
-
-            {/* Words Content: KERALA */}
-            <h2 className="font-heading text-3xl sm:text-5xl md:text-6xl font-black tracking-wider text-white uppercase drop-shadow-2xl leading-none my-1">
-              KERALA
-            </h2>
-
-            {/* Words Content: GOD'S OWN COUNTRY with decorative lines */}
-            <div className="flex items-center justify-center gap-3 w-full max-w-sm sm:max-w-md my-1">
-              <div className="h-px bg-gradient-to-r from-transparent via-amber-400/80 to-amber-400 flex-1" />
-              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.25em] text-amber-300 whitespace-nowrap drop-shadow">
-                GOD&apos;S OWN COUNTRY.
+            {/* Words Content matching the active slide */}
+            <div className="min-h-[140px] sm:min-h-[155px] flex flex-col items-center justify-center">
+              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.35em] text-amber-300/95 drop-shadow transition-all duration-500">
+                {LOGIN_DESTINATION_SLIDES[activeSlide].eyebrow}
               </p>
-              <div className="h-px bg-gradient-to-r from-amber-400 via-amber-400/80 to-transparent flex-1" />
+
+              <h2 className="font-heading text-3xl sm:text-5xl md:text-6xl font-black tracking-wider text-white uppercase drop-shadow-2xl leading-none my-1 transition-all duration-500">
+                {LOGIN_DESTINATION_SLIDES[activeSlide].title}
+              </h2>
+
+              <div className="flex items-center justify-center gap-3 w-full max-w-sm sm:max-w-md my-1">
+                <div className="h-px bg-gradient-to-r from-transparent via-amber-400/80 to-amber-400 flex-1" />
+                <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.25em] text-amber-300 whitespace-nowrap drop-shadow transition-all duration-500">
+                  {LOGIN_DESTINATION_SLIDES[activeSlide].tagline}
+                </p>
+                <div className="h-px bg-gradient-to-r from-amber-400 via-amber-400/80 to-transparent flex-1" />
+              </div>
+
+              <p className="max-w-xl text-xs sm:text-sm text-slate-200 italic font-serif leading-relaxed px-4 drop-shadow-md transition-all duration-500">
+                {LOGIN_DESTINATION_SLIDES[activeSlide].quote}
+              </p>
             </div>
 
-            {/* Words Content: Quote */}
-            <p className="max-w-xl text-xs sm:text-sm text-slate-200 italic font-serif leading-relaxed px-4 drop-shadow-md mb-6">
-              &ldquo;Backwaters, misty hills and coconut coasts &mdash; where nature slows time down.&rdquo;
-            </p>
+            {/* Slide Navigation Indicator Dots */}
+            <div className="flex items-center justify-center gap-2 my-4">
+              {LOGIN_DESTINATION_SLIDES.map((slide, idx) => (
+                <button
+                  key={slide.title}
+                  type="button"
+                  onClick={() => setActiveSlide(idx)}
+                  className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
+                    idx === activeSlide
+                      ? "w-6 bg-amber-400 shadow-xs"
+                      : "w-1.5 bg-white/40 hover:bg-white/70"
+                  }`}
+                  aria-label={`Go to ${slide.title} slide`}
+                />
+              ))}
+            </div>
 
             {/* Login Credentials Card */}
             <div className="w-full max-w-md bg-white/95 backdrop-blur-md border border-white/30 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 text-left">
