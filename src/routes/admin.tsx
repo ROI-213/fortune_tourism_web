@@ -823,17 +823,19 @@ function AdminPage() {
         {/* Top Header: Compact White Section with Tagline aligned under TUNE */}
         <header className="relative w-full h-auto bg-white border-b border-slate-200/90 text-slate-900 py-[15px] flex items-center justify-center shadow-xs">
           <div className="w-full flex items-center justify-center text-center px-4">
-            <div className="relative inline-flex flex-col items-start max-w-full">
+            <div className="relative inline-block max-w-full">
               <h1 className="sr-only">Fortune Tourism</h1>
               <img
                 src={fullLogoAsset}
                 alt="Fortune Tourism"
-                className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto max-w-[90vw] sm:max-w-[75vw] md:max-w-[65vw] object-contain block"
+                className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto max-w-[90vw] sm:max-w-[75vw] md:max-w-[65vw] object-contain block mx-auto"
               />
-              {/* Tagline aligned directly under the 'T' of FORTUNE */}
-              <p className="pl-[36.6%] -mt-1 sm:-mt-1.5 md:-mt-2 text-[#006837] font-serif italic font-medium tracking-wide text-[10px] sm:text-xs md:text-sm whitespace-nowrap select-none">
-                Meets all your travel needs...
-              </p>
+              {/* Tagline centered directly underneath the 'TUNE' portion of FORTUNE */}
+              <div className="absolute left-[48.5%] -translate-x-1/2 bottom-[-2px] sm:bottom-[-3px] md:bottom-[-4px] whitespace-nowrap pointer-events-none">
+                <p className="text-[#006837] font-serif italic font-medium tracking-tight text-[9px] sm:text-[11px] md:text-xs text-center select-none leading-none">
+                  Meets all your travel needs
+                </p>
+              </div>
             </div>
           </div>
         </header>
