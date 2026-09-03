@@ -25,6 +25,7 @@ import fleetInnovaImg from "@/assets/fleet-innova-hero.jpg";
 import fleetTempoImg from "@/assets/fleet-tempo-hero.jpg";
 import fleetDzireImg from "@/assets/fleet-dzire-hero.jpg";
 import fleetHondaImg from "@/assets/fleet-honda-hero.jpg";
+import fleetUrbaniaImg from "@/assets/fleet-urbania-hero.png";
 import { BUSINESS_RESOURCES } from "@/lib/business-schema";
 
 const LOGIN_DESTINATION_SLIDES = [
@@ -83,6 +84,14 @@ const LOGIN_DESTINATION_SLIDES = [
     quote: "\u201CComfortable luxury group touring for family outings, pilgrimages and corporate events.\u201D",
     image: fleetTempoImg,
     alt: "Force Tempo Traveller - Fortune Tourism Fleet",
+  },
+  {
+    eyebrow: "LUXURY COMMUTE",
+    title: "FORCE URBANIA",
+    tagline: "MODERN. LUXURY. SPACIOUS.",
+    quote: "\u201CNext-generation luxury van crafted for premium group touring and executive travel.\u201D",
+    image: fleetUrbaniaImg,
+    alt: "Force Urbania - Fortune Tourism Fleet",
   },
   {
     eyebrow: "CITY & OUTSTATION",
