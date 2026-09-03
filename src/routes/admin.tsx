@@ -819,136 +819,135 @@ function AdminPage() {
   if (!isAuthenticated) {
     return (
       <SiteLayout transparentHeader>
-        {/* Admin Login Hero Banner with Kerala Background Image */}
-        <section className="relative overflow-hidden min-h-[360px] sm:min-h-[400px] md:min-h-[440px] flex items-center justify-center text-center text-white py-14 sm:py-16 md:py-20 px-4">
-          {/* Background Image with Cinematic Overlay */}
+        {/* Full-screen Kerala Background Section with Login Card Overlay */}
+        <section className="relative overflow-hidden min-h-[92vh] flex flex-col items-center justify-center py-12 sm:py-16 px-4">
+          {/* Panoramic Kerala Background Image with Cinematic Darkness Overlay */}
           <div className="absolute inset-0 z-0">
             <img
               src={keralaHeroImg}
               alt="Explore Kerala - God's Own Country"
               className="w-full h-full object-cover object-center"
             />
-            {/* Cinematic Gradient Overlays for optimal readability and contrast */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0b1329] via-[#0b1329]/55 to-[#0b1329]/75" />
-            <div className="absolute inset-0 bg-black/25 backdrop-blur-[0.5px]" />
+            {/* Dark cinematic gradient vignette overlays so the text & login card are crystal clear */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0b1329]/95 via-[#0b1329]/75 to-[#0b1329]/85" />
+            <div className="absolute inset-0 bg-black/35 backdrop-blur-[0.5px]" />
           </div>
 
-          <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center justify-center space-y-3 sm:space-y-4">
-            {/* Company Branding */}
-            <div className="flex items-center justify-center gap-2 sm:gap-2.5 mb-0.5">
+          <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center text-center">
+            {/* Branding: Logo + Fortune Tourism */}
+            <div className="flex items-center justify-center gap-2.5 mb-2">
               <img
                 src={logoAsset}
                 alt="Fortune Tourism Logo"
-                className="h-8 sm:h-9 w-auto object-contain rounded-lg shadow-md border border-amber-400/30 bg-black/40 p-0.5"
+                className="h-9 sm:h-11 w-auto object-contain rounded-xl shadow-lg border border-amber-400/40 bg-black/40 p-0.5"
               />
-              <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-amber-300 drop-shadow">
+              <span className="text-sm sm:text-base font-extrabold uppercase tracking-widest text-amber-300 drop-shadow-md">
                 Fortune Tourism
               </span>
             </div>
 
             {/* Words Content: EXPLORE */}
-            <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.35em] text-amber-300/95 drop-shadow">
+            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.35em] text-amber-300/95 drop-shadow">
               EXPLORE
             </p>
 
             {/* Words Content: KERALA */}
-            <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl font-black tracking-wider text-white uppercase drop-shadow-2xl leading-none">
+            <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl font-black tracking-wider text-white uppercase drop-shadow-2xl leading-none my-1">
               KERALA
             </h1>
 
             {/* Words Content: GOD'S OWN COUNTRY with decorative lines */}
-            <div className="flex items-center justify-center gap-3 w-full max-w-md my-1">
+            <div className="flex items-center justify-center gap-3 w-full max-w-sm sm:max-w-md my-1">
               <div className="h-px bg-gradient-to-r from-transparent via-amber-400/80 to-amber-400 flex-1" />
-              <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em] text-amber-300 whitespace-nowrap drop-shadow">
+              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.25em] text-amber-300 whitespace-nowrap drop-shadow">
                 GOD&apos;S OWN COUNTRY.
               </p>
               <div className="h-px bg-gradient-to-r from-amber-400 via-amber-400/80 to-transparent flex-1" />
             </div>
 
             {/* Words Content: Quote */}
-            <p className="max-w-2xl text-xs sm:text-sm md:text-base text-slate-100 italic font-serif leading-relaxed px-4 drop-shadow-md">
+            <p className="max-w-xl text-xs sm:text-sm text-slate-200 italic font-serif leading-relaxed px-4 drop-shadow-md mb-6">
               &ldquo;Backwaters, misty hills and coconut coasts &mdash; where nature slows time down.&rdquo;
             </p>
-          </div>
-        </section>
 
-        <section className="py-12 sm:py-16 bg-slate-50 min-h-[60vh] flex items-center justify-center px-4">
-          <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl space-y-5">
-            {loginError && (
-              <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-2xl p-3.5 text-xs text-red-700">
-                <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                <div className="font-medium leading-relaxed">{loginError}</div>
-              </div>
-            )}
-
-            <form onSubmit={handleAdminLogin} className="space-y-4">
-              <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
-                  User ID / Email *
-                </label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="email"
-                    required
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    placeholder="adminfortunetourism@gmail.com"
-                    className="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
-                  />
+            {/* Login Credentials Card placed directly on top of the Kerala Background */}
+            <div className="w-full max-w-md bg-white/95 backdrop-blur-md border border-white/30 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 text-left">
+              {loginError && (
+                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-2xl p-3.5 text-xs text-red-700">
+                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                  <div className="font-medium leading-relaxed">{loginError}</div>
                 </div>
-              </div>
+              )}
 
-              <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
-                  Password *
-                </label>
-                <div className="relative">
-                  <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-10 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
-                  />
+              <form onSubmit={handleAdminLogin} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
+                    User ID / Email *
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      required
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
+                      placeholder="adminfortunetourism@gmail.com"
+                      className="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
+                    Password *
+                  </label>
+                  <div className="relative">
+                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-10 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-2">
                   <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                    type="submit"
+                    disabled={loginLoading}
+                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-sm shadow-md shadow-amber-500/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {loginLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Authenticating...
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="w-4 h-4" /> Sign In to Admin Operations
+                      </>
+                    )}
                   </button>
                 </div>
-              </div>
+              </form>
 
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={loginLoading}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-sm shadow-md shadow-amber-500/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
-                >
-                  {loginLoading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Authenticating...
-                    </>
-                  ) : (
-                    <>
-                      <Shield className="w-4 h-4" /> Sign In to Admin Operations
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-
-            <div className="pt-4 border-t border-slate-100 text-center space-y-1">
-              <div className="text-[11px] text-slate-400">
-                Authorized Personnel Only · Fortune Tourism &copy; 2026
-              </div>
-              <div className="text-[10px] text-slate-400 font-mono">
-                adminfortunetourism@gmail.com
+              <div className="pt-4 border-t border-slate-100 text-center space-y-1">
+                <div className="text-[11px] text-slate-400">
+                  Authorized Personnel Only · Fortune Tourism &copy; 2026
+                </div>
+                <div className="text-[10px] text-slate-400 font-mono">
+                  adminfortunetourism@gmail.com
+                </div>
               </div>
             </div>
           </div>
