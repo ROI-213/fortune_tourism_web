@@ -835,18 +835,8 @@ function AdminPage() {
           </div>
         </section>
 
-        <section className="py-16 bg-slate-50 min-h-[70vh] flex items-center justify-center px-4">
-          <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-8 shadow-xl space-y-6">
-            <div className="text-center space-y-2">
-              <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-xs">
-                <Lock className="w-7 h-7" />
-              </div>
-              <h2 className="text-2xl font-extrabold text-slate-900">Administrator Sign In</h2>
-              <p className="text-xs text-slate-500">
-                Enter your credentials to access the Fortune Tourism operational dashboard.
-              </p>
-            </div>
-
+        <section className="py-12 sm:py-16 bg-slate-50 min-h-[60vh] flex items-center justify-center px-4">
+          <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl space-y-5">
             {loginError && (
               <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-2xl p-3.5 text-xs text-red-700">
                 <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
