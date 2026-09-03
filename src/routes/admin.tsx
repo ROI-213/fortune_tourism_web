@@ -929,7 +929,7 @@ function AdminPage() {
             <img
               src={fullLogoAsset}
               alt="Fortune Tourism - Meets all your travel needs"
-              className="h-[100px] sm:h-[125px] md:h-[150px] lg:h-[175px] w-auto max-w-[94vw] sm:max-w-[85vw] md:max-w-[75vw] object-contain block mx-auto"
+              className="h-14 sm:h-18 md:h-22 lg:h-26 w-auto max-w-[94vw] sm:max-w-[85vw] md:max-w-[75vw] object-contain block mx-auto"
             />
           </div>
         </header>
