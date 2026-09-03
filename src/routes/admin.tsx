@@ -819,24 +819,19 @@ function AdminPage() {
     return (
       <SiteLayout transparentHeader>
         {/* Centered Admin Login Hero Section */}
-        <section className="relative overflow-hidden bg-[color:var(--color-navy)] text-[color:var(--color-cream)] py-16 md:py-24">
-          <div className="relative container-fortune flex flex-col items-center justify-center text-center">
+        <section className="relative overflow-hidden bg-[color:var(--color-navy)] text-[color:var(--color-cream)] py-14 sm:py-16 md:py-20 flex items-center justify-center">
+          <div className="relative container-fortune flex items-center justify-center text-center">
             {/* Logo and Heading Group */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4.5">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4.5">
               <img
                 src={logoAsset}
                 alt="Fortune Tourism Logo"
                 className="h-14 sm:h-16 w-auto object-contain rounded-xl shadow-md shrink-0"
               />
-              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[color:var(--color-gold)]">
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[color:var(--color-gold)] leading-none">
                 Fortune Tourism
               </h1>
             </div>
-
-            {/* Subtitle directly below */}
-            <p className="mt-3 sm:mt-4 max-w-2xl text-sm sm:text-base md:text-lg opacity-90 text-slate-300 font-medium">
-              Live Operations, Booking Lifecycle &amp; Utility Services
-            </p>
           </div>
         </section>
 
