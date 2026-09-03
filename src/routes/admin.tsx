@@ -819,42 +819,46 @@ function AdminPage() {
   if (!isAuthenticated) {
     return (
       <SiteLayout transparentHeader>
-        {/* Full-screen Kerala Background Section with Login Card Overlay */}
-        <section className="relative overflow-hidden min-h-[92vh] flex flex-col items-center justify-center py-12 sm:py-16 px-4">
-          {/* Panoramic Kerala Background Image with Cinematic Darkness Overlay */}
+        {/* Top Half: Dark Navy Hero Section */}
+        <section className="relative overflow-hidden bg-[color:var(--color-navy)] text-[color:var(--color-cream)] py-12 sm:py-14 flex items-center justify-center">
+          <div className="relative container-fortune flex items-center justify-center text-center">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4.5">
+              <img
+                src={logoAsset}
+                alt="Fortune Tourism Logo"
+                className="h-12 sm:h-14 w-auto object-contain rounded-xl shadow-md shrink-0"
+              />
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[color:var(--color-gold)] leading-none">
+                Fortune Tourism
+              </h1>
+            </div>
+          </div>
+        </section>
+
+        {/* Bottom Half: Kerala Background Section with Words Content & Login Card */}
+        <section className="relative overflow-hidden py-14 sm:py-18 px-4 min-h-[75vh] flex flex-col items-center justify-center">
+          {/* Panoramic Kerala Background applied ONLY to this bottom half */}
           <div className="absolute inset-0 z-0">
             <img
               src={keralaHeroImg}
               alt="Explore Kerala - God's Own Country"
               className="w-full h-full object-cover object-center"
             />
-            {/* Dark cinematic gradient vignette overlays so the text & login card are crystal clear */}
+            {/* Cinematic Gradient Overlays for high contrast */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0b1329]/95 via-[#0b1329]/75 to-[#0b1329]/85" />
             <div className="absolute inset-0 bg-black/35 backdrop-blur-[0.5px]" />
           </div>
 
           <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center text-center">
-            {/* Branding: Logo + Fortune Tourism */}
-            <div className="flex items-center justify-center gap-2.5 mb-2">
-              <img
-                src={logoAsset}
-                alt="Fortune Tourism Logo"
-                className="h-9 sm:h-11 w-auto object-contain rounded-xl shadow-lg border border-amber-400/40 bg-black/40 p-0.5"
-              />
-              <span className="text-sm sm:text-base font-extrabold uppercase tracking-widest text-amber-300 drop-shadow-md">
-                Fortune Tourism
-              </span>
-            </div>
-
             {/* Words Content: EXPLORE */}
             <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.35em] text-amber-300/95 drop-shadow">
               EXPLORE
             </p>
 
             {/* Words Content: KERALA */}
-            <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl font-black tracking-wider text-white uppercase drop-shadow-2xl leading-none my-1">
+            <h2 className="font-heading text-3xl sm:text-5xl md:text-6xl font-black tracking-wider text-white uppercase drop-shadow-2xl leading-none my-1">
               KERALA
-            </h1>
+            </h2>
 
             {/* Words Content: GOD'S OWN COUNTRY with decorative lines */}
             <div className="flex items-center justify-center gap-3 w-full max-w-sm sm:max-w-md my-1">
@@ -870,7 +874,7 @@ function AdminPage() {
               &ldquo;Backwaters, misty hills and coconut coasts &mdash; where nature slows time down.&rdquo;
             </p>
 
-            {/* Login Credentials Card placed directly on top of the Kerala Background */}
+            {/* Login Credentials Card */}
             <div className="w-full max-w-md bg-white/95 backdrop-blur-md border border-white/30 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 text-left">
               {loginError && (
                 <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-2xl p-3.5 text-xs text-red-700">
