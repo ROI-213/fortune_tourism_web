@@ -818,15 +818,28 @@ function AdminPage() {
   if (!isAuthenticated) {
     return (
       <SiteLayout transparentHeader>
-        <PageHero
-          title={
-            <>
-              <span className="text-white">Welcome to </span>
-              <span className="text-[color:var(--color-gold)] font-bold">Fortune Tourism</span>
-            </>
-          }
-          blurb="Live Operations, Booking Lifecycle & Utility Services"
-        />
+        {/* Centered Admin Login Hero Section */}
+        <section className="relative overflow-hidden bg-[color:var(--color-navy)] text-[color:var(--color-cream)] py-16 md:py-24">
+          <div className="relative container-fortune flex flex-col items-center justify-center text-center">
+            {/* Logo and Heading Group */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4.5">
+              <img
+                src={logoAsset}
+                alt="Fortune Tourism Logo"
+                className="h-14 sm:h-16 w-auto object-contain rounded-xl shadow-md shrink-0"
+              />
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+                <span className="font-semibold text-white">Welcome to </span>
+                <span className="text-[color:var(--color-gold)] font-bold">Fortune Tourism</span>
+              </h1>
+            </div>
+
+            {/* Subtitle directly below */}
+            <p className="mt-3 sm:mt-4 max-w-2xl text-sm sm:text-base md:text-lg opacity-90 text-slate-300 font-medium">
+              Live Operations, Booking Lifecycle &amp; Utility Services
+            </p>
+          </div>
+        </section>
 
         <section className="py-16 bg-slate-50 min-h-[70vh] flex items-center justify-center px-4">
           <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-8 shadow-xl space-y-6">
