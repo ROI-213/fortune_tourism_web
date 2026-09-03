@@ -997,8 +997,8 @@ function AdminPage() {
               ))}
             </div>
 
-            {/* Login Credentials Card */}
-            <div className="w-full max-w-md bg-white/95 backdrop-blur-md border border-white/30 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 text-left">
+            {/* Login Credentials Card (reduced 20% desktop width) */}
+            <div className="w-full max-w-[92vw] sm:max-w-[360px] mx-auto bg-white/95 backdrop-blur-md border border-white/30 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 text-left">
               {loginError && (
                 <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-2xl p-3.5 text-xs text-red-700">
                   <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
