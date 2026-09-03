@@ -820,17 +820,17 @@ function AdminPage() {
   if (!isAuthenticated) {
     return (
       <SiteLayout transparentHeader>
-        {/* Top Header: Clean White Section with Large Official Fortune Tourism Brand Logo */}
-        <section className="relative overflow-hidden bg-white border-b border-slate-200/90 text-slate-900 py-6 sm:py-8 md:py-10 flex items-center justify-center shadow-sm">
-          <div className="relative container-fortune flex items-center justify-center text-center px-4">
+        {/* Top Header: Compact White Section with 15px Padding */}
+        <header className="relative w-full h-auto bg-white border-b border-slate-200/90 text-slate-900 py-[15px] flex items-center justify-center shadow-xs">
+          <div className="w-full flex items-center justify-center text-center px-4">
             <h1 className="sr-only">Fortune Tourism</h1>
             <img
               src={fullLogoAsset}
               alt="Fortune Tourism"
-              className="h-20 sm:h-28 md:h-36 lg:h-40 w-auto max-w-[92vw] sm:max-w-[80vw] md:max-w-[70vw] object-contain mx-auto"
+              className="h-16 sm:h-20 md:h-24 lg:h-28 w-auto max-w-[90vw] sm:max-w-[75vw] md:max-w-[65vw] object-contain mx-auto block"
             />
           </div>
-        </section>
+        </header>
 
         {/* Bottom Half: Kerala Background Section with Words Content & Login Card */}
         <section className="relative overflow-hidden py-14 sm:py-18 px-4 min-h-[75vh] flex flex-col items-center justify-center">
