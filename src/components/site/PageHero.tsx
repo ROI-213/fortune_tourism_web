@@ -7,8 +7,8 @@ export function PageHero({
   image,
   children,
 }: {
-  eyebrow: string;
-  title: string;
+  eyebrow?: string;
+  title: ReactNode;
   blurb?: string;
   image?: string;
   children?: ReactNode;
@@ -22,7 +22,7 @@ export function PageHero({
         </>
       )}
       <div className="relative container-fortune py-20 md:py-28">
-        <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--color-gold)]">{eyebrow}</p>
+        {eyebrow && <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--color-gold)]">{eyebrow}</p>}
         <h1 className="mt-3 max-w-3xl font-heading text-4xl md:text-6xl">{title}</h1>
         {blurb && <p className="mt-4 max-w-2xl text-base opacity-90 md:text-lg">{blurb}</p>}
         {children && <div className="mt-6">{children}</div>}

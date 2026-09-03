@@ -819,9 +819,13 @@ function AdminPage() {
     return (
       <SiteLayout transparentHeader>
         <PageHero
-          eyebrow="FORTUNE TOURISM · SECURE OPERATIONS"
-          title="Admin Portal Login"
-          blurb="Authorized administrator access for bookings, fleet management, and day operations."
+          title={
+            <>
+              <span className="text-white">Welcome to </span>
+              <span className="text-[color:var(--color-gold)] font-bold">Fortune Tourism</span>
+            </>
+          }
+          blurb="Live Operations, Booking Lifecycle & Utility Services"
         />
 
         <section className="py-16 bg-slate-50 min-h-[70vh] flex items-center justify-center px-4">
