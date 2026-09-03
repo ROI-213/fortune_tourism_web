@@ -15,6 +15,7 @@ import { RechargeAdminManager } from "@/components/admin/RechargeAdminManager";
 import { BillPaymentAdminManager } from "@/components/admin/BillPaymentAdminManager";
 import { AccountsReportsHub, type AccountReportKey, REPORT_DEFINITIONS } from "@/components/admin/AccountsReportsHub";
 import logoAsset from "@/assets/fortune-tourism-logo.png";
+import fullLogoAsset from "@/assets/fortune-tourism-full-logo.png";
 import keralaHeroImg from "@/assets/kerala-hero.jpg";
 import { BUSINESS_RESOURCES } from "@/lib/business-schema";
 import {
@@ -819,20 +820,15 @@ function AdminPage() {
   if (!isAuthenticated) {
     return (
       <SiteLayout transparentHeader>
-        {/* Top Half: Clean White Header Section */}
-        <section className="relative overflow-hidden bg-white border-b border-slate-200/80 text-slate-900 py-10 sm:py-12 flex items-center justify-center shadow-xs">
+        {/* Top Half: Clean White Header Section with Official Fortune Tourism Logo Font */}
+        <section className="relative overflow-hidden bg-white border-b border-slate-200/80 text-slate-900 py-8 sm:py-10 flex items-center justify-center shadow-xs">
           <div className="relative container-fortune flex items-center justify-center text-center">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4.5">
-              <img
-                src={logoAsset}
-                alt="Fortune Tourism Logo"
-                className="h-12 sm:h-14 w-auto object-contain rounded-xl shadow-sm shrink-0"
-              />
-              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-none">
-                <span className="text-slate-900">Fortune </span>
-                <span className="text-amber-600">Tourism</span>
-              </h1>
-            </div>
+            <h1 className="sr-only">Fortune Tourism</h1>
+            <img
+              src={fullLogoAsset}
+              alt="Fortune Tourism"
+              className="h-12 sm:h-16 md:h-18 w-auto max-w-[85vw] object-contain mx-auto drop-shadow-xs"
+            />
           </div>
         </section>
 
