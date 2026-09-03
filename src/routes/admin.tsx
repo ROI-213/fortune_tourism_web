@@ -15,6 +15,7 @@ import { RechargeAdminManager } from "@/components/admin/RechargeAdminManager";
 import { BillPaymentAdminManager } from "@/components/admin/BillPaymentAdminManager";
 import { AccountsReportsHub, type AccountReportKey, REPORT_DEFINITIONS } from "@/components/admin/AccountsReportsHub";
 import logoAsset from "@/assets/fortune-tourism-logo.png";
+import keralaHeroImg from "@/assets/kerala-hero.jpg";
 import { BUSINESS_RESOURCES } from "@/lib/business-schema";
 import {
   Users,
@@ -818,20 +819,56 @@ function AdminPage() {
   if (!isAuthenticated) {
     return (
       <SiteLayout transparentHeader>
-        {/* Centered Admin Login Hero Section */}
-        <section className="relative overflow-hidden bg-[color:var(--color-navy)] text-[color:var(--color-cream)] py-14 sm:py-16 md:py-20 flex items-center justify-center">
-          <div className="relative container-fortune flex items-center justify-center text-center">
-            {/* Logo and Heading Group */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4.5">
+        {/* Admin Login Hero Banner with Kerala Background Image */}
+        <section className="relative overflow-hidden min-h-[360px] sm:min-h-[400px] md:min-h-[440px] flex items-center justify-center text-center text-white py-14 sm:py-16 md:py-20 px-4">
+          {/* Background Image with Cinematic Overlay */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src={keralaHeroImg}
+              alt="Explore Kerala - God's Own Country"
+              className="w-full h-full object-cover object-center"
+            />
+            {/* Cinematic Gradient Overlays for optimal readability and contrast */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0b1329] via-[#0b1329]/55 to-[#0b1329]/75" />
+            <div className="absolute inset-0 bg-black/25 backdrop-blur-[0.5px]" />
+          </div>
+
+          <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center justify-center space-y-3 sm:space-y-4">
+            {/* Company Branding */}
+            <div className="flex items-center justify-center gap-2 sm:gap-2.5 mb-0.5">
               <img
                 src={logoAsset}
                 alt="Fortune Tourism Logo"
-                className="h-14 sm:h-16 w-auto object-contain rounded-xl shadow-md shrink-0"
+                className="h-8 sm:h-9 w-auto object-contain rounded-lg shadow-md border border-amber-400/30 bg-black/40 p-0.5"
               />
-              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[color:var(--color-gold)] leading-none">
+              <span className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-amber-300 drop-shadow">
                 Fortune Tourism
-              </h1>
+              </span>
             </div>
+
+            {/* Words Content: EXPLORE */}
+            <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.35em] text-amber-300/95 drop-shadow">
+              EXPLORE
+            </p>
+
+            {/* Words Content: KERALA */}
+            <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl font-black tracking-wider text-white uppercase drop-shadow-2xl leading-none">
+              KERALA
+            </h1>
+
+            {/* Words Content: GOD'S OWN COUNTRY with decorative lines */}
+            <div className="flex items-center justify-center gap-3 w-full max-w-md my-1">
+              <div className="h-px bg-gradient-to-r from-transparent via-amber-400/80 to-amber-400 flex-1" />
+              <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em] text-amber-300 whitespace-nowrap drop-shadow">
+                GOD&apos;S OWN COUNTRY.
+              </p>
+              <div className="h-px bg-gradient-to-r from-amber-400 via-amber-400/80 to-transparent flex-1" />
+            </div>
+
+            {/* Words Content: Quote */}
+            <p className="max-w-2xl text-xs sm:text-sm md:text-base text-slate-100 italic font-serif leading-relaxed px-4 drop-shadow-md">
+              &ldquo;Backwaters, misty hills and coconut coasts &mdash; where nature slows time down.&rdquo;
+            </p>
           </div>
         </section>
 
