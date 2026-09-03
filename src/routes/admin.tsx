@@ -939,58 +939,41 @@ function AdminPage() {
       {/* First Navigation Bar - Sticky Admin Header */}
       <header className="sticky top-0 z-50 w-full bg-[#0b1329] border-b border-slate-800 shadow-md backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16 gap-3">
-            {/* Left: Company Logo & Welcome text */}
-            <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+          <div className="relative flex items-center justify-between h-11 sm:h-12">
+            {/* Left empty slot to preserve balance */}
+            <div className="w-16 sm:w-20 shrink-0" aria-hidden="true" />
+
+            {/* Exact Horizontal Centre: Logo + Welcome to Fortune Tourism + Subtitle */}
+            <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-2.5 min-w-0 max-w-[calc(100%-110px)] sm:max-w-[calc(100%-160px)]">
               <button
                 type="button"
                 onClick={() => setActiveService("home")}
-                className="shrink-0 flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 rounded-lg p-0.5 transition"
+                className="shrink-0 flex items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 rounded-lg p-0.5 transition"
                 title="Fortune Tourism Admin Home"
               >
                 <img
                   src={logoAsset}
                   alt="Fortune Tourism Logo"
-                  className="h-8 sm:h-10 w-auto object-contain rounded-md"
+                  className="h-6 sm:h-7 w-auto object-contain rounded-md"
                 />
               </button>
-              <div className="min-w-0">
-                <h1 className="text-xs sm:text-sm md:text-base font-extrabold text-white tracking-tight truncate flex items-center gap-1 sm:gap-1.5">
+              <div className="min-w-0 text-center sm:text-left">
+                <h1 className="text-xs sm:text-sm md:text-base font-extrabold text-white tracking-tight truncate flex items-center gap-1 sm:gap-1.5 justify-center sm:justify-start">
                   <span className="font-semibold text-slate-300">Welcome to</span>
                   <span className="text-amber-400 font-black">Fortune Tourism</span>
-                  <span className="text-white">Admin Page</span>
                 </h1>
-                <p className="text-[10px] text-slate-400 hidden sm:block font-medium">
+                <p className="text-[9px] sm:text-[10px] text-slate-400 hidden sm:block font-medium truncate leading-tight">
                   Live Operations, Booking Lifecycle &amp; Utility Services
                 </p>
               </div>
             </div>
 
-            {/* Right: Logged-in admin email, Refresh Data, Sign Out */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-              <div className="hidden lg:flex items-center gap-2 bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-1.5 shadow-inner">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <Mail className="w-3.5 h-3.5 text-amber-400" />
-                <span className="text-xs font-semibold text-slate-200 max-w-[200px] truncate">
-                  {adminUser?.email || "adminfortunetourism@gmail.com"}
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={fetchData}
-                disabled={loading}
-                className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-slate-100 hover:text-white px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs font-bold shadow-xs transition-all disabled:opacity-50 cursor-pointer focus:ring-2 focus:ring-amber-400"
-                title="Refresh All Database Records"
-              >
-                <RefreshCw className={`h-3.5 w-3.5 text-amber-400 ${loading ? "animate-spin" : ""}`} />
-                <span className="hidden sm:inline">Refresh Data</span>
-              </button>
-
+            {/* Right: Sign Out Button */}
+            <div className="flex items-center shrink-0 z-10">
               <button
                 type="button"
                 onClick={handleLogout}
-                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-xl border border-red-900/40 bg-red-950/50 hover:bg-red-900/70 text-red-300 hover:text-red-100 px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs font-extrabold shadow-xs transition-all cursor-pointer focus:ring-2 focus:ring-red-400"
+                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-lg border border-red-900/40 bg-red-950/50 hover:bg-red-900/70 text-red-300 hover:text-red-100 px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-extrabold shadow-xs transition-all cursor-pointer focus:ring-2 focus:ring-red-400"
                 title="Sign out of Admin Portal"
               >
                 <LogOut className="h-3.5 w-3.5 text-red-400" />
@@ -1002,7 +985,7 @@ function AdminPage() {
       </header>
 
       {/* Second Navigation Bar - Sticky Service Management Menu */}
-      <nav className="sticky top-14 sm:top-16 z-40 w-full bg-[#0f1b3d] border-b border-slate-800/90 shadow-sm backdrop-blur-md overflow-visible">
+      <nav className="sticky top-11 sm:top-12 z-40 w-full bg-[#0f1b3d] border-b border-slate-800/90 shadow-sm backdrop-blur-md overflow-visible">
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 overflow-visible">
           <div className="grid grid-cols-5 gap-1 sm:gap-2 py-2 overflow-visible items-center">
             {/* 1. Home */}
