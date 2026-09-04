@@ -1282,91 +1282,13 @@ function AdminPage() {
       {/* Main Content Area */}
       <section className="py-6 sm:py-8 bg-slate-50/80 min-h-screen">
         <div className="container-fortune">
-          {/* Sub-header status bar */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 bg-white border border-slate-200/90 rounded-2xl px-4 py-3 shadow-xs">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 shadow-2xs">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-                Live PostgreSQL Connected
-              </div>
-              <span className="text-xs text-slate-500 font-medium">
-                Active View: <span className="font-bold text-[#063f2d] uppercase">{activeService.replace("_", " ")}</span>
-              </span>
-            </div>
-
-            <div className="text-xs text-slate-500 font-medium flex items-center gap-2">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <span>Auto-synced: {new Date().toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}</span>
-            </div>
-          </div>
-
           {/* HOME SERVICE VIEW: MODERN ADMIN DASHBOARD */}
           {activeService === "home" && (
             <>
-              {/* 1. Summary Cards: Total Bookings, Pending Bookings, Confirmed Bookings, Total Revenue */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                {/* Total Bookings */}
-                <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-md transition">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Bookings</span>
-                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#063f2d] grid place-items-center shadow-2xs">
-                      <CalendarDays className="w-5 h-5" />
-                    </div>
-                  </div>
-                  <p className="text-3xl font-black text-slate-900 tracking-tight">
-                    {bookingStats.totalBookings || 0}
-                  </p>
-                  <p className="text-[11px] text-emerald-700 font-semibold mt-1">Across all travel services</p>
-                </div>
-
-                {/* Pending Bookings */}
-                <div className="bg-white rounded-2xl border border-amber-200/90 p-5 shadow-xs hover:shadow-md transition">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Pending Bookings</span>
-                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#d79a17] grid place-items-center shadow-2xs">
-                      <Clock className="w-5 h-5" />
-                    </div>
-                  </div>
-                  <p className="text-3xl font-black text-amber-700 tracking-tight">
-                    {bookingStats.pendingPayments || 0}
-                  </p>
-                  <p className="text-[11px] text-amber-600 font-semibold mt-1">Awaiting balance / confirmation</p>
-                </div>
-
-                {/* Confirmed Bookings */}
-                <div className="bg-white rounded-2xl border border-emerald-200/90 p-5 shadow-xs hover:shadow-md transition">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">Confirmed Bookings</span>
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#063f2d] grid place-items-center shadow-2xs">
-                      <ShieldCheck className="w-5 h-5" />
-                    </div>
-                  </div>
-                  <p className="text-3xl font-black text-emerald-800 tracking-tight">
-                    {(bookingStats.totalBookings - bookingStats.cancelled) || bookingStats.fullyPaid || 0}
-                  </p>
-                  <p className="text-[11px] text-emerald-600 font-semibold mt-1">Ready &amp; active departures</p>
-                </div>
-
-                {/* Total Revenue */}
-                <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-md transition">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Revenue</span>
-                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#d79a17] grid place-items-center shadow-2xs">
-                      <IndianRupee className="w-5 h-5" />
-                    </div>
-                  </div>
-                  <p className="text-3xl font-black text-slate-900 tracking-tight">
-                    ₹{Number(bookingStats.totalRevenue || 0).toLocaleString("en-IN")}
-                  </p>
-                  <p className="text-[11px] text-slate-500 font-semibold mt-1">Live booking value collected</p>
-                </div>
-              </div>
-
-              {/* 2. Clean Dashboard Service Cards */}
-              <div className="mb-10">
+              {/* Booking Itinerary Service Cards */}
+              <div className="mb-8">
                 <div className="mb-4">
-                  <h2 className="text-lg sm:text-xl font-black text-slate-900 font-heading">Travel Services &amp; Operations</h2>
-                  <p className="text-xs text-slate-500">Quickly manage bookings, fleet allocations, packages, and ticketing across all channels</p>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 font-heading">Booking Itinerary</h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
