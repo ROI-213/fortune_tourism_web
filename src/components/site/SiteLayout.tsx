@@ -7,17 +7,19 @@ export function SiteLayout({
   children,
   transparentHeader = false,
   hideFooter = false,
+  hideFloatingContact = false,
 }: {
   children: ReactNode;
   transparentHeader?: boolean;
   hideFooter?: boolean;
+  hideFloatingContact?: boolean;
 }) {
   return (
     <div className="flex min-h-screen flex-col">
       {!transparentHeader && <Header />}
       <main className="pb-[calc(72px+env(safe-area-inset-bottom))] md:pb-0">{children}</main>
       {!hideFooter && <Footer />}
-      <FloatingContact />
+      {!hideFloatingContact && <FloatingContact />}
     </div>
   );
 }
