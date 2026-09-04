@@ -1279,16 +1279,28 @@ function AdminPage() {
         </div>
       </nav>
 
-      {/* Main Content Area */}
-      <section className="py-4 sm:py-6 bg-slate-50/80">
-        <div className="container-fortune">
+      {/* Main Content Area with Taj Mahal Background */}
+      <section
+        className="relative py-6 sm:py-8 min-h-[calc(100vh-108px)] bg-cover bg-center bg-no-repeat bg-fixed flex flex-col justify-center"
+        style={{ backgroundImage: `url('/taj-mahal-admin-bg.jpg')` }}
+      >
+        {/* Soft elegant gradient overlay to ensure perfect contrast & readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/65 via-slate-900/50 to-slate-950/75 backdrop-blur-[2px] pointer-events-none" />
+
+        <div className="container-fortune relative z-10">
           {/* HOME SERVICE VIEW: MODERN ADMIN DASHBOARD */}
           {activeService === "home" && (
             <>
               {/* Booking Itinerary Service Cards */}
               <div className="mb-2">
-                <div className="mb-3">
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 font-heading">Booking Itinerary</h2>
+                <div className="mb-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-amber-300 text-xs font-bold mb-2 shadow-xs">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Fortune Tourism Operations</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-white font-heading drop-shadow-md tracking-tight">
+                    Booking Itinerary
+                  </h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1348,21 +1360,21 @@ function AdminPage() {
                         key={service.title}
                         type="button"
                         onClick={service.onClick}
-                        className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-xl hover:border-amber-400/60 hover:-translate-y-1 transition-all duration-300 text-left flex flex-col justify-between group cursor-pointer"
+                        className="bg-white/95 backdrop-blur-md rounded-2xl border border-white/80 p-5 shadow-lg hover:shadow-2xl hover:border-amber-400 hover:bg-white hover:-translate-y-1 transition-all duration-300 text-left flex flex-col justify-between group cursor-pointer"
                       >
                         <div>
                           <div className="flex items-center justify-between mb-3">
-                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${service.iconBg}`}>
+                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs ${service.iconBg}`}>
                               <Icon className="w-5 h-5" />
                             </div>
-                            <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 group-hover:bg-amber-100 group-hover:text-amber-900 transition">
+                            <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 group-hover:bg-amber-100 group-hover:text-amber-900 transition shadow-2xs">
                               {service.badge}
                             </span>
                           </div>
                           <h3 className="text-base font-extrabold text-slate-900 group-hover:text-[#063f2d] transition">
                             {service.title}
                           </h3>
-                          <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                          <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-medium">
                             {service.description}
                           </p>
                         </div>
