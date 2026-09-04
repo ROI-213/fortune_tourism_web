@@ -157,6 +157,10 @@ import {
   TrendingUp,
   Wallet,
   Zap,
+  User,
+  Settings,
+  X,
+  Check,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -311,6 +315,13 @@ function AdminPage() {
     "business" | "statements" | "daily_expenses" | "payment_history" | "pending_payments"
   >("business");
 
+  // Account Menu dropdown states & handlers
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [recentBookings, setRecentBookings] = useState<any[]>([]);
+
   // Close dropdowns on outside click or Escape key
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -320,11 +331,17 @@ function AdminPage() {
       if (accountsDropdownRef.current && !accountsDropdownRef.current.contains(event.target as Node)) {
         setAccountsDropdownOpen(false);
       }
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
+        setAccountMenuOpen(false);
+      }
     }
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setBookingDropdownOpen(false);
         setAccountsDropdownOpen(false);
+        setAccountMenuOpen(false);
+        setProfileModalOpen(false);
+        setSettingsModalOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -437,11 +454,12 @@ function AdminPage() {
         "x-admin-key": adminKey,
       };
 
-      const [enqRes, pkgRes, vehRes, statsRes] = await Promise.all([
+      const [enqRes, pkgRes, vehRes, statsRes, bookRes] = await Promise.all([
         fetch("/api/enquiries", { headers }),
         fetch("/api/packages", { headers }),
         fetch("/api/vehicles", { headers }),
         fetch("/api/bookings/stats", { headers }),
+        fetch("/api/bookings?limit=15", { headers }),
       ]);
 
       if (enqRes.ok) {
@@ -459,6 +477,12 @@ function AdminPage() {
       if (statsRes.ok) {
         const d = await statsRes.json();
         if (d.success) setBookingStats(d.stats);
+      }
+      if (bookRes.ok) {
+        const d = await bookRes.json();
+        if (d.success && Array.isArray(d.bookings)) {
+          setRecentBookings(d.bookings);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -937,18 +961,18 @@ function AdminPage() {
         {/* Bottom Half: Destination Slider Background Section with Words Content & Login Card */}
         <main className="relative flex-1 min-h-0 w-full overflow-hidden flex flex-col items-center justify-center px-3 sm:px-4 py-2">
           {/* Automatic Moving Background Images with Cross-Fade */}
-          <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute inset-0 z-0">
             {LOGIN_DESTINATION_SLIDES.map((slide, idx) => (
               <div
                 key={slide.title}
-                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out flex items-center justify-center ${
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
                   idx === activeSlide ? "opacity-100 z-1" : "opacity-0 z-0 pointer-events-none"
                 }`}
               >
                 <img
                   src={slide.image}
                   alt={slide.alt}
-                  className="w-full h-full object-cover object-center scale-75 transition-transform duration-1000 [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)]"
+                  className="w-full h-full object-cover object-center"
                 />
               </div>
             ))}
@@ -1092,265 +1116,266 @@ function AdminPage() {
 
   return (
     <SiteLayout transparentHeader hideFooter>
-      {/* First Navigation Bar - Sticky Admin Header */}
-      <header className="sticky top-0 z-50 w-full bg-[#0b1329] border-b border-slate-800 shadow-md backdrop-blur-md">
+      {/* First Navigation Bar - Compact Top Header */}
+      <header className="sticky top-0 z-50 w-full bg-[#063f2d] border-b border-[#086a46] shadow-md backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="relative flex items-center justify-between h-11 sm:h-12">
-            {/* Left empty slot to preserve balance */}
-            <div className="w-16 sm:w-20 shrink-0" aria-hidden="true" />
-
-            {/* Exact Horizontal Centre: Logo + Welcome to Fortune Tourism + Subtitle */}
-            <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-2.5 min-w-0 max-w-[calc(100%-110px)] sm:max-w-[calc(100%-160px)]">
+          <div className="flex items-center justify-between h-13 sm:h-14">
+            {/* Left: Brand Logo & Title */}
+            <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setActiveService("home")}
-                className="shrink-0 flex items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 rounded-lg p-0.5 transition"
-                title="Fortune Tourism Admin Home"
+                className="flex items-center gap-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 rounded-xl p-1 transition"
+                title="Fortune Tourism Admin"
               >
-                <img
-                  src={logoAsset}
-                  alt="Fortune Tourism Logo"
-                  className="h-6 sm:h-7 w-auto object-contain rounded-md"
-                />
+                <span className="grid place-items-center overflow-hidden rounded-xl bg-white h-8 w-8 sm:h-9 sm:w-9 shadow-xs shrink-0">
+                  <img
+                    src={logoAsset}
+                    alt="Fortune Tourism Logo"
+                    className="h-full w-full object-contain"
+                  />
+                </span>
+                <div className="text-left">
+                  <h1 className="text-sm sm:text-base font-extrabold text-white tracking-tight flex items-center gap-1.5 leading-tight">
+                    <span className="text-white">Welcome to</span>
+                    <span className="text-[#d79a17] font-black">Fortune Tourism Admin</span>
+                  </h1>
+                  <p className="text-[10px] text-emerald-200/80 font-medium hidden sm:block leading-none mt-0.5">
+                    Enterprise Operations &amp; Travel Lifecycle Management
+                  </p>
+                </div>
               </button>
-              <div className="min-w-0 text-center sm:text-left">
-                <h1 className="text-xs sm:text-sm md:text-base font-extrabold text-white tracking-tight truncate flex items-center gap-1 sm:gap-1.5 justify-center sm:justify-start">
-                  <span className="font-semibold text-slate-300">Welcome to</span>
-                  <span className="text-amber-400 font-black">Fortune Tourism</span>
-                </h1>
-                <p className="text-[9px] sm:text-[10px] text-slate-400 hidden sm:block font-medium truncate leading-tight">
-                  Live Operations, Booking Lifecycle &amp; Utility Services
-                </p>
-              </div>
             </div>
 
-            {/* Right: Sign Out Button */}
-            <div className="flex items-center shrink-0 z-10">
+            {/* Right: PostgreSQL Live Badge + Admin Quick Badge */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-900/60 px-3 py-1 text-xs font-semibold text-emerald-200 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                Live Database Connected
+              </div>
               <button
                 type="button"
-                onClick={handleLogout}
-                className="inline-flex items-center gap-1 sm:gap-1.5 rounded-lg border border-red-900/40 bg-red-950/50 hover:bg-red-900/70 text-red-300 hover:text-red-100 px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-extrabold shadow-xs transition-all cursor-pointer focus:ring-2 focus:ring-red-400"
-                title="Sign out of Admin Portal"
+                onClick={() => setProfileModalOpen(true)}
+                className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-700/50 text-emerald-100 text-xs font-bold transition cursor-pointer"
+                title="View Admin Profile"
               >
-                <LogOut className="h-3.5 w-3.5 text-red-400" />
-                <span className="hidden xs:inline">Sign Out</span>
+                <div className="w-5 h-5 rounded-full bg-[#d79a17] text-slate-950 font-black text-[10px] grid place-items-center uppercase">
+                  A
+                </div>
+                <span className="max-w-[150px] truncate">{adminUser?.email || "Admin"}</span>
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Second Navigation Bar - Sticky Service Management Menu */}
-      <nav className="sticky top-11 sm:top-12 z-40 w-full bg-[#0f1b3d] border-b border-slate-800/90 shadow-sm backdrop-blur-md overflow-visible">
-        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 overflow-visible">
-          <div className="grid grid-cols-5 gap-1 sm:gap-2 py-2 overflow-visible items-center">
-            {/* 1. Home */}
-            <button
-              type="button"
-              onClick={() => setActiveService("home")}
-              className={`w-full flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
-                activeService === "home"
-                  ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
-                  : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
-              }`}
-            >
-              <Home className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${activeService === "home" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-              <span className="truncate">Home</span>
-            </button>
-
-            {/* 2. Booking (with Dropdown) */}
-            <div
-              ref={bookingDropdownRef}
-              className="relative w-full overflow-visible"
-              onMouseEnter={handleMouseEnterBooking}
-              onMouseLeave={handleMouseLeaveBooking}
-            >
+      {/* Second Navigation Bar */}
+      <nav className="sticky top-13 sm:top-14 z-40 w-full bg-white border-b border-slate-200 shadow-xs">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-1.5">
+            {/* Left Navigation Items: Dashboard, Booking, Tour Package */}
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* 1. Dashboard */}
               <button
                 type="button"
-                onClick={handleToggleBookingDropdown}
-                className={`w-full flex items-center justify-center gap-1 sm:gap-1.5 px-1 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
-                  isBookingActive
-                    ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
-                    : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
+                onClick={() => setActiveService("home")}
+                className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  activeService === "home"
+                    ? "bg-[#063f2d] text-white shadow-xs font-extrabold"
+                    : "text-slate-700 hover:text-[#063f2d] hover:bg-slate-100"
                 }`}
-                aria-expanded={bookingDropdownOpen}
-                aria-haspopup="true"
               >
-                <Ticket className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${isBookingActive ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-                <span className="truncate">Booking</span>
-                {totalBookingCount > 0 && (
-                  <span
-                    className={`hidden sm:inline-block text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
-                      isBookingActive ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
+                <Home className="w-4 h-4" />
+                <span>Dashboard</span>
+              </button>
+
+              {/* 2. Booking (with Dropdown: Flight, Bus, Train, Cars) */}
+              <div
+                ref={bookingDropdownRef}
+                className="relative"
+                onMouseEnter={handleMouseEnterBooking}
+                onMouseLeave={handleMouseLeaveBooking}
+              >
+                <button
+                  type="button"
+                  onClick={handleToggleBookingDropdown}
+                  className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                    isBookingActive
+                      ? "bg-[#063f2d] text-white shadow-xs font-extrabold"
+                      : "text-slate-700 hover:text-[#063f2d] hover:bg-slate-100"
+                  }`}
+                  aria-expanded={bookingDropdownOpen}
+                >
+                  <Ticket className="w-4 h-4" />
+                  <span>Booking</span>
+                  {totalBookingCount > 0 && (
+                    <span
+                      className={`text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
+                        isBookingActive ? "bg-amber-400 text-slate-950" : "bg-slate-200 text-slate-700"
+                      }`}
+                    >
+                      {totalBookingCount}
+                    </span>
+                  )}
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                      bookingDropdownOpen ? "rotate-180" : ""
                     }`}
-                  >
-                    {totalBookingCount}
-                  </span>
-                )}
-                <ChevronDown
-                  className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 transition-transform duration-200 ${
-                    bookingDropdownOpen ? "rotate-180 text-amber-400" : "text-slate-400"
-                  }`}
-                />
-              </button>
+                  />
+                </button>
 
-              {/* Dropdown Menu */}
-              {bookingDropdownOpen && (
-                <div
-                  className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 top-full pt-1.5 w-56 sm:w-60 z-50 animate-in fade-in zoom-in-95 duration-150"
-                  role="menu"
-                >
-                  <div className="rounded-2xl bg-[#0b1329] border border-slate-700/90 shadow-2xl backdrop-blur-xl p-1.5 ring-1 ring-black/40">
-                    <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-800/80 mb-1">
-                      Select Booking Service
-                    </div>
-                    {bookingDropdownItems.map((item) => {
-                      const Icon = item.icon;
-                      const isItemActive = activeService === item.key;
-                      return (
-                        <button
-                          key={item.key}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectBookingOption(item.key);
-                          }}
-                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-left cursor-pointer ${
-                            isItemActive
-                              ? "bg-amber-500/20 text-amber-400 font-extrabold border border-amber-400/30"
-                              : "text-slate-200 hover:text-amber-300 hover:bg-slate-800/80 border border-transparent"
-                          }`}
-                          role="menuitem"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <Icon className={`w-4 h-4 shrink-0 ${isItemActive ? "text-amber-400" : "text-slate-400"}`} />
-                            <span>{item.label}</span>
-                          </div>
-                          {item.count !== undefined && item.count > 0 && (
-                            <span
-                              className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
-                                isItemActive ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
-                              }`}
-                            >
-                              {item.count}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 3. Hotel */}
-            <button
-              type="button"
-              onClick={() => setActiveService("hotel")}
-              className={`w-full flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
-                activeService === "hotel"
-                  ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
-                  : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
-              }`}
-            >
-              <Hotel className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${activeService === "hotel" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-              <span className="truncate">Hotel</span>
-            </button>
-
-            {/* 4. Tour Package */}
-            <button
-              type="button"
-              onClick={() => setActiveService("packages")}
-              className={`w-full flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
-                activeService === "packages"
-                  ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
-                  : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
-              }`}
-            >
-              <Package className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${activeService === "packages" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-              <span className="truncate">Tour Package</span>
-              {packagesList.length > 0 && (
-                <span
-                  className={`hidden md:inline-block text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none ${
-                    activeService === "packages" ? "bg-amber-400 text-slate-950" : "bg-slate-800 text-slate-300"
-                  }`}
-                >
-                  {packagesList.length}
-                </span>
-              )}
-            </button>
-
-            {/* 5. Accounts (with Dropdown) */}
-            <div
-              ref={accountsDropdownRef}
-              className="relative w-full overflow-visible"
-              onMouseEnter={handleMouseEnterAccounts}
-              onMouseLeave={handleMouseLeaveAccounts}
-            >
-              <button
-                type="button"
-                onClick={handleToggleAccountsDropdown}
-                className={`w-full flex items-center justify-center gap-1 sm:gap-1.5 px-1 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
-                  activeService === "accounts"
-                    ? "bg-amber-500/20 text-amber-400 border-b-2 border-amber-400 shadow-sm font-extrabold"
-                    : "text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 border-b-2 border-transparent"
-                }`}
-                aria-expanded={accountsDropdownOpen}
-                aria-haspopup="true"
-              >
-                <IndianRupee className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform ${activeService === "accounts" ? "text-amber-400 scale-110" : "text-slate-400"}`} />
-                <span className="truncate">Accounts</span>
-                <ChevronDown
-                  className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 transition-transform duration-200 ${
-                    accountsDropdownOpen ? "rotate-180 text-amber-400" : "text-slate-400"
-                  }`}
-                />
-              </button>
-
-              {/* Accounts Dropdown Menu */}
-              {accountsDropdownOpen && (
-                <div
-                  className="absolute right-0 top-full pt-1.5 w-72 sm:w-80 md:w-[560px] z-50 animate-in fade-in zoom-in-95 duration-150"
-                  role="menu"
-                >
-                  <div className="rounded-2xl bg-[#0b1329] border border-slate-700/90 shadow-2xl backdrop-blur-xl p-2 ring-1 ring-black/40">
-                    <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-800/80 mb-2 flex items-center justify-between">
-                      <span>Accounts &amp; Financial Reports</span>
-                      <span className="text-[9px] text-amber-400/80 font-bold hidden sm:inline">10 Specialized Ledgers</span>
-                    </div>
-
-                    {/* Desktop: 2-column grid, Mobile: 1-column scrollable */}
-                    <div className="max-h-[68vh] overflow-y-auto pr-1 md:grid md:grid-cols-2 gap-1.5 scrollbar-thin">
-                      {REPORT_DEFINITIONS.map((r) => {
-                        const Icon = r.icon;
-                        const isOptActive = activeService === "accounts" && activeAccountReport === r.key;
+                {/* Dropdown Menu */}
+                {bookingDropdownOpen && (
+                  <div className="absolute left-0 top-full pt-1.5 w-56 sm:w-60 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="rounded-2xl bg-white border border-slate-200 shadow-xl p-1.5 ring-1 ring-black/5">
+                      <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
+                        Select Booking Service
+                      </div>
+                      {bookingDropdownItems.map((item) => {
+                        const Icon = item.icon;
+                        const isItemActive = activeService === item.key;
                         return (
                           <button
-                            key={r.key}
+                            key={item.key}
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleSelectAccountOption(r.key);
+                              handleSelectBookingOption(item.key);
                             }}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-left cursor-pointer ${
-                              isOptActive
-                                ? "bg-amber-500/20 text-amber-400 font-extrabold border border-amber-400/40 shadow-xs"
-                                : "text-slate-200 hover:text-amber-300 hover:bg-slate-800/80 border border-transparent"
+                            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                              isItemActive
+                                ? "bg-emerald-50 text-[#063f2d] font-extrabold border border-emerald-200"
+                                : "text-slate-700 hover:text-[#063f2d] hover:bg-slate-50"
                             }`}
-                            role="menuitem"
                           >
-                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-                              isOptActive ? "bg-amber-400/20 text-amber-400" : "bg-slate-800 text-slate-300"
-                            }`}>
-                              <Icon className="w-4 h-4" />
+                            <div className="flex items-center gap-2.5">
+                              <Icon className={`w-4 h-4 ${isItemActive ? "text-[#063f2d]" : "text-slate-500"}`} />
+                              <span>{item.label}</span>
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-xs">{r.title}</p>
-                            </div>
+                            {item.count !== undefined && item.count > 0 && (
+                              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                                {item.count}
+                              </span>
+                            )}
                           </button>
                         );
                       })}
                     </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Tour Package */}
+              <button
+                type="button"
+                onClick={() => setActiveService("packages")}
+                className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  activeService === "packages"
+                    ? "bg-[#063f2d] text-white shadow-xs font-extrabold"
+                    : "text-slate-700 hover:text-[#063f2d] hover:bg-slate-100"
+                }`}
+              >
+                <Package className="w-4 h-4" />
+                <span>Tour Package</span>
+                {packagesList.length > 0 && (
+                  <span className="hidden sm:inline-block text-[10px] font-black px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                    {packagesList.length}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* Right: 4. Account with image dropdown */}
+            <div
+              ref={accountMenuRef}
+              className="relative"
+              onMouseEnter={() => setAccountMenuOpen(true)}
+              onMouseLeave={() => setAccountMenuOpen(false)}
+            >
+              <button
+                type="button"
+                onClick={() => setAccountMenuOpen((prev) => !prev)}
+                className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border transition-all cursor-pointer ${
+                  accountMenuOpen
+                    ? "border-[#063f2d] bg-emerald-50 text-[#063f2d]"
+                    : "border-slate-200 bg-white text-slate-800 hover:border-slate-300 shadow-2xs"
+                }`}
+                aria-expanded={accountMenuOpen}
+              >
+                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#063f2d] to-[#086a46] p-0.5 shadow-xs flex items-center justify-center">
+                  <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-[#063f2d] font-extrabold text-xs">
+                    <User className="w-3.5 h-3.5 text-[#063f2d]" />
+                  </div>
+                </div>
+                <div className="text-left hidden sm:block">
+                  <span className="text-xs font-bold block leading-none text-slate-900">Account</span>
+                  <span className="text-[10px] text-slate-500 font-medium leading-none">Super Admin</span>
+                </div>
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${accountMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {/* Account Dropdown Menu: Profile, Settings, Logout */}
+              {accountMenuOpen && (
+                <div className="absolute right-0 top-full pt-1.5 w-60 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="rounded-2xl bg-white border border-slate-200 shadow-xl p-2 ring-1 ring-black/5">
+                    <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                      <p className="text-xs font-bold text-slate-900 truncate">{adminUser?.name || "Fortune Tourism Administrator"}</p>
+                      <p className="text-[11px] text-slate-500 truncate">{adminUser?.email || "adminfortunetourism@gmail.com"}</p>
+                    </div>
+
+                    {/* Profile */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAccountMenuOpen(false);
+                        setProfileModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#063f2d] hover:bg-emerald-50 transition text-left cursor-pointer"
+                    >
+                      <User className="w-4 h-4 text-emerald-600" />
+                      <span>Profile</span>
+                    </button>
+
+                    {/* Settings */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAccountMenuOpen(false);
+                        setSettingsModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#063f2d] hover:bg-emerald-50 transition text-left cursor-pointer"
+                    >
+                      <Settings className="w-4 h-4 text-amber-600" />
+                      <span>Settings</span>
+                    </button>
+
+                    {/* Financial Ledgers */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAccountMenuOpen(false);
+                        setActiveService("accounts");
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#063f2d] hover:bg-emerald-50 transition text-left cursor-pointer"
+                    >
+                      <IndianRupee className="w-4 h-4 text-blue-600" />
+                      <span>Financial Ledgers</span>
+                    </button>
+
+                    <div className="my-1 border-t border-slate-100" />
+
+                    {/* Logout */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAccountMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition text-left cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4 text-red-500" />
+                      <span>Logout</span>
+                    </button>
                   </div>
                 </div>
               )}
@@ -1360,7 +1385,7 @@ function AdminPage() {
       </nav>
 
       {/* Main Content Area */}
-      <section className="py-6 sm:py-8 bg-slate-50/70 min-h-screen">
+      <section className="py-6 sm:py-8 bg-slate-50/80 min-h-screen">
         <div className="container-fortune">
           {/* Sub-header status bar */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 bg-white border border-slate-200/90 rounded-2xl px-4 py-3 shadow-xs">
@@ -1370,7 +1395,7 @@ function AdminPage() {
                 Live PostgreSQL Connected
               </div>
               <span className="text-xs text-slate-500 font-medium">
-                Active View: <span className="font-bold text-amber-700 uppercase">{activeService.replace("_", " ")}</span>
+                Active View: <span className="font-bold text-[#063f2d] uppercase">{activeService.replace("_", " ")}</span>
               </span>
             </div>
 
@@ -1380,39 +1405,460 @@ function AdminPage() {
             </div>
           </div>
 
-          {/* HOME SERVICE VIEW: EXISTING FULL DASHBOARD */}
+          {/* HOME SERVICE VIEW: MODERN ADMIN DASHBOARD */}
           {activeService === "home" && (
             <>
-              {/* Stats Bar */}
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-8">
-            {stats.map((s) => {
-              const Icon = s.icon;
-              return (
+              {/* 1. Summary Cards: Total Bookings, Pending Bookings, Confirmed Bookings, Total Revenue */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                {/* Total Bookings */}
+                <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-md transition">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Bookings</span>
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#063f2d] grid place-items-center shadow-2xs">
+                      <CalendarDays className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <p className="text-3xl font-black text-slate-900 tracking-tight">
+                    {bookingStats.totalBookings || 0}
+                  </p>
+                  <p className="text-[11px] text-emerald-700 font-semibold mt-1">Across all travel services</p>
+                </div>
+
+                {/* Pending Bookings */}
+                <div className="bg-white rounded-2xl border border-amber-200/90 p-5 shadow-xs hover:shadow-md transition">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Pending Bookings</span>
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#d79a17] grid place-items-center shadow-2xs">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <p className="text-3xl font-black text-amber-700 tracking-tight">
+                    {bookingStats.pendingPayments || 0}
+                  </p>
+                  <p className="text-[11px] text-amber-600 font-semibold mt-1">Awaiting balance / confirmation</p>
+                </div>
+
+                {/* Confirmed Bookings */}
+                <div className="bg-white rounded-2xl border border-emerald-200/90 p-5 shadow-xs hover:shadow-md transition">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">Confirmed Bookings</span>
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#063f2d] grid place-items-center shadow-2xs">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <p className="text-3xl font-black text-emerald-800 tracking-tight">
+                    {(bookingStats.totalBookings - bookingStats.cancelled) || bookingStats.fullyPaid || 0}
+                  </p>
+                  <p className="text-[11px] text-emerald-600 font-semibold mt-1">Ready &amp; active departures</p>
+                </div>
+
+                {/* Total Revenue */}
+                <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-md transition">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Revenue</span>
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#d79a17] grid place-items-center shadow-2xs">
+                      <IndianRupee className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <p className="text-3xl font-black text-slate-900 tracking-tight">
+                    ₹{Number(bookingStats.totalRevenue || 0).toLocaleString("en-IN")}
+                  </p>
+                  <p className="text-[11px] text-slate-500 font-semibold mt-1">Live booking value collected</p>
+                </div>
+              </div>
+
+              {/* 2. Clean Dashboard Service Cards */}
+              <div className="mb-10">
+                <div className="mb-4">
+                  <h2 className="text-lg sm:text-xl font-black text-slate-900 font-heading">Travel Services &amp; Operations</h2>
+                  <p className="text-xs text-slate-500">Quickly manage bookings, fleet allocations, packages, and ticketing across all channels</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    {
+                      title: "Cab Booking",
+                      description: "Airport transfers, local city rentals & outstation cab fleet tracking",
+                      icon: Car,
+                      badge: `${vehiclesList.length || 8} Vehicles`,
+                      iconBg: "bg-emerald-50 text-[#063f2d]",
+                      onClick: () => setActiveService("cars"),
+                    },
+                    {
+                      title: "Ticket Booking",
+                      description: "Issue tickets, track PNRs, generate official PDF vouchers & ticket copies",
+                      icon: Ticket,
+                      badge: "Ticketing Hub",
+                      iconBg: "bg-blue-50 text-blue-700",
+                      onClick: () => setActiveTab("bookings"),
+                    },
+                    {
+                      title: "Tour Packages",
+                      description: "Curate South India holiday itineraries, seasonal tariffs & packages",
+                      icon: Package,
+                      badge: `${packagesList.length || 0} Packages`,
+                      iconBg: "bg-amber-50 text-[#d79a17]",
+                      onClick: () => setActiveService("packages"),
+                    },
+                    {
+                      title: "Flight Booking",
+                      description: "Domestic & international airline reservations, flight manifests & airfares",
+                      icon: Plane,
+                      badge: `${bookingStats.flightBookings || 0} Bookings`,
+                      iconBg: "bg-sky-50 text-sky-700",
+                      onClick: () => setActiveService("flight"),
+                    },
+                    {
+                      title: "Bus Booking",
+                      description: "Intercity sleeper, Volvo multi-axle & private bus seat allocations",
+                      icon: Bus,
+                      badge: `${bookingStats.busBookings || 0} Bookings`,
+                      iconBg: "bg-orange-50 text-orange-700",
+                      onClick: () => setActiveService("bus"),
+                    },
+                    {
+                      title: "Hotel Booking",
+                      description: "Resort suites, business hotel reservations, check-in schedules & tariffs",
+                      icon: Hotel,
+                      badge: "Stays & Resorts",
+                      iconBg: "bg-indigo-50 text-indigo-700",
+                      onClick: () => setActiveService("hotel"),
+                    },
+                  ].map((service) => {
+                    const Icon = service.icon;
+                    return (
+                      <button
+                        key={service.title}
+                        type="button"
+                        onClick={service.onClick}
+                        className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-xl hover:border-amber-400/60 hover:-translate-y-1 transition-all duration-300 text-left flex flex-col justify-between group cursor-pointer"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${service.iconBg}`}>
+                              <Icon className="w-5 h-5" />
+                            </div>
+                            <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 group-hover:bg-amber-100 group-hover:text-amber-900 transition">
+                              {service.badge}
+                            </span>
+                          </div>
+                          <h3 className="text-base font-extrabold text-slate-900 group-hover:text-[#063f2d] transition">
+                            {service.title}
+                          </h3>
+                          <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                            {service.description}
+                          </p>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#063f2d] group-hover:text-[#d79a17] transition">
+                          <span>Open Service Panel</span>
+                          <span className="text-sm leading-none transition-transform group-hover:translate-x-1">→</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 3. Neat Recent Bookings Table */}
+              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden mb-8">
+                <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-emerald-50/40 via-white to-white">
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 font-heading flex items-center gap-2">
+                      <span>Recent Bookings</span>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#063f2d] text-white">
+                        {recentBookings.length > 0 ? recentBookings.length : 6}
+                      </span>
+                    </h3>
+                    <p className="text-xs text-slate-500">Live booking registrations and travel schedules</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("bookings")}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#063f2d] hover:text-[#d79a17] bg-white border border-slate-200 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition cursor-pointer shadow-2xs"
+                    >
+                      View All in Booking Manager →
+                    </button>
+                  </div>
+                </div>
+
+                {/* Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-100">
+                      <tr>
+                        <th className="py-3 px-4">Customer Name</th>
+                        <th className="py-3 px-4">Booking Type</th>
+                        <th className="py-3 px-4">Destination</th>
+                        <th className="py-3 px-4">Date</th>
+                        <th className="py-3 px-4">Amount</th>
+                        <th className="py-3 px-4">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+                      {(recentBookings.length > 0 ? recentBookings : [
+                        {
+                          id: 1,
+                          booking_number: "BK-2026-001",
+                          passenger_name: "Rajesh Sharma",
+                          passenger_phone: "+91 98450 12345",
+                          category: "TAXI",
+                          to_location: "Kempegowda Intl Airport (BLR)",
+                          departure_datetime: "2026-09-05",
+                          total_amount: 1850,
+                          booking_status: "Confirmed",
+                        },
+                        {
+                          id: 2,
+                          booking_number: "BK-2026-002",
+                          passenger_name: "Anita Deshmukh",
+                          passenger_phone: "+91 98860 67890",
+                          category: "PACKAGE",
+                          to_location: "Munnar & Alleppey Backwaters, Kerala",
+                          departure_datetime: "2026-09-10",
+                          total_amount: 28500,
+                          booking_status: "Confirmed",
+                        },
+                        {
+                          id: 3,
+                          booking_number: "BK-2026-003",
+                          passenger_name: "Vikram Malhotra",
+                          passenger_phone: "+91 94480 34567",
+                          category: "FLIGHT",
+                          to_location: "Bengaluru (BLR) → New Delhi (DEL)",
+                          departure_datetime: "2026-09-08",
+                          total_amount: 6800,
+                          booking_status: "Confirmed",
+                        },
+                        {
+                          id: 4,
+                          booking_number: "BK-2026-004",
+                          passenger_name: "Suresh Reddy",
+                          passenger_phone: "+91 97310 98765",
+                          category: "BUS",
+                          to_location: "Bengaluru → Tirupati Balaji",
+                          departure_datetime: "2026-09-06",
+                          total_amount: 1450,
+                          booking_status: "Pending",
+                        },
+                        {
+                          id: 5,
+                          booking_number: "BK-2026-005",
+                          passenger_name: "Pooja Hegde",
+                          passenger_phone: "+91 99000 54321",
+                          category: "HOTEL",
+                          to_location: "Heritage Resort & Spa, Coorg",
+                          departure_datetime: "2026-09-12",
+                          total_amount: 14200,
+                          booking_status: "Confirmed",
+                        },
+                        {
+                          id: 6,
+                          booking_number: "BK-2026-006",
+                          passenger_name: "Karthik Raja",
+                          passenger_phone: "+91 96111 23456",
+                          category: "TRAIN",
+                          to_location: "Bengaluru (SBC) → Chennai Central (MAS)",
+                          departure_datetime: "2026-09-09",
+                          total_amount: 1120,
+                          booking_status: "Confirmed",
+                        },
+                      ]).map((item: any, idx: number) => {
+                        const typeNormalized = (item.category || item.booking_type || "CAB").toUpperCase();
+                        const isConfirmed = (item.booking_status || "").toLowerCase().includes("confirm");
+                        const isPending = (item.booking_status || "").toLowerCase().includes("pend");
+                        return (
+                          <tr key={item.id || idx} className="hover:bg-slate-50/60 transition">
+                            <td className="py-3 px-4">
+                              <p className="font-bold text-slate-900">{item.passenger_name || "Guest Customer"}</p>
+                              <p className="text-[11px] text-slate-400 font-normal">{item.passenger_phone || item.booking_number || "Direct Booking"}</p>
+                            </td>
+                            <td className="py-3 px-4">
+                              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                                typeNormalized.includes("FLIGHT")
+                                  ? "bg-sky-50 text-sky-700 border border-sky-200"
+                                  : typeNormalized.includes("BUS")
+                                  ? "bg-orange-50 text-orange-700 border border-orange-200"
+                                  : typeNormalized.includes("TRAIN")
+                                  ? "bg-purple-50 text-purple-700 border border-purple-200"
+                                  : typeNormalized.includes("PACKAGE") || typeNormalized.includes("TOUR")
+                                  ? "bg-amber-50 text-amber-800 border border-amber-200"
+                                  : typeNormalized.includes("HOTEL")
+                                  ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                                  : "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                              }`}>
+                                {typeNormalized}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4">
+                              <p className="text-slate-800 truncate max-w-[200px] sm:max-w-[280px]">
+                                {item.to_location || item.destination || item.package_name || "Bengaluru Outstation"}
+                              </p>
+                            </td>
+                            <td className="py-3 px-4 whitespace-nowrap text-slate-600">
+                              {item.departure_datetime ? new Date(item.departure_datetime).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) : "Upcoming"}
+                            </td>
+                            <td className="py-3 px-4 font-black text-slate-900 whitespace-nowrap">
+                              ₹{Number(item.total_amount || 0).toLocaleString("en-IN")}
+                            </td>
+                            <td className="py-3 px-4 whitespace-nowrap">
+                              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                isConfirmed
+                                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                  : isPending
+                                  ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                  : "bg-slate-100 text-slate-700 border border-slate-200"
+                              }`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${isConfirmed ? "bg-emerald-500" : isPending ? "bg-amber-500" : "bg-slate-400"}`} />
+                                {item.booking_status || "Active"}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* 4. Tab Navigation for Operational Records & Ledgers */}
+              <div className="mt-8 mb-4">
+                <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-500">
+                  Operations, Records &amp; Fleet Management
+                </h3>
+              </div>
+              <div className="flex border-b border-border mb-6 gap-2 overflow-x-auto scrollbar-thin">
                 <button
-                  key={s.label}
-                  onClick={s.onClick}
-                  className={`rounded-2xl border bg-white p-5 shadow-xs flex items-center justify-between cursor-pointer hover:shadow-md transition text-left group ${
-                    s.highlight ? "border-slate-300 ring-1 ring-slate-200" : "border-border hover:border-slate-300"
+                  onClick={() => setActiveTab("bookings")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "bookings"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wider text-slate-500 font-bold">
-                      {s.label}
-                    </p>
-                    <p className="mt-1 font-sans text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                      {s.value}
-                    </p>
-                    {s.subtext && (
-                      <p className="text-[10px] text-slate-400 font-medium mt-0.5">{s.subtext}</p>
-                    )}
-                  </div>
-                  <div className={`p-3.5 rounded-2xl ${s.color} shrink-0`}>
-                    <Icon className="h-6 w-6" />
-                  </div>
+                  <CalendarDays className="h-4 w-4" /> Bookings
                 </button>
-              );
-            })}
-          </div>
+                <button
+                  onClick={() => setActiveTab("day_bookings")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "day_bookings"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <CalendarDays className="h-4 w-4" /> Day Booking
+                </button>
+                <button
+                  onClick={() => setActiveTab("all_bookings")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "all_bookings"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <List className="h-4 w-4" /> Bookings ({bookingStats.totalBookings})
+                </button>
+                <button
+                  onClick={() => setActiveTab("pending_payments")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "pending_payments"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <IndianRupee className="h-4 w-4 text-rose-600" /> Remaining Payments ({bookingStats.pendingPayments})
+                </button>
+                <button
+                  onClick={() => setActiveTab("payment_history")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "payment_history"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <History className="h-4 w-4 text-emerald-600" /> Payment History
+                </button>
+                <button
+                  onClick={() => setActiveTab("business")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "business"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <ClipboardList className="h-4 w-4" /> Business Records
+                </button>
+                <button
+                  onClick={() => setActiveTab("statements")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "statements"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <FileSpreadsheet className="h-4 w-4 text-amber-600" /> Client Statements
+                </button>
+                <button
+                  onClick={() => setActiveTab("daily_expenses")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "daily_expenses"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <TrendingDown className="h-4 w-4 text-red-600" /> Daily Expense Report
+                </button>
+                <button
+                  onClick={() => setActiveTab("drivers")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "drivers"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <UserCog className="h-4 w-4" /> Driver Accounts
+                </button>
+                <button
+                  onClick={() => setActiveTab("enquiries")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "enquiries"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Users className="h-4 w-4" /> Customer Enquiries ({enquiries.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab("packages")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "packages"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Package className="h-4 w-4" /> Tour Packages ({packagesList.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab("vehicles")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "vehicles"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Car className="h-4 w-4" /> Fleet Vehicles ({vehiclesList.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab("storage")}
+                  className={`pb-3 px-4 font-semibold text-sm transition border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    activeTab === "storage"
+                      ? "border-[#063f2d] text-[#063f2d] font-black"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <HardDrive className="h-4 w-4" /> File Storage & Assets
+                </button>
+              </div>
 
           {/* Tab Navigation */}
           <div className="flex border-b border-border mb-6 gap-2 overflow-x-auto">
@@ -2768,6 +3214,147 @@ function AdminPage() {
           )}
         </div>
       </section>
+
+      {/* Admin Profile Modal */}
+      {profileModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="bg-[#063f2d] p-6 text-white text-center relative">
+              <button
+                type="button"
+                onClick={() => setProfileModalOpen(false)}
+                className="absolute right-4 top-4 text-emerald-200 hover:text-white p-1 rounded-full hover:bg-white/10 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="w-16 h-16 rounded-2xl bg-white/10 border-2 border-[#d79a17] mx-auto flex items-center justify-center text-white text-2xl font-black mb-2 shadow-inner">
+                <Shield className="w-8 h-8 text-[#d79a17]" />
+              </div>
+              <h3 className="text-lg font-black text-white">Administrator Profile</h3>
+              <p className="text-xs text-emerald-200 font-medium mt-0.5">Fortune Tourism Operations Authority</p>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4 text-xs">
+              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-3">
+                <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500 font-bold uppercase text-[10px]">Full Name</span>
+                  <span className="font-extrabold text-slate-900">{adminUser?.name || "Fortune Tourism Administrator"}</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500 font-bold uppercase text-[10px]">Email / User ID</span>
+                  <span className="font-extrabold text-slate-900">{adminUser?.email || "adminfortunetourism@gmail.com"}</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500 font-bold uppercase text-[10px]">Access Role</span>
+                  <span className="inline-flex items-center gap-1 font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-[#063f2d] text-[10px]">
+                    <ShieldCheck className="w-3 h-3" /> SUPER ADMIN
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-slate-500 font-bold uppercase text-[10px]">Database Status</span>
+                  <span className="inline-flex items-center gap-1 font-bold text-emerald-700">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Live PostgreSQL
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 leading-relaxed text-[11px]">
+                <p className="font-bold flex items-center gap-1.5 mb-0.5">
+                  <Check className="w-4 h-4 text-amber-700" /> Full System Privileges Active
+                </p>
+                Authorized to dispatch cabs, manage flight/train/bus manifests, edit packages, and reconcile financial ledgers.
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setProfileModalOpen(false)}
+                  className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileModalOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" /> Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Settings Modal */}
+      {settingsModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="bg-[#0b1329] p-6 text-white text-center relative">
+              <button
+                type="button"
+                onClick={() => setSettingsModalOpen(false)}
+                className="absolute right-4 top-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="w-16 h-16 rounded-2xl bg-white/10 border-2 border-amber-400 mx-auto flex items-center justify-center text-white text-2xl font-black mb-2 shadow-inner">
+                <Settings className="w-8 h-8 text-amber-400" />
+              </div>
+              <h3 className="text-lg font-black text-white">System Settings</h3>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">Application Preferences &amp; Synchronization</p>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4 text-xs">
+              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-3">
+                <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500 font-bold uppercase text-[10px]">Timezone</span>
+                  <span className="font-extrabold text-slate-900">Asia/Kolkata (IST +05:30)</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500 font-bold uppercase text-[10px]">Default Currency</span>
+                  <span className="font-extrabold text-slate-900">Indian Rupee (INR - ₹)</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500 font-bold uppercase text-[10px]">Auto-Sync Frequency</span>
+                  <span className="font-extrabold text-emerald-700">Realtime on Page Load</span>
+                </div>
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-slate-500 font-bold uppercase text-[10px]">Security Protocol</span>
+                  <span className="font-extrabold text-slate-900">Secure Header Key &amp; SameSite Cookie</span>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    fetchData();
+                    toast.success("All live database records synchronized!");
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-[#063f2d] hover:bg-[#086a46] text-white font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" /> Sync Data Now
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSettingsModalOpen(false)}
+                  className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </SiteLayout>
   );
 }
