@@ -921,21 +921,21 @@ function AdminPage() {
 
   if (!isAuthenticated) {
     return (
-      <SiteLayout transparentHeader>
+      <div className="h-screen h-[100dvh] w-full overflow-hidden flex flex-col bg-[#0b1329]">
         {/* Top Header: Compact White Section with Official Integrated Fortune Tourism Logo */}
-        <header className="relative w-full h-auto bg-white border-b border-slate-200/90 text-slate-900 py-[15px] flex items-center justify-center shadow-xs">
-          <div className="w-full flex items-center justify-center text-center px-4">
+        <header className="relative w-full shrink-0 bg-white border-b border-slate-200/90 text-slate-900 py-1.5 sm:py-2 flex items-center justify-center shadow-xs z-20">
+          <div className="w-full flex items-center justify-center text-center px-3 sm:px-4">
             <h1 className="sr-only">Fortune Tourism - Meets all your travel needs</h1>
             <img
               src={fullLogoAsset}
               alt="Fortune Tourism - Meets all your travel needs"
-              className="h-14 sm:h-18 md:h-22 lg:h-26 w-auto max-w-[94vw] sm:max-w-[85vw] md:max-w-[75vw] object-contain block mx-auto"
+              className="h-7 sm:h-8 md:h-10 lg:h-11 w-auto max-w-[65vw] sm:max-w-[50vw] md:max-w-[40vw] object-contain block mx-auto"
             />
           </div>
         </header>
 
         {/* Bottom Half: Destination Slider Background Section with Words Content & Login Card */}
-        <section className="relative overflow-hidden py-14 sm:py-18 px-4 min-h-[75vh] flex flex-col items-center justify-center">
+        <main className="relative flex-1 min-h-0 w-full overflow-hidden flex flex-col items-center justify-center px-3 sm:px-4 py-2">
           {/* Automatic Moving Background Images with Cross-Fade */}
           <div className="absolute inset-0 z-0">
             {LOGIN_DESTINATION_SLIDES.map((slide, idx) => (
@@ -957,112 +957,112 @@ function AdminPage() {
             <div className="absolute inset-0 z-2 bg-black/35 backdrop-blur-[0.5px]" />
           </div>
 
-          <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center text-center">
+          <div className="relative z-10 w-full max-w-3xl mx-auto flex flex-col items-center justify-center text-center my-auto">
             {/* Words Content matching the active slide */}
-            <div className="min-h-[140px] sm:min-h-[155px] flex flex-col items-center justify-center">
-              <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.35em] text-amber-300/95 drop-shadow transition-all duration-500">
+            <div className="flex flex-col items-center justify-center mb-1 sm:mb-2">
+              <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.3em] text-amber-300/95 drop-shadow transition-all duration-500">
                 {LOGIN_DESTINATION_SLIDES[activeSlide].eyebrow}
               </p>
 
-              <h2 className="font-heading text-3xl sm:text-5xl md:text-6xl font-black tracking-wider text-white uppercase drop-shadow-2xl leading-none my-1 transition-all duration-500">
+              <h2 className="font-heading text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-wider text-white uppercase drop-shadow-2xl leading-tight my-0.5 transition-all duration-500">
                 {LOGIN_DESTINATION_SLIDES[activeSlide].title}
               </h2>
 
-              <div className="flex items-center justify-center gap-3 w-full max-w-sm sm:max-w-md my-1">
+              <div className="flex items-center justify-center gap-2 w-full max-w-xs sm:max-w-sm my-0.5">
                 <div className="h-px bg-gradient-to-r from-transparent via-amber-400/80 to-amber-400 flex-1" />
-                <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.25em] text-amber-300 whitespace-nowrap drop-shadow transition-all duration-500">
+                <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300 whitespace-nowrap drop-shadow transition-all duration-500">
                   {LOGIN_DESTINATION_SLIDES[activeSlide].tagline}
                 </p>
                 <div className="h-px bg-gradient-to-r from-amber-400 via-amber-400/80 to-transparent flex-1" />
               </div>
 
-              <p className="max-w-xl text-xs sm:text-sm text-slate-200 italic font-serif leading-relaxed px-4 drop-shadow-md transition-all duration-500">
+              <p className="max-w-lg text-[10px] sm:text-xs text-slate-200 italic font-serif leading-snug px-3 drop-shadow-md transition-all duration-500 line-clamp-2 sm:line-clamp-none">
                 {LOGIN_DESTINATION_SLIDES[activeSlide].quote}
               </p>
             </div>
 
             {/* Slide Navigation Indicator Dots */}
-            <div className="flex items-center justify-center gap-2 my-4">
+            <div className="flex items-center justify-center gap-1.5 mb-2 sm:mb-2.5">
               {LOGIN_DESTINATION_SLIDES.map((slide, idx) => (
                 <button
                   key={slide.title}
                   type="button"
                   onClick={() => setActiveSlide(idx)}
-                  className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
+                  className={`h-1 rounded-full transition-all duration-500 cursor-pointer ${
                     idx === activeSlide
-                      ? "w-6 bg-amber-400 shadow-xs"
-                      : "w-1.5 bg-white/40 hover:bg-white/70"
+                      ? "w-5 bg-amber-400 shadow-xs"
+                      : "w-1 bg-white/40 hover:bg-white/70"
                   }`}
                   aria-label={`Go to ${slide.title} slide`}
                 />
               ))}
             </div>
 
-            {/* Login Credentials Card (reduced 20% desktop width) */}
-            <div className="w-full max-w-[92vw] sm:max-w-[360px] mx-auto bg-white/95 backdrop-blur-md border border-white/30 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 text-left">
+            {/* Login Credentials Card */}
+            <div className="w-full max-w-[92vw] sm:max-w-[340px] mx-auto bg-white/95 backdrop-blur-md border border-white/30 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-2.5 sm:space-y-3 text-left">
               {loginError && (
-                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-2xl p-3.5 text-xs text-red-700">
-                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                  <div className="font-medium leading-relaxed">{loginError}</div>
+                <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-2.5 text-xs text-red-700">
+                  <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0 mt-0.5" />
+                  <div className="font-medium leading-tight">{loginError}</div>
                 </div>
               )}
 
-              <form onSubmit={handleAdminLogin} className="space-y-4">
+              <form onSubmit={handleAdminLogin} className="space-y-2 sm:space-y-2.5">
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
+                  <label className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-700 block mb-1">
                     User ID / Email *
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
                       required
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       placeholder="adminfortunetourism@gmail.com"
-                      className="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
+                      className="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
+                  <label className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-700 block mb-1">
                     Password *
                   </label>
                   <div className="relative">
-                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <KeyRound className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type={showPassword ? "text" : "password"}
                       required
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-10 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
+                      className="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-9 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-1">
                   <button
                     type="submit"
                     disabled={loginLoading}
-                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-sm shadow-md shadow-amber-500/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
+                    className="w-full py-2 sm:py-2.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-amber-500/20 hover:shadow-lg transition-all flex items-center justify-center gap-1.5 disabled:opacity-60 cursor-pointer"
                   >
                     {loginLoading ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         Authenticating...
                       </>
                     ) : (
                       <>
-                        <Shield className="w-4 h-4" /> Sign In
+                        <Shield className="w-3.5 h-3.5" /> Sign In
                       </>
                     )}
                   </button>
@@ -1070,8 +1070,8 @@ function AdminPage() {
               </form>
             </div>
           </div>
-        </section>
-      </SiteLayout>
+        </main>
+      </div>
     );
   }
 
