@@ -937,18 +937,18 @@ function AdminPage() {
         {/* Bottom Half: Destination Slider Background Section with Words Content & Login Card */}
         <main className="relative flex-1 min-h-0 w-full overflow-hidden flex flex-col items-center justify-center px-3 sm:px-4 py-2">
           {/* Automatic Moving Background Images with Cross-Fade */}
-          <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 z-0 overflow-hidden">
             {LOGIN_DESTINATION_SLIDES.map((slide, idx) => (
               <div
                 key={slide.title}
-                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out flex items-center justify-center ${
                   idx === activeSlide ? "opacity-100 z-1" : "opacity-0 z-0 pointer-events-none"
                 }`}
               >
                 <img
                   src={slide.image}
                   alt={slide.alt}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover object-center scale-75 transition-transform duration-1000 [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)]"
                 />
               </div>
             ))}
