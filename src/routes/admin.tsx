@@ -1295,10 +1295,6 @@ function AdminPage() {
               {/* Booking Itinerary Service Cards */}
               <div className="mb-2">
                 <div className="mb-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-amber-300 text-xs font-bold mb-2 shadow-xs">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                    <span>Fortune Tourism Operations</span>
-                  </div>
                   <h2 className="text-2xl sm:text-3xl font-black text-white font-heading drop-shadow-md tracking-tight">
                     Booking Itinerary
                   </h2>
