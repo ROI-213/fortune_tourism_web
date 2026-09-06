@@ -162,6 +162,7 @@ import {
   X,
   Check,
   Phone,
+  Sparkles,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
