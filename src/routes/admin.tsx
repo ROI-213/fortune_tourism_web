@@ -501,6 +501,7 @@ function AdminPage() {
 
     if (key === "Admin@fortunetourism2026") {
       setIsAuthenticated(true);
+      setActiveService("home");
       if (authStr) {
         try {
           setAdminUser(JSON.parse(authStr));
@@ -544,6 +545,7 @@ function AdminPage() {
         localStorage.setItem("fortune_admin_key", data.admin_key);
         localStorage.setItem("fortune_admin_auth", JSON.stringify(data.user));
         setAdminUser(data.user);
+        setActiveService("home");
         setIsAuthenticated(true);
         fetchData();
       } else {
