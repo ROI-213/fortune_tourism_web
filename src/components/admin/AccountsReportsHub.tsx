@@ -29,6 +29,7 @@ import {
   Trash2,
   X,
   Check,
+  ChevronDown,
 } from "lucide-react";
 
 export type AccountReportKey =
@@ -402,9 +403,12 @@ function formatDisplayDate(val?: string | null): string {
 function parseToComparableDate(val?: string | null): string {
   if (!val) return "";
   const str = String(val).trim();
-  const match = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  const match = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (match) {
-    return `${match[3]}-${match[2]}-${match[1]}`;
+    const day = match[1].padStart(2, "0");
+    const month = match[2].padStart(2, "0");
+    const year = match[3];
+    return `${year}-${month}-${day}`;
   }
   if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
     return str.slice(0, 10);
@@ -423,6 +427,26 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
   const [transactions, setTransactions] = useState<TransactionRecord[]>(SEED_TRANSACTIONS);
   const [dailyRecords, setDailyRecords] = useState<DailyReportRecord[]>(INITIAL_DAILY_REPORTS);
   const [loading, setLoading] = useState(false);
+
+  // Daily Reports Header Filter States (From Date, To Date, All Booking Types)
+  const [dailyFromDate, setDailyFromDate] = useState("");
+  const [dailyToDate, setDailyToDate] = useState("");
+  const [dailyBookingType, setDailyBookingType] = useState("ALL");
+  const [appliedDailyFromDate, setAppliedDailyFromDate] = useState("");
+  const [appliedDailyToDate, setAppliedDailyToDate] = useState("");
+  const [appliedDailyBookingType, setAppliedDailyBookingType] = useState("ALL");
+  const [dateError, setDateError] = useState<string | null>(null);
+
+  const handleDailySearch = () => {
+    if (dailyFromDate && dailyToDate && dailyToDate < dailyFromDate) {
+      setDateError("To Date cannot be earlier than From Date");
+      return;
+    }
+    setDateError(null);
+    setAppliedDailyFromDate(dailyFromDate);
+    setAppliedDailyToDate(dailyToDate);
+    setAppliedDailyBookingType(dailyBookingType);
+  };
 
   // Daily Report Add / Edit Modal State
   const [dailyModalOpen, setDailyModalOpen] = useState(false);
@@ -553,47 +577,47 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
     fetchLiveTransactions();
   }, []);
 
-  // Filter Daily Reports (Excel-based structure)
+  // Filter Daily Reports (Filtered using Header Controls: DATE range and Booking Type)
   const filteredDailyRecords = useMemo(() => {
     return dailyRecords.filter((r) => {
-      // Search
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matches =
-          (r.pax && r.pax.toLowerCase().includes(q)) ||
-          (r.ph_no && r.ph_no.includes(q)) ||
-          (r.from && r.from.toLowerCase().includes(q)) ||
-          (r.to && r.to.toLowerCase().includes(q)) ||
-          (r.pickup && r.pickup.toLowerCase().includes(q)) ||
-          (r.trav_by && r.trav_by.toLowerCase().includes(q)) ||
-          (r.date && r.date.toLowerCase().includes(q)) ||
-          (r.trav_on && r.trav_on.toLowerCase().includes(q));
-        if (!matches) return false;
+      // 1. Filter against the report's DATE field (not TRAV ON)
+      const recDate = parseToComparableDate(r.date);
+      if (appliedDailyFromDate && recDate) {
+        if (recDate < appliedDailyFromDate) return false;
+      }
+      if (appliedDailyToDate && recDate) {
+        if (recDate > appliedDailyToDate) return false;
       }
 
-      // Category Filter (CAR, BUS, FLIGHT, TRAIN, HOTEL)
-      if (categoryFilter !== "ALL") {
-        const cat = categoryFilter.toUpperCase();
+      // 2. Booking Type Filter
+      if (appliedDailyBookingType !== "ALL") {
         const tb = (r.trav_by || "").toUpperCase();
-        if (!tb.includes(cat) && !cat.includes(tb)) {
-          return false;
+        if (appliedDailyBookingType === "FLIGHT") {
+          if (!tb.includes("FLIGHT")) return false;
+        } else if (appliedDailyBookingType === "BUS") {
+          if (!tb.includes("BUS")) return false;
+        } else if (appliedDailyBookingType === "TRAIN") {
+          if (!tb.includes("TRAIN")) return false;
+        } else if (appliedDailyBookingType === "CAR") {
+          const isCar =
+            tb.includes("CAR") ||
+            tb.includes("TAXI") ||
+            tb.includes("CAB") ||
+            tb.includes("SEDAN") ||
+            tb.includes("INNOVA") ||
+            tb.includes("TEMPO") ||
+            tb.includes("SUV");
+          if (!isCar) return false;
+        } else if (appliedDailyBookingType === "HOTEL") {
+          if (!tb.includes("HOTEL")) return false;
+        } else if (appliedDailyBookingType === "TOUR") {
+          if (!tb.includes("TOUR") && !tb.includes("PACKAGE")) return false;
         }
       }
 
-      // Status Filter
-      if (statusFilter !== "ALL") {
-        if (statusFilter === "PAID" && Number(r.due || 0) > 0) return false;
-        if (statusFilter === "PENDING" && Number(r.due || 0) === 0) return false;
-      }
-
-      // Date range filter
-      const comp = parseToComparableDate(r.raw_date || r.date);
-      if (startDate && comp && comp < startDate) return false;
-      if (endDate && comp && comp > endDate) return false;
-
       return true;
     });
-  }, [dailyRecords, searchQuery, categoryFilter, statusFilter, startDate, endDate]);
+  }, [dailyRecords, appliedDailyFromDate, appliedDailyToDate, appliedDailyBookingType]);
 
   // Dynamic Totals for Daily Reports
   const dailyTotals = useMemo(() => {
@@ -1170,186 +1194,259 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
         </div>
       )}
 
-      {/* Filter Controls Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-amber-500" />
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-              Filter &amp; Audit Tools
-            </span>
+      {/* Filter Controls Card - Only shown for non-daily reports */}
+      {activeReport !== "daily" && (
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-amber-500" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                Filter &amp; Audit Tools
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-500">
+                Showing <span className="font-bold text-slate-900">{filteredTransactions.length}</span> transactions
+              </span>
+              {(searchQuery || categoryFilter !== "ALL" || paymentMethodFilter !== "ALL" || statusFilter !== "ALL" || startDate || endDate) && (
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setCategoryFilter("ALL");
+                    setPaymentMethodFilter("ALL");
+                    setStatusFilter("ALL");
+                    setStartDate("");
+                    setEndDate("");
+                    setDatePreset("all");
+                  }}
+                  className="text-xs font-bold text-rose-600 hover:text-rose-800 transition cursor-pointer"
+                >
+                  Reset Filters
+                </button>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500">
-              Showing <span className="font-bold text-slate-900">{filteredTransactions.length}</span> transactions
-            </span>
-            {(searchQuery || categoryFilter !== "ALL" || paymentMethodFilter !== "ALL" || statusFilter !== "ALL" || startDate || endDate) && (
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            {/* Search Box */}
+            <div className="lg:col-span-2 relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search ID, passenger, phone, voucher..."
+                className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none"
+              />
+            </div>
+
+            {/* Booking Type Filter */}
+            <div>
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-700 cursor-pointer"
+              >
+                <option value="ALL">All Booking Types</option>
+                <option value="FLIGHT">Flight</option>
+                <option value="BUS">Bus</option>
+                <option value="TRAIN">Train</option>
+                <option value="CAR">Car / Taxi</option>
+                <option value="HOTEL">Hotel</option>
+                <option value="TOUR">Tour Package</option>
+              </select>
+            </div>
+
+            {/* Payment Method Filter */}
+            <div>
+              <select
+                value={paymentMethodFilter}
+                onChange={(e) => setPaymentMethodFilter(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-700 cursor-pointer"
+              >
+                <option value="ALL">All Payment Methods</option>
+                <option value="CASH">Cash Inflow</option>
+                <option value="UPI">UPI / QR Code</option>
+                <option value="CARD">Debit / Credit Card</option>
+                <option value="NETBANKING">Net Banking</option>
+                <option value="RAZORPAY">Razorpay Gateway</option>
+              </select>
+            </div>
+
+            {/* Status Filter */}
+            <div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-700 cursor-pointer"
+              >
+                <option value="ALL">All Statuses</option>
+                <option value="PAID">Paid</option>
+                <option value="PENDING">Pending Dues</option>
+                <option value="REFUNDED">Refunded</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Date Filters Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 pt-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-600 whitespace-nowrap">From:</span>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full px-2.5 py-1.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none text-slate-700"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-600 whitespace-nowrap">To:</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full px-2.5 py-1.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none text-slate-700"
+              />
+            </div>
+            <div className="flex items-center gap-2 sm:col-span-2">
               <button
                 onClick={() => {
-                  setSearchQuery("");
-                  setCategoryFilter("ALL");
-                  setPaymentMethodFilter("ALL");
-                  setStatusFilter("ALL");
+                  const today = new Date().toISOString().slice(0, 10);
+                  setStartDate(today);
+                  setEndDate(today);
+                  setDatePreset("today");
+                }}
+                className="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition cursor-pointer"
+              >
+                Today
+              </button>
+              <button
+                onClick={() => {
+                  const now = new Date();
+                  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+                  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+                  setStartDate(firstDay);
+                  setEndDate(lastDay);
+                  setDatePreset("month");
+                }}
+                className="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition cursor-pointer"
+              >
+                This Month
+              </button>
+              <button
+                onClick={() => {
                   setStartDate("");
                   setEndDate("");
                   setDatePreset("all");
                 }}
-                className="text-xs font-bold text-rose-600 hover:text-rose-800 transition cursor-pointer"
+                className="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition cursor-pointer"
               >
-                Reset Filters
+                All Time
               </button>
-            )}
+            </div>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-          {/* Search Box */}
-          <div className="lg:col-span-2 relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search ID, passenger, phone, voucher..."
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none"
-            />
-          </div>
-
-          {/* Booking Type Filter */}
-          <div>
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-700 cursor-pointer"
-            >
-              <option value="ALL">All Booking Types</option>
-              <option value="FLIGHT">Flight</option>
-              <option value="BUS">Bus</option>
-              <option value="TRAIN">Train</option>
-              <option value="CAR">Car / Taxi</option>
-              <option value="HOTEL">Hotel</option>
-              <option value="TOUR">Tour Package</option>
-            </select>
-          </div>
-
-          {/* Payment Method Filter */}
-          <div>
-            <select
-              value={paymentMethodFilter}
-              onChange={(e) => setPaymentMethodFilter(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-700 cursor-pointer"
-            >
-              <option value="ALL">All Payment Methods</option>
-              <option value="CASH">Cash Inflow</option>
-              <option value="UPI">UPI / QR Code</option>
-              <option value="CARD">Debit / Credit Card</option>
-              <option value="NETBANKING">Net Banking</option>
-              <option value="RAZORPAY">Razorpay Gateway</option>
-            </select>
-          </div>
-
-          {/* Status Filter */}
-          <div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-700 cursor-pointer"
-            >
-              <option value="ALL">All Statuses</option>
-              <option value="PAID">Paid</option>
-              <option value="PENDING">Pending Dues</option>
-              <option value="REFUNDED">Refunded</option>
-              <option value="CANCELLED">Cancelled</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Date Filters Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 pt-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-600 whitespace-nowrap">From:</span>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-2.5 py-1.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none text-slate-700"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-600 whitespace-nowrap">To:</span>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-2.5 py-1.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none text-slate-700"
-            />
-          </div>
-          <div className="flex items-center gap-2 sm:col-span-2">
-            <button
-              onClick={() => {
-                const today = new Date().toISOString().slice(0, 10);
-                setStartDate(today);
-                setEndDate(today);
-                setDatePreset("today");
-              }}
-              className="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition cursor-pointer"
-            >
-              Today
-            </button>
-            <button
-              onClick={() => {
-                const now = new Date();
-                const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-                const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
-                setStartDate(firstDay);
-                setEndDate(lastDay);
-                setDatePreset("month");
-              }}
-              className="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition cursor-pointer"
-            >
-              This Month
-            </button>
-            <button
-              onClick={() => {
-                setStartDate("");
-                setEndDate("");
-                setDatePreset("all");
-              }}
-              className="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition cursor-pointer"
-            >
-              All Time
-            </button>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Transaction Records Table / Daily Reports Table */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2">
-            <FileSpreadsheet className="w-4 h-4 text-amber-500" />
-            <h3 className="font-black text-slate-900 text-sm">
-              {activeReport === "daily"
-                ? "Daily Reports"
-                : `${activeDef.shortTitle} Statement Transactions (${filteredTransactions.length})`}
-            </h3>
-          </div>
-          <div className="flex items-center gap-3">
-            {activeReport === "daily" && (
+        {activeReport === "daily" ? (
+          <div className="p-4 border-b border-slate-100 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+            {/* Left: Heading with orange icon */}
+            <div className="flex items-center gap-2 shrink-0">
+              <FileSpreadsheet className="w-4 h-4 text-amber-500 shrink-0" />
+              <h3 className="font-black text-slate-900 text-sm whitespace-nowrap">
+                Daily Reports
+              </h3>
+            </div>
+
+            {/* Compact Controls: From Date -> To Date -> All Booking Types -> Search */}
+            <div className="flex flex-col sm:flex-row sm:flex-wrap xl:flex-nowrap items-stretch sm:items-center gap-2.5 w-full xl:w-auto">
+              {/* From Date */}
+              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 focus-within:ring-2 focus-within:ring-amber-400 focus-within:border-amber-400 transition">
+                <label htmlFor="daily-from-date" className="text-[11px] font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap">
+                  From:
+                </label>
+                <input
+                  id="daily-from-date"
+                  type="date"
+                  value={dailyFromDate}
+                  onChange={(e) => {
+                    setDailyFromDate(e.target.value);
+                    if (dateError) setDateError(null);
+                  }}
+                  className="text-xs font-semibold text-slate-800 bg-transparent outline-none cursor-pointer w-full sm:w-auto"
+                />
+              </div>
+
+              {/* To Date */}
+              <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 focus-within:ring-2 focus-within:ring-amber-400 focus-within:border-amber-400 transition">
+                <label htmlFor="daily-to-date" className="text-[11px] font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap">
+                  To:
+                </label>
+                <input
+                  id="daily-to-date"
+                  type="date"
+                  value={dailyToDate}
+                  onChange={(e) => {
+                    setDailyToDate(e.target.value);
+                    if (dateError) setDateError(null);
+                  }}
+                  className="text-xs font-semibold text-slate-800 bg-transparent outline-none cursor-pointer w-full sm:w-auto"
+                />
+              </div>
+
+              {/* All Booking Types Dropdown */}
+              <div className="relative">
+                <select
+                  value={dailyBookingType}
+                  onChange={(e) => setDailyBookingType(e.target.value)}
+                  className="w-full sm:w-auto appearance-none bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 pr-8 text-xs font-bold text-slate-800 hover:bg-slate-100 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none cursor-pointer transition"
+                >
+                  <option value="ALL">All Booking Types</option>
+                  <option value="FLIGHT">Flight</option>
+                  <option value="BUS">Bus</option>
+                  <option value="TRAIN">Train</option>
+                  <option value="CAR">Car / Taxi</option>
+                  <option value="HOTEL">Hotel</option>
+                  <option value="TOUR">Tour Package</option>
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+
+              {/* Search Button */}
               <button
                 type="button"
-                onClick={openAddDailyModal}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-xs transition cursor-pointer"
+                onClick={handleDailySearch}
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-xs transition cursor-pointer"
               >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Entry</span>
+                <Search className="w-3.5 h-3.5" />
+                <span>Search</span>
               </button>
-            )}
+            </div>
+          </div>
+        ) : (
+          <div className="p-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <FileSpreadsheet className="w-4 h-4 text-amber-500" />
+              <h3 className="font-black text-slate-900 text-sm">
+                {activeDef.shortTitle} Statement Transactions ({filteredTransactions.length})
+              </h3>
+            </div>
             <span className="text-[11px] text-slate-500 font-semibold hidden sm:inline">
               Double-entry verified against PostgreSQL
             </span>
           </div>
-        </div>
+        )}
+
+        {/* Date Validation Error Message */}
+        {activeReport === "daily" && dateError && (
+          <div className="px-4 py-2 bg-rose-50 border-b border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-600" />
+            <span>{dateError}</span>
+          </div>
+        )}
 
         <div className="overflow-x-auto">
           {activeReport === "daily" ? (
@@ -1376,8 +1473,8 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
                   <tr>
                     <td colSpan={13} className="py-12 text-center text-slate-400">
                       <AlertCircle className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                      <p className="font-bold text-sm">No daily report records match the selected filters.</p>
-                      <p className="text-xs text-slate-400 mt-1">Try clearing your search query or selecting "All Time".</p>
+                      <p className="font-bold text-sm">No daily report records match the selected date range and booking type.</p>
+                      <p className="text-xs text-slate-400 mt-1">Try selecting "All Booking Types" or adjusting your date range.</p>
                     </td>
                   </tr>
                 ) : (
