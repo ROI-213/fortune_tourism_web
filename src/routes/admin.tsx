@@ -140,6 +140,8 @@ import {
   Receipt,
   Ticket,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   AlertCircle,
   History,
   Lock,
@@ -374,15 +376,24 @@ function AdminPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  // Login destination background slides auto-cycle (5s interval)
+  // Login destination background slides auto-cycle (4.5s interval with pause on hover)
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isSliderHovered, setIsSliderHovered] = useState(false);
   useEffect(() => {
-    if (isAuthenticated) return;
+    if (isAuthenticated || isSliderHovered) return;
     const interval = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % LOGIN_DESTINATION_SLIDES.length);
-    }, 5000);
+    }, 4500);
     return () => clearInterval(interval);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isSliderHovered]);
+
+  const handlePrevSlide = () => {
+    setActiveSlide((prev) => (prev === 0 ? LOGIN_DESTINATION_SLIDES.length - 1 : prev - 1));
+  };
+
+  const handleNextSlide = () => {
+    setActiveSlide((prev) => (prev + 1) % LOGIN_DESTINATION_SLIDES.length);
+  };
 
   // Data states
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
@@ -948,14 +959,7 @@ function AdminPage() {
   }
 
   if (!isAuthenticated) {
-    const tempoSlide = {
-      eyebrow: "GROUP TRAVEL",
-      title: "TEMPO TRAVELLER",
-      tagline: "SPACE. TOGETHERNESS. ADVENTURE.",
-      quote: "“Comfortable luxury group touring for family outings, pilgrimages and corporate events.”",
-      image: fleetTempoImg,
-      alt: "Force Tempo Traveller - Fortune Tourism Fleet",
-    };
+    const currentSlide = LOGIN_DESTINATION_SLIDES[activeSlide] || LOGIN_DESTINATION_SLIDES[0];
 
     return (
       <div className="min-h-screen min-h-[100dvh] w-full flex flex-col bg-slate-50 text-slate-900">
@@ -974,60 +978,111 @@ function AdminPage() {
         {/* Two-Column Layout below Header */}
         <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex flex-col justify-center">
           <div className="w-full flex flex-col lg:flex-row items-stretch justify-center gap-6 lg:gap-8">
-            {/* Left Side (~65% width): Tempo Traveller Promotional Showcase Panel */}
-            <div className="w-full lg:w-[65%] bg-white rounded-2xl border border-slate-200/90 shadow-md p-6 sm:p-8 flex flex-col justify-between overflow-hidden">
-              {/* Top Text Content */}
-              <div>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-black uppercase tracking-[0.25em] bg-emerald-50 text-[#063f2d] border border-emerald-200/70 shadow-2xs">
-                    <Sparkles className="w-3 h-3 text-[#d79a17]" />
-                    {tempoSlide.eyebrow}
-                  </span>
-                  <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Fortune Tourism Fleet
+            {/* Left Side (~65% width): All Existing Promotional Slides as an Automatic Slider */}
+            <div
+              className="w-full lg:w-[65%] bg-white rounded-2xl border border-slate-200/90 shadow-md p-5 sm:p-7 flex flex-col justify-between overflow-hidden relative group"
+              onMouseEnter={() => setIsSliderHovered(true)}
+              onMouseLeave={() => setIsSliderHovered(false)}
+            >
+              {/* Top Text Content belonging to the current slide */}
+              <div className="min-h-[92px] sm:min-h-[102px]">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] bg-emerald-50 text-[#063f2d] border border-emerald-200/70 shadow-2xs">
+                      <Sparkles className="w-3 h-3 text-[#d79a17]" />
+                      {currentSlide.eyebrow}
+                    </span>
+                    <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                      Fortune Tourism Showcase
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-extrabold text-slate-400 font-mono tracking-wider">
+                    {activeSlide + 1} / {LOGIN_DESTINATION_SLIDES.length}
                   </span>
                 </div>
 
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 font-heading tracking-tight uppercase mt-1 leading-tight">
-                  {tempoSlide.title}
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 font-heading tracking-tight uppercase leading-tight">
+                  {currentSlide.title}
                 </h2>
 
-                <div className="flex items-center gap-2 max-w-md my-1.5">
+                <div className="flex items-center gap-2 max-w-md my-1">
                   <div className="h-px bg-gradient-to-r from-transparent via-amber-400 to-amber-500 w-8 sm:w-12 shrink-0" />
                   <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-[#d79a17] whitespace-nowrap">
-                    {tempoSlide.tagline}
+                    {currentSlide.tagline}
                   </p>
                   <div className="h-px bg-gradient-to-r from-amber-500 via-amber-400 to-transparent flex-1" />
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-600 italic font-serif leading-relaxed max-w-xl">
-                  {tempoSlide.quote}
+                <p className="text-xs sm:text-sm text-slate-600 italic font-serif leading-relaxed line-clamp-2">
+                  {currentSlide.quote}
                 </p>
               </div>
 
-              {/* Center Image: Pristine Force Tempo Traveller with Original Brightness & Full Visibility */}
-              <div className="flex-1 min-h-[220px] sm:min-h-[260px] lg:min-h-[300px] flex items-center justify-center py-4 my-auto">
-                <img
-                  src={tempoSlide.image}
-                  alt={tempoSlide.alt}
-                  className="w-full h-auto max-h-[260px] sm:max-h-[300px] lg:max-h-[340px] object-contain mx-auto transition-transform duration-500 hover:scale-[1.02] drop-shadow-md"
-                />
+              {/* Center Image Container: All images with smooth cross-fade, no dark tint, object-contain */}
+              <div className="relative flex-1 min-h-[230px] sm:min-h-[280px] lg:min-h-[320px] flex items-center justify-center my-3 overflow-hidden rounded-xl bg-slate-50/70 border border-slate-100 p-2 sm:p-4">
+                {LOGIN_DESTINATION_SLIDES.map((slide, idx) => (
+                  <div
+                    key={slide.title}
+                    className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-in-out p-2 ${
+                      idx === activeSlide ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                    }`}
+                  >
+                    <img
+                      src={slide.image}
+                      alt={slide.alt}
+                      className="w-full h-full max-h-[240px] sm:max-h-[290px] lg:max-h-[320px] object-contain mx-auto drop-shadow-sm transition-transform duration-500"
+                    />
+                  </div>
+                ))}
+
+                {/* Previous Arrow Button */}
+                <button
+                  type="button"
+                  onClick={handlePrevSlide}
+                  aria-label="Previous slide"
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-[#063f2d] border border-slate-200/80 shadow-md flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                {/* Next Arrow Button */}
+                <button
+                  type="button"
+                  onClick={handleNextSlide}
+                  aria-label="Next slide"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-[#063f2d] border border-slate-200/80 shadow-md flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </div>
 
-              {/* Bottom Feature Badges */}
-              <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-slate-500">
-                <span className="flex items-center gap-1.5 text-slate-700">
-                  <Shield className="w-3.5 h-3.5 text-emerald-600" />
-                  Verified Fleet &amp; Expert Chauffeurs
-                </span>
-                <span className="flex items-center gap-1.5 text-slate-700">
-                  <Users className="w-3.5 h-3.5 text-blue-600" />
-                  12 - 26 Seater Luxury Seating
-                </span>
-                <span className="flex items-center gap-1.5 text-[#063f2d] font-bold">
-                  <Car className="w-3.5 h-3.5 text-[#d79a17]" />
-                  All South India Outstation Tours
-                </span>
+              {/* Bottom Navigation Dots & Hover Status */}
+              <div className="pt-2 flex items-center justify-between gap-3 border-t border-slate-100">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  {LOGIN_DESTINATION_SLIDES.map((slide, idx) => (
+                    <button
+                      key={slide.title}
+                      type="button"
+                      onClick={() => setActiveSlide(idx)}
+                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                        idx === activeSlide
+                          ? "w-6 bg-[#063f2d] shadow-2xs"
+                          : "w-2 bg-slate-300 hover:bg-slate-400"
+                      }`}
+                      aria-label={`Go to ${slide.title} slide`}
+                      title={slide.title}
+                    />
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      isSliderHovered ? "bg-amber-500" : "bg-emerald-500 animate-pulse"
+                    }`}
+                  />
+                  <span>{isSliderHovered ? "Paused on hover" : "Auto-sliding"}</span>
+                </div>
               </div>
             </div>
 
