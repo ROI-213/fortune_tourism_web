@@ -24,6 +24,11 @@ import {
   XCircle,
   ChevronRight,
   FileSpreadsheet,
+  Plus,
+  Pencil,
+  Trash2,
+  X,
+  Check,
 } from "lucide-react";
 
 export type AccountReportKey =
@@ -37,6 +42,96 @@ export type AccountReportKey =
   | "dues"
   | "profit_loss"
   | "online_cash_inflow";
+
+export interface DailyReportRecord {
+  id: string | number;
+  sl?: number;
+  date: string; // DATE (e.g. 01/09/2026)
+  trav_on: string; // TRAV ON (e.g. 01/09/2026)
+  trav_by: string; // TRAV BY (e.g. CAR, BUS, FLIGHT, TRAIN, HOTEL)
+  pax: string; // PAX (Passenger name)
+  ph_no: string; // PH NO (Phone number)
+  from: string; // FROM
+  to: string; // TO
+  pickup: string; // PICK UP
+  booking: number; // BOOKING
+  off_adv: number; // OFF ADV
+  due: number; // DUE
+  status?: string;
+  notes?: string;
+  raw_date?: string;
+}
+
+export const INITIAL_DAILY_REPORTS: DailyReportRecord[] = [
+  {
+    id: "DR-1",
+    sl: 1,
+    date: "01/09/2026",
+    trav_on: "01/09/2026",
+    trav_by: "CAR",
+    pax: "MOSTAQUE",
+    ph_no: "9800312531",
+    from: "KIA",
+    to: "BOMMASANDRA DROP",
+    pickup: "T2 G 10",
+    booking: 1500,
+    off_adv: 0,
+    due: 1500,
+    status: "Pending",
+    raw_date: "2026-09-01",
+  },
+  {
+    id: "DR-2",
+    sl: 2,
+    date: "01/09/2026",
+    trav_on: "02/09/2026",
+    trav_by: "CAR",
+    pax: "DEBENDRA KR ROUT",
+    ph_no: "9845471540",
+    from: "JIGANI + J D MARA",
+    to: "KIA DROP",
+    pickup: "JIGANI",
+    booking: 1500,
+    off_adv: 500,
+    due: 1000,
+    status: "Pending",
+    raw_date: "2026-09-01",
+  },
+  {
+    id: "DR-3",
+    sl: 3,
+    date: "02/09/2026",
+    trav_on: "02/09/2026",
+    trav_by: "CAR",
+    pax: "PRADIP KR MITRA",
+    ph_no: "9431087563",
+    from: "BOMMASANDRA",
+    to: "BSS",
+    pickup: "OFFICE",
+    booking: 2500,
+    off_adv: 0,
+    due: 0,
+    status: "Paid",
+    raw_date: "2026-09-02",
+  },
+  {
+    id: "DR-4",
+    sl: 4,
+    date: "02/09/2026",
+    trav_on: "02/09/2026",
+    trav_by: "CAR",
+    pax: "DEBENDRA KR ROUT",
+    ph_no: "9845471540",
+    from: "KIA",
+    to: "JIGANI DROP",
+    pickup: "T2 G 10",
+    booking: 1500,
+    off_adv: 0,
+    due: 0,
+    status: "Paid",
+    raw_date: "2026-09-02",
+  },
+];
 
 export interface TransactionRecord {
   id: string;
@@ -288,10 +383,63 @@ const SEED_TRANSACTIONS: TransactionRecord[] = [
   },
 ];
 
+function formatDisplayDate(val?: string | null): string {
+  if (!val) return "—";
+  const str = String(val).trim();
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) return str;
+  try {
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+  } catch {}
+  return str;
+}
+
+function parseToComparableDate(val?: string | null): string {
+  if (!val) return "";
+  const str = String(val).trim();
+  const match = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (match) {
+    return `${match[3]}-${match[2]}-${match[1]}`;
+  }
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    return str.slice(0, 10);
+  }
+  try {
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+      return d.toISOString().slice(0, 10);
+    }
+  } catch {}
+  return "";
+}
+
 export function AccountsReportsHub({ initialReport = "reports", onSelectReport }: AccountsReportsHubProps) {
   const [activeReport, setActiveReport] = useState<AccountReportKey>(initialReport);
   const [transactions, setTransactions] = useState<TransactionRecord[]>(SEED_TRANSACTIONS);
+  const [dailyRecords, setDailyRecords] = useState<DailyReportRecord[]>(INITIAL_DAILY_REPORTS);
   const [loading, setLoading] = useState(false);
+
+  // Daily Report Add / Edit Modal State
+  const [dailyModalOpen, setDailyModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<DailyReportRecord | null>(null);
+  const [dailyFormData, setDailyFormData] = useState({
+    date: "01/09/2026",
+    trav_on: "01/09/2026",
+    trav_by: "CAR",
+    pax: "",
+    ph_no: "",
+    from: "",
+    to: "",
+    pickup: "",
+    booking: 0,
+    off_adv: 0,
+    due: 0,
+  });
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -315,9 +463,54 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
     }
   };
 
-  // Fetch real database transactions from business API
+  // Fetch real database transactions & day book entries from PostgreSQL API
   const fetchLiveTransactions = async () => {
     setLoading(true);
+    try {
+      // 1. Fetch Day Book Entries for Daily Reports
+      const dbRes = await fetch("/api/business/day_book_entries?limit=200", {
+        headers: { "x-admin-key": "Admin@fortunetourism2026" },
+      });
+      if (dbRes.ok) {
+        const dbData = await dbRes.json();
+        if (dbData.success && Array.isArray(dbData.rows)) {
+          const liveDaily: DailyReportRecord[] = dbData.rows.map((r: any) => ({
+            id: r.id,
+            date: formatDisplayDate(r.booking_date || r.created_at),
+            raw_date: r.booking_date || r.created_at,
+            trav_on: formatDisplayDate(r.travel_date),
+            trav_by: (r.travel_by || "CAR").toUpperCase(),
+            pax: r.passenger_name || "",
+            ph_no: r.passenger_phone || "",
+            from: r.from_location || "",
+            to: r.to_location || "",
+            pickup: r.pickup_location || "—",
+            booking: Number(r.booking_amount || r.total_amount || 0),
+            off_adv: Number(r.office_advance || 0),
+            due:
+              r.due_amount !== null && r.due_amount !== undefined
+                ? Number(r.due_amount)
+                : Math.max(0, Number(r.booking_amount || 0) - Number(r.office_advance || 0)),
+            status: r.status || (Number(r.due_amount || 0) > 0 ? "Pending" : "Paid"),
+            notes: r.notes || "",
+          }));
+
+          // Merge: ensure INITIAL_DAILY_REPORTS are included if not present in DB
+          const existingKeys = new Set(
+            liveDaily.map((d) => `${(d.pax || "").toLowerCase()}_${d.ph_no || ""}`)
+          );
+          const seedsToKeep = INITIAL_DAILY_REPORTS.filter(
+            (s) => !existingKeys.has(`${s.pax.toLowerCase()}_${s.ph_no}`)
+          );
+          setDailyRecords([...seedsToKeep, ...liveDaily]);
+        }
+      }
+    } catch (err) {
+      console.warn("Using seeded daily records:", err);
+      setDailyRecords(INITIAL_DAILY_REPORTS);
+    }
+
+    // 2. Fetch general business transactions for other reports
     try {
       const res = await fetch("/api/business/business_records?limit=200", {
         headers: { "x-admin-key": "Admin@fortunetourism2026" },
@@ -360,7 +553,231 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
     fetchLiveTransactions();
   }, []);
 
-  // Filter transactions
+  // Filter Daily Reports (Excel-based structure)
+  const filteredDailyRecords = useMemo(() => {
+    return dailyRecords.filter((r) => {
+      // Search
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matches =
+          (r.pax && r.pax.toLowerCase().includes(q)) ||
+          (r.ph_no && r.ph_no.includes(q)) ||
+          (r.from && r.from.toLowerCase().includes(q)) ||
+          (r.to && r.to.toLowerCase().includes(q)) ||
+          (r.pickup && r.pickup.toLowerCase().includes(q)) ||
+          (r.trav_by && r.trav_by.toLowerCase().includes(q)) ||
+          (r.date && r.date.toLowerCase().includes(q)) ||
+          (r.trav_on && r.trav_on.toLowerCase().includes(q));
+        if (!matches) return false;
+      }
+
+      // Category Filter (CAR, BUS, FLIGHT, TRAIN, HOTEL)
+      if (categoryFilter !== "ALL") {
+        const cat = categoryFilter.toUpperCase();
+        const tb = (r.trav_by || "").toUpperCase();
+        if (!tb.includes(cat) && !cat.includes(tb)) {
+          return false;
+        }
+      }
+
+      // Status Filter
+      if (statusFilter !== "ALL") {
+        if (statusFilter === "PAID" && Number(r.due || 0) > 0) return false;
+        if (statusFilter === "PENDING" && Number(r.due || 0) === 0) return false;
+      }
+
+      // Date range filter
+      const comp = parseToComparableDate(r.raw_date || r.date);
+      if (startDate && comp && comp < startDate) return false;
+      if (endDate && comp && comp > endDate) return false;
+
+      return true;
+    });
+  }, [dailyRecords, searchQuery, categoryFilter, statusFilter, startDate, endDate]);
+
+  // Dynamic Totals for Daily Reports
+  const dailyTotals = useMemo(() => {
+    let booking = 0;
+    let offAdv = 0;
+    let due = 0;
+    filteredDailyRecords.forEach((r) => {
+      booking += Number(r.booking || 0);
+      offAdv += Number(r.off_adv || 0);
+      due += Number(r.due || 0);
+    });
+    return { booking, offAdv, due };
+  }, [filteredDailyRecords]);
+
+  // Modal Handlers for Daily Reports
+  const openAddDailyModal = () => {
+    setEditingRecord(null);
+    const now = new Date();
+    const dd = String(now.getDate()).padStart(2, "0");
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const yyyy = now.getFullYear();
+    const todayFormatted = `${dd}/${mm}/${yyyy}`;
+    setDailyFormData({
+      date: todayFormatted,
+      trav_on: todayFormatted,
+      trav_by: "CAR",
+      pax: "",
+      ph_no: "",
+      from: "",
+      to: "",
+      pickup: "",
+      booking: 0,
+      off_adv: 0,
+      due: 0,
+    });
+    setDailyModalOpen(true);
+  };
+
+  const openEditDailyModal = (rec: DailyReportRecord) => {
+    setEditingRecord(rec);
+    setDailyFormData({
+      date: rec.date,
+      trav_on: rec.trav_on,
+      trav_by: rec.trav_by,
+      pax: rec.pax,
+      ph_no: rec.ph_no,
+      from: rec.from,
+      to: rec.to,
+      pickup: rec.pickup,
+      booking: rec.booking,
+      off_adv: rec.off_adv,
+      due: rec.due,
+    });
+    setDailyModalOpen(true);
+  };
+
+  const handleDeleteDailyRecord = async (id: string | number) => {
+    if (!window.confirm("Are you sure you want to delete this Daily Report entry?")) return;
+    setDailyRecords((prev) => prev.filter((r) => r.id !== id));
+    if (typeof id === "number") {
+      try {
+        await fetch(`/api/business/day_book_entries?id=${id}`, {
+          method: "DELETE",
+          headers: { "x-admin-key": "Admin@fortunetourism2026" },
+        });
+      } catch (err) {
+        console.warn("DELETE /api/business/day_book_entries error:", err);
+      }
+    }
+  };
+
+  const handleSaveDailyRecord = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const bookingVal = Number(dailyFormData.booking || 0);
+    const offAdvVal = Number(dailyFormData.off_adv || 0);
+    const dueVal = Number(dailyFormData.due !== undefined ? dailyFormData.due : Math.max(0, bookingVal - offAdvVal));
+
+    if (editingRecord) {
+      const updated: DailyReportRecord = {
+        ...editingRecord,
+        date: dailyFormData.date,
+        trav_on: dailyFormData.trav_on,
+        trav_by: dailyFormData.trav_by.toUpperCase(),
+        pax: dailyFormData.pax,
+        ph_no: dailyFormData.ph_no,
+        from: dailyFormData.from,
+        to: dailyFormData.to,
+        pickup: dailyFormData.pickup,
+        booking: bookingVal,
+        off_adv: offAdvVal,
+        due: dueVal,
+        status: dueVal === 0 ? "Paid" : "Pending",
+      };
+
+      setDailyRecords((prev) => prev.map((r) => (r.id === editingRecord.id ? updated : r)));
+
+      if (typeof editingRecord.id === "number") {
+        try {
+          await fetch("/api/business/day_book_entries", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "x-admin-key": "Admin@fortunetourism2026",
+            },
+            body: JSON.stringify({
+              id: editingRecord.id,
+              booking_date: parseToComparableDate(dailyFormData.date),
+              travel_date: parseToComparableDate(dailyFormData.trav_on),
+              travel_by: dailyFormData.trav_by,
+              passenger_name: dailyFormData.pax,
+              passenger_phone: dailyFormData.ph_no,
+              from_location: dailyFormData.from,
+              to_location: dailyFormData.to,
+              pickup_location: dailyFormData.pickup,
+              booking_amount: bookingVal,
+              office_advance: offAdvVal,
+              due_amount: dueVal,
+              status: dueVal === 0 ? "Paid" : "Pending",
+            }),
+          });
+        } catch (err) {
+          console.warn("PUT /api/business/day_book_entries error:", err);
+        }
+      }
+    } else {
+      const tempId = `DR-${Date.now()}`;
+      const newRec: DailyReportRecord = {
+        id: tempId,
+        sl: dailyRecords.length + 1,
+        date: dailyFormData.date,
+        trav_on: dailyFormData.trav_on,
+        trav_by: dailyFormData.trav_by.toUpperCase(),
+        pax: dailyFormData.pax,
+        ph_no: dailyFormData.ph_no,
+        from: dailyFormData.from,
+        to: dailyFormData.to,
+        pickup: dailyFormData.pickup,
+        booking: bookingVal,
+        off_adv: offAdvVal,
+        due: dueVal,
+        status: dueVal === 0 ? "Paid" : "Pending",
+      };
+
+      setDailyRecords((prev) => [newRec, ...prev]);
+
+      try {
+        const res = await fetch("/api/business/day_book_entries", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-key": "Admin@fortunetourism2026",
+          },
+          body: JSON.stringify({
+            booking_date: parseToComparableDate(dailyFormData.date),
+            travel_date: parseToComparableDate(dailyFormData.trav_on),
+            travel_by: dailyFormData.trav_by,
+            passenger_name: dailyFormData.pax,
+            passenger_phone: dailyFormData.ph_no,
+            from_location: dailyFormData.from,
+            to_location: dailyFormData.to,
+            pickup_location: dailyFormData.pickup,
+            booking_amount: bookingVal,
+            office_advance: offAdvVal,
+            due_amount: dueVal,
+            status: dueVal === 0 ? "Paid" : "Pending",
+          }),
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.row?.id) {
+            setDailyRecords((prev) =>
+              prev.map((r) => (r.id === tempId ? { ...r, id: json.row.id } : r))
+            );
+          }
+        }
+      } catch (err) {
+        console.warn("POST /api/business/day_book_entries error:", err);
+      }
+    }
+
+    setDailyModalOpen(false);
+  };
+
+  // Filter transactions (for other reports)
   const filteredTransactions = useMemo(() => {
     return transactions.filter((t) => {
       // Search
@@ -391,16 +808,9 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
       }
 
       // Report-specific filtering
-      if (activeReport === "daily") {
-        // Daily: Only transactions from today if preset selected
-        const tDate = new Date(t.date).toDateString();
-        const today = new Date().toDateString();
-        if (datePreset === "today" && tDate !== today) return false;
-      } else if (activeReport === "dues") {
-        // Dues: Only pending transactions
+      if (activeReport === "dues") {
         if (t.status !== "PENDING") return false;
       } else if (activeReport === "final") {
-        // Final: only settled / paid transactions
         if (t.status !== "PAID") return false;
       }
 
@@ -418,7 +828,7 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
 
       return true;
     });
-  }, [transactions, searchQuery, categoryFilter, paymentMethodFilter, statusFilter, activeReport, datePreset, startDate, endDate]);
+  }, [transactions, searchQuery, categoryFilter, paymentMethodFilter, statusFilter, activeReport, startDate, endDate]);
 
   // Aggregate Metrics
   const metrics = useMemo(() => {
@@ -459,6 +869,62 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
 
   // Export to CSV
   const handleExportCSV = () => {
+    if (activeReport === "daily") {
+      const headers = [
+        "SL",
+        "DATE",
+        "TRAV ON",
+        "TRAV BY",
+        "PAX",
+        "PH NO",
+        "FROM",
+        "TO",
+        "PICK UP",
+        "BOOKING",
+        "OFF ADV",
+        "DUE",
+      ];
+      const rows = filteredDailyRecords.map((r, idx) => [
+        idx + 1,
+        `"${r.date}"`,
+        `"${r.trav_on}"`,
+        `"${r.trav_by}"`,
+        `"${(r.pax || "").replace(/"/g, '""')}"`,
+        `"${r.ph_no || ""}"`,
+        `"${(r.from || "").replace(/"/g, '""')}"`,
+        `"${(r.to || "").replace(/"/g, '""')}"`,
+        `"${(r.pickup || "").replace(/"/g, '""')}"`,
+        r.booking,
+        r.off_adv,
+        r.due,
+      ]);
+      // Total Cash Row
+      rows.push([
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        `"Total Cash"`,
+        dailyTotals.booking,
+        dailyTotals.offAdv,
+        dailyTotals.due,
+      ]);
+
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `fortune_tourism_daily_reports_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+
     const headers = ["Transaction ID", "Date", "Voucher/Ref", "Particulars", "Category", "Payment Method", "Status", "Income (₹)", "Expense (₹)", "Balance (₹)", "Customer", "Phone", "Notes"];
     const rows = filteredTransactions.map((t) => [
       t.id,
@@ -570,15 +1036,19 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
 
       {/* 4 Key Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Income */}
+        {/* Total Income / Total Booking */}
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Income</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              {activeReport === "daily" ? "Total Booking" : "Total Income"}
+            </p>
             <p className="text-2xl font-black text-emerald-600 mt-1">
-              ₹{metrics.totalIncome.toLocaleString("en-IN")}
+              ₹{(activeReport === "daily" ? dailyTotals.booking : metrics.totalIncome).toLocaleString("en-IN")}
             </p>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Online: ₹{metrics.totalOnline.toLocaleString("en-IN")} · Cash: ₹{metrics.totalCash.toLocaleString("en-IN")}
+              {activeReport === "daily"
+                ? `Off Adv: ₹${dailyTotals.offAdv.toLocaleString("en-IN")} · Due: ₹${dailyTotals.due.toLocaleString("en-IN")}`
+                : `Online: ₹${metrics.totalOnline.toLocaleString("en-IN")} · Cash: ₹${metrics.totalCash.toLocaleString("en-IN")}`}
             </p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
@@ -586,43 +1056,65 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
           </div>
         </div>
 
-        {/* Total Expenses */}
+        {/* Total Expenses / Office Advance */}
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Expenses</p>
-            <p className="text-2xl font-black text-red-600 mt-1">
-              ₹{metrics.totalExpenses.toLocaleString("en-IN")}
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              {activeReport === "daily" ? "Office Advance (Off Adv)" : "Total Expenses"}
             </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">Disbursed supplier &amp; fleet costs</p>
+            <p className="text-2xl font-black text-blue-600 mt-1">
+              ₹{(activeReport === "daily" ? dailyTotals.offAdv : metrics.totalExpenses).toLocaleString("en-IN")}
+            </p>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              {activeReport === "daily" ? "Advance payments received in office" : "Disbursed supplier & fleet costs"}
+            </p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
             <ArrowUpRight className="w-6 h-6" />
           </div>
         </div>
 
-        {/* Total Pending Payments */}
+        {/* Total Pending Payments / Remaining Due */}
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Pending Dues</p>
-            <p className="text-2xl font-black text-amber-600 mt-1">
-              ₹{metrics.totalPending.toLocaleString("en-IN")}
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              {activeReport === "daily" ? "Total Due" : "Pending Dues"}
             </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">Awaiting customer collection</p>
+            <p className="text-2xl font-black text-rose-600 mt-1">
+              ₹{(activeReport === "daily" ? dailyTotals.due : metrics.totalPending).toLocaleString("en-IN")}
+            </p>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              {activeReport === "daily" ? "Remaining customer dues to collect" : "Awaiting customer collection"}
+            </p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+          <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
             <AlertCircle className="w-6 h-6" />
           </div>
         </div>
 
-        {/* Net Balance / Profit */}
+        {/* Net Balance / Cash Collected */}
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Net Balance</p>
-            <p className={`text-2xl font-black mt-1 ${metrics.netBalance >= 0 ? "text-indigo-600" : "text-rose-600"}`}>
-              ₹{metrics.netBalance.toLocaleString("en-IN")}
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              {activeReport === "daily" ? "Net Collected" : "Net Balance"}
+            </p>
+            <p className={`text-2xl font-black mt-1 ${
+              (activeReport === "daily" ? dailyTotals.booking - dailyTotals.due : metrics.netBalance) >= 0 ? "text-indigo-600" : "text-rose-600"
+            }`}>
+              ₹{(activeReport === "daily" ? dailyTotals.booking - dailyTotals.due : metrics.netBalance).toLocaleString("en-IN")}
             </p>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Operating margin: <span className="font-bold text-emerald-600">{metrics.profitMargin}%</span>
+              {activeReport === "daily" ? (
+                <>
+                  Collection Rate: <span className="font-bold text-emerald-600">
+                    {dailyTotals.booking > 0 ? (((dailyTotals.booking - dailyTotals.due) / dailyTotals.booking) * 100).toFixed(1) : "0"}%
+                  </span>
+                </>
+              ) : (
+                <>
+                  Operating margin: <span className="font-bold text-emerald-600">{metrics.profitMargin}%</span>
+                </>
+              )}
             </p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600">
@@ -831,151 +1323,537 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
         </div>
       </div>
 
-      {/* Transaction Records Table */}
+      {/* Transaction Records Table / Daily Reports Table */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="p-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <FileSpreadsheet className="w-4 h-4 text-amber-500" />
             <h3 className="font-black text-slate-900 text-sm">
-              {activeDef.shortTitle} Statement Transactions ({filteredTransactions.length})
+              {activeReport === "daily"
+                ? "Daily Reports"
+                : `${activeDef.shortTitle} Statement Transactions (${filteredTransactions.length})`}
             </h3>
           </div>
-          <span className="text-[11px] text-slate-500 font-semibold hidden sm:inline">
-            Double-entry verified against PostgreSQL
-          </span>
+          <div className="flex items-center gap-3">
+            {activeReport === "daily" && (
+              <button
+                type="button"
+                onClick={openAddDailyModal}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-xs transition cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Entry</span>
+              </button>
+            )}
+            <span className="text-[11px] text-slate-500 font-semibold hidden sm:inline">
+              Double-entry verified against PostgreSQL
+            </span>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 uppercase tracking-wider text-[10px]">
-                <th className="py-3 px-4">Date &amp; ID</th>
-                <th className="py-3 px-4">Particulars &amp; Voucher</th>
-                <th className="py-3 px-4">Sector</th>
-                <th className="py-3 px-4">Customer</th>
-                <th className="py-3 px-4">Method</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-right">Income (₹)</th>
-                <th className="py-3 px-4 text-right">Expense (₹)</th>
-                <th className="py-3 px-4 text-right">Balance (₹)</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 font-medium">
-              {filteredTransactions.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-400">
-                    <AlertCircle className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                    <p className="font-bold text-sm">No transaction records match the selected filters.</p>
-                    <p className="text-xs text-slate-400 mt-1">Try clearing your search query or selecting "All Time".</p>
-                  </td>
+          {activeReport === "daily" ? (
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-600 font-black border-b border-slate-200 uppercase tracking-wider text-[10px]">
+                  <th className="py-3 px-3 text-center w-12">SL</th>
+                  <th className="py-3 px-3 whitespace-nowrap">DATE</th>
+                  <th className="py-3 px-3 whitespace-nowrap">TRAV ON</th>
+                  <th className="py-3 px-3 whitespace-nowrap">TRAV BY</th>
+                  <th className="py-3 px-3 whitespace-nowrap">PAX</th>
+                  <th className="py-3 px-3 whitespace-nowrap">PH NO</th>
+                  <th className="py-3 px-3 whitespace-nowrap">FROM</th>
+                  <th className="py-3 px-3 whitespace-nowrap">TO</th>
+                  <th className="py-3 px-3 whitespace-nowrap">PICK UP</th>
+                  <th className="py-3 px-3 text-right whitespace-nowrap">BOOKING</th>
+                  <th className="py-3 px-3 text-right whitespace-nowrap">OFF ADV</th>
+                  <th className="py-3 px-3 text-right whitespace-nowrap">DUE</th>
+                  <th className="py-3 px-3 text-center whitespace-nowrap w-24">ACTION</th>
                 </tr>
-              ) : (
-                filteredTransactions.map((t) => {
-                  return (
-                    <tr key={t.id} className="hover:bg-slate-50/80 transition">
-                      {/* Date & ID */}
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        <p className="font-bold text-slate-900">{t.id}</p>
-                        <p className="text-[10px] text-slate-400">
-                          {new Date(t.date).toLocaleDateString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </p>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                {filteredDailyRecords.length === 0 ? (
+                  <tr>
+                    <td colSpan={13} className="py-12 text-center text-slate-400">
+                      <AlertCircle className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                      <p className="font-bold text-sm">No daily report records match the selected filters.</p>
+                      <p className="text-xs text-slate-400 mt-1">Try clearing your search query or selecting "All Time".</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredDailyRecords.map((r, idx) => (
+                    <tr key={r.id} className="hover:bg-slate-50/80 transition">
+                      {/* 1. SL */}
+                      <td className="py-3 px-3 text-center font-bold text-slate-500 whitespace-nowrap">
+                        {idx + 1}
                       </td>
 
-                      {/* Particulars & Voucher */}
-                      <td className="py-3 px-4 max-w-xs">
-                        <p className="font-bold text-slate-800 line-clamp-1">{t.particulars}</p>
-                        <p className="text-[10px] font-mono text-slate-400">{t.ref_number}</p>
+                      {/* 2. DATE */}
+                      <td className="py-3 px-3 whitespace-nowrap font-bold text-slate-900">
+                        {r.date}
                       </td>
 
-                      {/* Sector / Category */}
-                      <td className="py-3 px-4 whitespace-nowrap">
+                      {/* 3. TRAV ON */}
+                      <td className="py-3 px-3 whitespace-nowrap text-slate-700 font-semibold">
+                        {r.trav_on}
+                      </td>
+
+                      {/* 4. TRAV BY */}
+                      <td className="py-3 px-3 whitespace-nowrap">
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-700 border border-slate-200">
-                          {t.category}
+                          {r.trav_by}
                         </span>
                       </td>
 
-                      {/* Customer */}
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        <p className="font-semibold text-slate-800">{t.customer_name || "—"}</p>
-                        <p className="text-[10px] text-slate-400">{t.phone || ""}</p>
+                      {/* 5. PAX */}
+                      <td className="py-3 px-3 whitespace-nowrap">
+                        <span className="font-bold text-slate-900">{r.pax}</span>
                       </td>
 
-                      {/* Payment Method */}
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                          t.payment_method === "CASH"
-                            ? "bg-amber-100 text-amber-800"
-                            : t.payment_method === "UPI"
-                            ? "bg-indigo-100 text-indigo-800"
-                            : "bg-cyan-100 text-cyan-800"
-                        }`}>
-                          {t.payment_method}
+                      {/* 6. PH NO */}
+                      <td className="py-3 px-3 whitespace-nowrap">
+                        <span className="font-mono text-slate-600">{r.ph_no}</span>
+                      </td>
+
+                      {/* 7. FROM */}
+                      <td className="py-3 px-3 whitespace-nowrap text-slate-800 font-semibold">
+                        {r.from}
+                      </td>
+
+                      {/* 8. TO */}
+                      <td className="py-3 px-3 whitespace-nowrap text-slate-800 font-semibold">
+                        {r.to}
+                      </td>
+
+                      {/* 9. PICK UP */}
+                      <td className="py-3 px-3 whitespace-nowrap text-slate-700">
+                        {r.pickup}
+                      </td>
+
+                      {/* 10. BOOKING */}
+                      <td className="py-3 px-3 text-right whitespace-nowrap font-bold text-slate-900">
+                        ₹{Number(r.booking).toLocaleString("en-IN")}
+                      </td>
+
+                      {/* 11. OFF ADV */}
+                      <td className="py-3 px-3 text-right whitespace-nowrap font-bold text-blue-600">
+                        ₹{Number(r.off_adv).toLocaleString("en-IN")}
+                      </td>
+
+                      {/* 12. DUE */}
+                      <td className="py-3 px-3 text-right whitespace-nowrap font-black">
+                        <span
+                          className={
+                            Number(r.due) > 0 ? "text-rose-600" : "text-emerald-700"
+                          }
+                        >
+                          ₹{Number(r.due).toLocaleString("en-IN")}
                         </span>
                       </td>
 
-                      {/* Status */}
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black ${
-                          t.status === "PAID"
-                            ? "bg-emerald-100 text-emerald-800 border border-emerald-300/60"
-                            : t.status === "PENDING"
-                            ? "bg-amber-100 text-amber-800 border border-amber-300/60"
-                            : t.status === "REFUNDED"
-                            ? "bg-purple-100 text-purple-800 border border-purple-300/60"
-                            : "bg-red-100 text-red-800 border border-red-300/60"
-                        }`}>
-                          {t.status === "PAID" && <CheckCircle2 className="w-3 h-3" />}
-                          {t.status === "PENDING" && <Clock className="w-3 h-3" />}
-                          {t.status === "REFUNDED" && <ArrowLeftRight className="w-3 h-3" />}
-                          {t.status === "CANCELLED" && <XCircle className="w-3 h-3" />}
-                          {t.status}
-                        </span>
-                      </td>
-
-                      {/* Income */}
-                      <td className="py-3 px-4 text-right whitespace-nowrap font-bold text-emerald-600">
-                        {t.income > 0 ? `+₹${t.income.toLocaleString("en-IN")}` : "—"}
-                      </td>
-
-                      {/* Expense */}
-                      <td className="py-3 px-4 text-right whitespace-nowrap font-bold text-red-600">
-                        {t.expense > 0 ? `-₹${t.expense.toLocaleString("en-IN")}` : "—"}
-                      </td>
-
-                      {/* Balance */}
-                      <td className="py-3 px-4 text-right whitespace-nowrap font-black text-slate-900">
-                        ₹{t.balance.toLocaleString("en-IN")}
+                      {/* ACTIONS */}
+                      <td className="py-3 px-3 text-center whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => openEditDailyModal(r)}
+                            className="p-1 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-md transition cursor-pointer"
+                            title="Edit Entry"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteDailyRecord(r.id)}
+                            className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition cursor-pointer"
+                            title="Delete Entry"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
-                  );
-                })
+                  ))
+                )}
+              </tbody>
+              {filteredDailyRecords.length > 0 && (
+                <tfoot className="bg-slate-100 text-slate-900 font-black border-t-2 border-slate-300">
+                  <tr>
+                    <td colSpan={8} className="py-3 px-3 text-right"></td>
+                    <td className="py-3 px-3 font-black text-slate-900 whitespace-nowrap text-xs uppercase tracking-wider">
+                      Total Cash
+                    </td>
+                    <td className="py-3 px-3 text-right font-black text-emerald-700 whitespace-nowrap text-sm">
+                      ₹{dailyTotals.booking.toLocaleString("en-IN")}
+                    </td>
+                    <td className="py-3 px-3 text-right font-black text-blue-700 whitespace-nowrap text-sm">
+                      ₹{dailyTotals.offAdv.toLocaleString("en-IN")}
+                    </td>
+                    <td className="py-3 px-3 text-right font-black text-rose-700 whitespace-nowrap text-sm">
+                      ₹{dailyTotals.due.toLocaleString("en-IN")}
+                    </td>
+                    <td className="py-3 px-3"></td>
+                  </tr>
+                </tfoot>
               )}
-            </tbody>
-            {filteredTransactions.length > 0 && (
-              <tfoot className="bg-slate-100 text-slate-900 font-black border-t-2 border-slate-300">
-                <tr>
-                  <td colSpan={6} className="py-3 px-4 text-right text-xs uppercase tracking-wider">
-                    Report Totals:
-                  </td>
-                  <td className="py-3 px-4 text-right text-emerald-700 text-sm font-black">
-                    ₹{metrics.totalIncome.toLocaleString("en-IN")}
-                  </td>
-                  <td className="py-3 px-4 text-right text-red-700 text-sm font-black">
-                    ₹{metrics.totalExpenses.toLocaleString("en-IN")}
-                  </td>
-                  <td className="py-3 px-4 text-right text-indigo-700 text-sm font-black">
-                    ₹{metrics.netBalance.toLocaleString("en-IN")}
-                  </td>
+            </table>
+          ) : (
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 uppercase tracking-wider text-[10px]">
+                  <th className="py-3 px-4">Date &amp; ID</th>
+                  <th className="py-3 px-4">Particulars &amp; Voucher</th>
+                  <th className="py-3 px-4">Sector</th>
+                  <th className="py-3 px-4">Customer</th>
+                  <th className="py-3 px-4">Method</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4 text-right">Income (₹)</th>
+                  <th className="py-3 px-4 text-right">Expense (₹)</th>
+                  <th className="py-3 px-4 text-right">Balance (₹)</th>
                 </tr>
-              </tfoot>
-            )}
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                {filteredTransactions.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} className="py-12 text-center text-slate-400">
+                      <AlertCircle className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                      <p className="font-bold text-sm">No transaction records match the selected filters.</p>
+                      <p className="text-xs text-slate-400 mt-1">Try clearing your search query or selecting "All Time".</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredTransactions.map((t) => {
+                    return (
+                      <tr key={t.id} className="hover:bg-slate-50/80 transition">
+                        {/* Date & ID */}
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <p className="font-bold text-slate-900">{t.id}</p>
+                          <p className="text-[10px] text-slate-400">
+                            {new Date(t.date).toLocaleDateString("en-IN", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </p>
+                        </td>
+
+                        {/* Particulars & Voucher */}
+                        <td className="py-3 px-4 max-w-xs">
+                          <p className="font-bold text-slate-800 line-clamp-1">{t.particulars}</p>
+                          <p className="text-[10px] font-mono text-slate-400">{t.ref_number}</p>
+                        </td>
+
+                        {/* Sector / Category */}
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-700 border border-slate-200">
+                            {t.category}
+                          </span>
+                        </td>
+
+                        {/* Customer */}
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <p className="font-semibold text-slate-800">{t.customer_name || "—"}</p>
+                          <p className="text-[10px] text-slate-400">{t.phone || ""}</p>
+                        </td>
+
+                        {/* Payment Method */}
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                            t.payment_method === "CASH"
+                              ? "bg-amber-100 text-amber-800"
+                              : t.payment_method === "UPI"
+                              ? "bg-indigo-100 text-indigo-800"
+                              : "bg-cyan-100 text-cyan-800"
+                          }`}>
+                            {t.payment_method}
+                          </span>
+                        </td>
+
+                        {/* Status */}
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black ${
+                            t.status === "PAID"
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-300/60"
+                              : t.status === "PENDING"
+                              ? "bg-amber-100 text-amber-800 border border-amber-300/60"
+                              : t.status === "REFUNDED"
+                              ? "bg-purple-100 text-purple-800 border border-purple-300/60"
+                              : "bg-red-100 text-red-800 border border-red-300/60"
+                          }`}>
+                            {t.status === "PAID" && <CheckCircle2 className="w-3 h-3" />}
+                            {t.status === "PENDING" && <Clock className="w-3 h-3" />}
+                            {t.status === "REFUNDED" && <ArrowLeftRight className="w-3 h-3" />}
+                            {t.status === "CANCELLED" && <XCircle className="w-3 h-3" />}
+                            {t.status}
+                          </span>
+                        </td>
+
+                        {/* Income */}
+                        <td className="py-3 px-4 text-right whitespace-nowrap font-bold text-emerald-600">
+                          {t.income > 0 ? `+₹${t.income.toLocaleString("en-IN")}` : "—"}
+                        </td>
+
+                        {/* Expense */}
+                        <td className="py-3 px-4 text-right whitespace-nowrap font-bold text-red-600">
+                          {t.expense > 0 ? `-₹${t.expense.toLocaleString("en-IN")}` : "—"}
+                        </td>
+
+                        {/* Balance */}
+                        <td className="py-3 px-4 text-right whitespace-nowrap font-black text-slate-900">
+                          ₹{t.balance.toLocaleString("en-IN")}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+              {filteredTransactions.length > 0 && (
+                <tfoot className="bg-slate-100 text-slate-900 font-black border-t-2 border-slate-300">
+                  <tr>
+                    <td colSpan={6} className="py-3 px-4 text-right text-xs uppercase tracking-wider">
+                      Report Totals:
+                    </td>
+                    <td className="py-3 px-4 text-right text-emerald-700 text-sm font-black">
+                      ₹{metrics.totalIncome.toLocaleString("en-IN")}
+                    </td>
+                    <td className="py-3 px-4 text-right text-red-700 text-sm font-black">
+                      ₹{metrics.totalExpenses.toLocaleString("en-IN")}
+                    </td>
+                    <td className="py-3 px-4 text-right text-indigo-700 text-sm font-black">
+                      ₹{metrics.netBalance.toLocaleString("en-IN")}
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
+            </table>
+          )}
         </div>
       </div>
+
+      {/* Daily Report Add/Edit Modal */}
+      {dailyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="bg-[#0b1329] p-5 text-white flex items-center justify-between border-b border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400">
+                  <FileSpreadsheet className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">
+                    {editingRecord ? "Edit Daily Report Entry" : "Add Daily Report Entry"}
+                  </h3>
+                  <p className="text-[11px] text-slate-300">
+                    Fortune Tourism Daily Ledger Records
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDailyModalOpen(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSaveDailyRecord} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* DATE */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">DATE (DD/MM/YYYY)</label>
+                  <input
+                    type="text"
+                    required
+                    value={dailyFormData.date}
+                    onChange={(e) => setDailyFormData({ ...dailyFormData, date: e.target.value })}
+                    placeholder="01/09/2026"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-800"
+                  />
+                </div>
+
+                {/* TRAV ON */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">TRAV ON (DD/MM/YYYY)</label>
+                  <input
+                    type="text"
+                    required
+                    value={dailyFormData.trav_on}
+                    onChange={(e) => setDailyFormData({ ...dailyFormData, trav_on: e.target.value })}
+                    placeholder="01/09/2026"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* TRAV BY */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">TRAV BY</label>
+                  <select
+                    value={dailyFormData.trav_by}
+                    onChange={(e) => setDailyFormData({ ...dailyFormData, trav_by: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-bold text-slate-800 cursor-pointer"
+                  >
+                    <option value="CAR">CAR</option>
+                    <option value="BUS">BUS</option>
+                    <option value="FLIGHT">FLIGHT</option>
+                    <option value="TRAIN">TRAIN</option>
+                    <option value="HOTEL">HOTEL</option>
+                    <option value="TOUR">TOUR</option>
+                  </select>
+                </div>
+
+                {/* PAX */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">PAX (Customer Name)</label>
+                  <input
+                    type="text"
+                    required
+                    value={dailyFormData.pax}
+                    onChange={(e) => setDailyFormData({ ...dailyFormData, pax: e.target.value })}
+                    placeholder="Passenger name"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-800"
+                  />
+                </div>
+              </div>
+
+              {/* PH NO */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">PH NO (Phone Number)</label>
+                <input
+                  type="text"
+                  value={dailyFormData.ph_no}
+                  onChange={(e) => setDailyFormData({ ...dailyFormData, ph_no: e.target.value })}
+                  placeholder="e.g. 9800312531"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-mono text-slate-800"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* FROM */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">FROM (Origin)</label>
+                  <input
+                    type="text"
+                    value={dailyFormData.from}
+                    onChange={(e) => setDailyFormData({ ...dailyFormData, from: e.target.value })}
+                    placeholder="e.g. KIA"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-800"
+                  />
+                </div>
+
+                {/* TO */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">TO (Destination)</label>
+                  <input
+                    type="text"
+                    value={dailyFormData.to}
+                    onChange={(e) => setDailyFormData({ ...dailyFormData, to: e.target.value })}
+                    placeholder="e.g. BOMMASANDRA DROP"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-800"
+                  />
+                </div>
+              </div>
+
+              {/* PICK UP */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">PICK UP (Pickup Details)</label>
+                <input
+                  type="text"
+                  value={dailyFormData.pickup}
+                  onChange={(e) => setDailyFormData({ ...dailyFormData, pickup: e.target.value })}
+                  placeholder="e.g. T2 G 10"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-semibold text-slate-800"
+                />
+              </div>
+
+              {/* FINANCIALS: BOOKING, OFF ADV, DUE */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 border-t border-slate-100">
+                {/* BOOKING */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">BOOKING (₹)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={dailyFormData.booking}
+                    onChange={(e) => {
+                      const newBk = Number(e.target.value || 0);
+                      const off = Number(dailyFormData.off_adv || 0);
+                      setDailyFormData({
+                        ...dailyFormData,
+                        booking: newBk,
+                        due: Math.max(0, newBk - off),
+                      });
+                    }}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-bold text-slate-900"
+                  />
+                </div>
+
+                {/* OFF ADV */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">OFF ADV (₹)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={dailyFormData.off_adv}
+                    onChange={(e) => {
+                      const newOff = Number(e.target.value || 0);
+                      const bk = Number(dailyFormData.booking || 0);
+                      setDailyFormData({
+                        ...dailyFormData,
+                        off_adv: newOff,
+                        due: Math.max(0, bk - newOff),
+                      });
+                    }}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-bold text-blue-700"
+                  />
+                </div>
+
+                {/* DUE */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">DUE (₹)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={dailyFormData.due}
+                    onChange={(e) =>
+                      setDailyFormData({
+                        ...dailyFormData,
+                        due: Number(e.target.value || 0),
+                      })
+                    }
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-400 outline-none font-black text-rose-700"
+                  />
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setDailyModalOpen(false)}
+                  className="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-black rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md transition cursor-pointer"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>{editingRecord ? "Update Entry" : "Save Entry"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
