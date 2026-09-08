@@ -403,7 +403,7 @@ function formatDisplayDate(val?: string | null): string {
 function parseToComparableDate(val?: string | null): string {
   if (!val) return "";
   const str = String(val).trim();
-  const match = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  const match = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
   if (match) {
     const day = match[1].padStart(2, "0");
     const month = match[2].padStart(2, "0");
@@ -416,7 +416,10 @@ function parseToComparableDate(val?: string | null): string {
   try {
     const d = new Date(str);
     if (!isNaN(d.getTime())) {
-      return d.toISOString().slice(0, 10);
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const yyyy = d.getFullYear();
+      return `${yyyy}-${mm}-${dd}`;
     }
   } catch {}
   return "";
@@ -428,14 +431,19 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
   const [dailyRecords, setDailyRecords] = useState<DailyReportRecord[]>(INITIAL_DAILY_REPORTS);
   const [loading, setLoading] = useState(false);
 
-  // Daily Reports Header Filter States (From Date, To Date, All Booking Types)
+  // Daily Reports Header Filter States (From Date, To Date, All Booking Types, Search Query)
   const [dailyFromDate, setDailyFromDate] = useState("");
   const [dailyToDate, setDailyToDate] = useState("");
   const [dailyBookingType, setDailyBookingType] = useState("ALL");
+  const [dailySearchQuery, setDailySearchQuery] = useState("");
+
   const [appliedDailyFromDate, setAppliedDailyFromDate] = useState("");
   const [appliedDailyToDate, setAppliedDailyToDate] = useState("");
   const [appliedDailyBookingType, setAppliedDailyBookingType] = useState("ALL");
+  const [appliedDailySearchQuery, setAppliedDailySearchQuery] = useState("");
   const [dateError, setDateError] = useState<string | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchFeedback, setSearchFeedback] = useState<string | null>(null);
 
   const handleDailySearch = () => {
     if (dailyFromDate && dailyToDate && dailyToDate < dailyFromDate) {
@@ -443,10 +451,38 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
       return;
     }
     setDateError(null);
+    setIsSearching(true);
+    setTimeout(() => setIsSearching(false), 250);
+
     setAppliedDailyFromDate(dailyFromDate);
     setAppliedDailyToDate(dailyToDate);
     setAppliedDailyBookingType(dailyBookingType);
+    setAppliedDailySearchQuery(dailySearchQuery);
+
+    setSearchFeedback("Search applied");
+    setTimeout(() => setSearchFeedback(null), 2500);
   };
+
+  const handleResetDailyFilters = () => {
+    setDailyFromDate("");
+    setDailyToDate("");
+    setDailyBookingType("ALL");
+    setDailySearchQuery("");
+    setAppliedDailyFromDate("");
+    setAppliedDailyToDate("");
+    setAppliedDailyBookingType("ALL");
+    setAppliedDailySearchQuery("");
+    setDateError(null);
+    setSearchFeedback("Filters reset");
+    setTimeout(() => setSearchFeedback(null), 2000);
+  };
+
+  const hasActiveDailyFilters = Boolean(
+    appliedDailyFromDate ||
+    appliedDailyToDate ||
+    appliedDailyBookingType !== "ALL" ||
+    appliedDailySearchQuery.trim()
+  );
 
   // Daily Report Add / Edit Modal State
   const [dailyModalOpen, setDailyModalOpen] = useState(false);
@@ -577,16 +613,16 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
     fetchLiveTransactions();
   }, []);
 
-  // Filter Daily Reports (Filtered using Header Controls: DATE range and Booking Type)
+  // Filter Daily Reports (Filtered using Header Controls: DATE range, Booking Type, and Search Query)
   const filteredDailyRecords = useMemo(() => {
     return dailyRecords.filter((r) => {
       // 1. Filter against the report's DATE field (not TRAV ON)
-      const recDate = parseToComparableDate(r.date);
-      if (appliedDailyFromDate && recDate) {
-        if (recDate < appliedDailyFromDate) return false;
+      const recDate = parseToComparableDate(r.date) || parseToComparableDate(r.raw_date);
+      if (appliedDailyFromDate) {
+        if (!recDate || recDate < appliedDailyFromDate) return false;
       }
-      if (appliedDailyToDate && recDate) {
-        if (recDate > appliedDailyToDate) return false;
+      if (appliedDailyToDate) {
+        if (!recDate || recDate > appliedDailyToDate) return false;
       }
 
       // 2. Booking Type Filter
@@ -615,9 +651,27 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
         }
       }
 
+      // 3. Search Query Filter (PAX name, Phone, Route, Pickup, SL, Amount)
+      if (appliedDailySearchQuery.trim()) {
+        const q = appliedDailySearchQuery.toLowerCase().trim();
+        const matches =
+          (r.pax && r.pax.toLowerCase().includes(q)) ||
+          (r.ph_no && r.ph_no.toLowerCase().includes(q)) ||
+          (r.from && r.from.toLowerCase().includes(q)) ||
+          (r.to && r.to.toLowerCase().includes(q)) ||
+          (r.pickup && r.pickup.toLowerCase().includes(q)) ||
+          (r.trav_by && r.trav_by.toLowerCase().includes(q)) ||
+          (r.date && r.date.toLowerCase().includes(q)) ||
+          (r.trav_on && r.trav_on.toLowerCase().includes(q)) ||
+          (String(r.sl || "") === q) ||
+          (String(r.booking || "").includes(q)) ||
+          (String(r.due || "").includes(q));
+        if (!matches) return false;
+      }
+
       return true;
     });
-  }, [dailyRecords, appliedDailyFromDate, appliedDailyToDate, appliedDailyBookingType]);
+  }, [dailyRecords, appliedDailyFromDate, appliedDailyToDate, appliedDailyBookingType, appliedDailySearchQuery]);
 
   // Dynamic Totals for Daily Reports
   const dailyTotals = useMemo(() => {
@@ -1353,16 +1407,26 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         {activeReport === "daily" ? (
           <div className="p-4 border-b border-slate-100 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
-            {/* Left: Heading with orange icon */}
-            <div className="flex items-center gap-2 shrink-0">
-              <FileSpreadsheet className="w-4 h-4 text-amber-500 shrink-0" />
-              <h3 className="font-black text-slate-900 text-sm whitespace-nowrap">
-                Daily Reports
-              </h3>
+            {/* Left: Heading with orange icon & record count badge */}
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+              <div className="flex items-center gap-2">
+                <FileSpreadsheet className="w-4 h-4 text-amber-500 shrink-0" />
+                <h3 className="font-black text-slate-900 text-sm whitespace-nowrap">
+                  Daily Reports
+                </h3>
+              </div>
+              <span className="text-[11px] font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200 shadow-2xs">
+                {filteredDailyRecords.length} {filteredDailyRecords.length === 1 ? "entry" : "entries"}
+              </span>
+              {searchFeedback && (
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full animate-in fade-in duration-150">
+                  {searchFeedback}
+                </span>
+              )}
             </div>
 
-            {/* Compact Controls: From Date -> To Date -> All Booking Types -> Search */}
-            <div className="flex flex-col sm:flex-row sm:flex-wrap xl:flex-nowrap items-stretch sm:items-center gap-2.5 w-full xl:w-auto">
+            {/* Compact Controls: From Date -> To Date -> All Booking Types -> Search Field -> Search Button -> Reset */}
+            <div className="flex flex-col sm:flex-row sm:flex-wrap xl:flex-nowrap items-stretch sm:items-center gap-2 w-full xl:w-auto">
               {/* From Date */}
               <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 focus-within:ring-2 focus-within:ring-amber-400 focus-within:border-amber-400 transition">
                 <label htmlFor="daily-from-date" className="text-[11px] font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap">
@@ -1375,6 +1439,9 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
                   onChange={(e) => {
                     setDailyFromDate(e.target.value);
                     if (dateError) setDateError(null);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleDailySearch();
                   }}
                   className="text-xs font-semibold text-slate-800 bg-transparent outline-none cursor-pointer w-full sm:w-auto"
                 />
@@ -1392,6 +1459,9 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
                   onChange={(e) => {
                     setDailyToDate(e.target.value);
                     if (dateError) setDateError(null);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleDailySearch();
                   }}
                   className="text-xs font-semibold text-slate-800 bg-transparent outline-none cursor-pointer w-full sm:w-auto"
                 />
@@ -1415,15 +1485,61 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
                 <ChevronDown className="w-3.5 h-3.5 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
 
+              {/* Search Query Field */}
+              <div className="relative flex-1 sm:w-44 xl:w-52">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={dailySearchQuery}
+                  onChange={(e) => setDailySearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleDailySearch();
+                  }}
+                  placeholder="Search name, ph, route..."
+                  className="w-full pl-8 pr-7 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition"
+                />
+                {dailySearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDailySearchQuery("");
+                      setAppliedDailySearchQuery("");
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full"
+                    title="Clear search text"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+
               {/* Search Button */}
               <button
                 type="button"
                 onClick={handleDailySearch}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-xs transition cursor-pointer"
+                disabled={isSearching}
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-1.5 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black text-xs rounded-xl shadow-xs transition cursor-pointer shrink-0 disabled:opacity-75"
               >
-                <Search className="w-3.5 h-3.5" />
+                {isSearching ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Search className="w-3.5 h-3.5" />
+                )}
                 <span>Search</span>
               </button>
+
+              {/* Reset Button */}
+              {hasActiveDailyFilters && (
+                <button
+                  type="button"
+                  onClick={handleResetDailyFilters}
+                  className="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer shrink-0"
+                  title="Reset all filters"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>Reset</span>
+                </button>
+              )}
             </div>
           </div>
         ) : (
