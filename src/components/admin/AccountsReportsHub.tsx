@@ -1112,94 +1112,82 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
         </div>
       </div>
 
-      {/* 4 Key Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Income / Total Booking */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              {activeReport === "daily" ? "Total Booking" : "Total Income"}
-            </p>
-            <p className="text-2xl font-black text-emerald-600 mt-1">
-              ₹{(activeReport === "daily" ? dailyTotals.booking : metrics.totalIncome).toLocaleString("en-IN")}
-            </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              {activeReport === "daily"
-                ? `Off Adv: ₹${dailyTotals.offAdv.toLocaleString("en-IN")} · Due: ₹${dailyTotals.due.toLocaleString("en-IN")}`
-                : `Online: ₹${metrics.totalOnline.toLocaleString("en-IN")} · Cash: ₹${metrics.totalCash.toLocaleString("en-IN")}`}
-            </p>
+      {/* 4 Key Metric Cards (Hidden on Daily Reports) */}
+      {activeReport !== "daily" && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total Income / Total Booking */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Total Income
+              </p>
+              <p className="text-2xl font-black text-emerald-600 mt-1">
+                ₹{metrics.totalIncome.toLocaleString("en-IN")}
+              </p>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Online: ₹{metrics.totalOnline.toLocaleString("en-IN")} · Cash: ₹{metrics.totalCash.toLocaleString("en-IN")}
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+              <ArrowDownLeft className="w-6 h-6" />
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
-            <ArrowDownLeft className="w-6 h-6" />
-          </div>
-        </div>
 
-        {/* Total Expenses / Office Advance */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              {activeReport === "daily" ? "Office Advance (Off Adv)" : "Total Expenses"}
-            </p>
-            <p className="text-2xl font-black text-blue-600 mt-1">
-              ₹{(activeReport === "daily" ? dailyTotals.offAdv : metrics.totalExpenses).toLocaleString("en-IN")}
-            </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              {activeReport === "daily" ? "Advance payments received in office" : "Disbursed supplier & fleet costs"}
-            </p>
+          {/* Total Expenses */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Total Expenses
+              </p>
+              <p className="text-2xl font-black text-blue-600 mt-1">
+                ₹{metrics.totalExpenses.toLocaleString("en-IN")}
+              </p>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Disbursed supplier &amp; fleet costs
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+              <ArrowUpRight className="w-6 h-6" />
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
-            <ArrowUpRight className="w-6 h-6" />
-          </div>
-        </div>
 
-        {/* Total Pending Payments / Remaining Due */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              {activeReport === "daily" ? "Total Due" : "Pending Dues"}
-            </p>
-            <p className="text-2xl font-black text-rose-600 mt-1">
-              ₹{(activeReport === "daily" ? dailyTotals.due : metrics.totalPending).toLocaleString("en-IN")}
-            </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              {activeReport === "daily" ? "Remaining customer dues to collect" : "Awaiting customer collection"}
-            </p>
+          {/* Pending Dues */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Pending Dues
+              </p>
+              <p className="text-2xl font-black text-rose-600 mt-1">
+                ₹{metrics.totalPending.toLocaleString("en-IN")}
+              </p>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Awaiting customer collection
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
+              <AlertCircle className="w-6 h-6" />
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
-            <AlertCircle className="w-6 h-6" />
-          </div>
-        </div>
 
-        {/* Net Balance / Cash Collected */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              {activeReport === "daily" ? "Net Collected" : "Net Balance"}
-            </p>
-            <p className={`text-2xl font-black mt-1 ${
-              (activeReport === "daily" ? dailyTotals.booking - dailyTotals.due : metrics.netBalance) >= 0 ? "text-indigo-600" : "text-rose-600"
-            }`}>
-              ₹{(activeReport === "daily" ? dailyTotals.booking - dailyTotals.due : metrics.netBalance).toLocaleString("en-IN")}
-            </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              {activeReport === "daily" ? (
-                <>
-                  Collection Rate: <span className="font-bold text-emerald-600">
-                    {dailyTotals.booking > 0 ? (((dailyTotals.booking - dailyTotals.due) / dailyTotals.booking) * 100).toFixed(1) : "0"}%
-                  </span>
-                </>
-              ) : (
-                <>
-                  Operating margin: <span className="font-bold text-emerald-600">{metrics.profitMargin}%</span>
-                </>
-              )}
-            </p>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600">
-            <IndianRupee className="w-6 h-6" />
+          {/* Net Balance */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Net Balance
+              </p>
+              <p className={`text-2xl font-black mt-1 ${metrics.netBalance >= 0 ? "text-indigo-600" : "text-rose-600"}`}>
+                ₹{metrics.netBalance.toLocaleString("en-IN")}
+              </p>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Operating margin: <span className="font-bold text-emerald-600">{metrics.profitMargin}%</span>
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600">
+              <IndianRupee className="w-6 h-6" />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Reports Overview Dashboard Hub (if activeReport === "reports") */}
       {activeReport === "reports" && (
