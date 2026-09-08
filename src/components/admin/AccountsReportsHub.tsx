@@ -484,6 +484,48 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
     appliedDailySearchQuery.trim()
   );
 
+  // Export Daily Reports to formatted Excel CSV
+  const handleExportExcelCSV = () => {
+    const headers = ["SL", "DATE", "TRAV ON", "TRAV BY", "PAX", "PH NO", "FROM", "TO", "PICK UP", "BOOKING", "OFF ADV", "DUE"];
+    const rows = filteredDailyRecords.map((r, idx) => [
+      idx + 1,
+      r.date,
+      r.trav_on,
+      r.trav_by,
+      `"${(r.pax || "").replace(/"/g, '""')}"`,
+      `"${r.ph_no || ""}"`,
+      `"${(r.from || "").replace(/"/g, '""')}"`,
+      `"${(r.to || "").replace(/"/g, '""')}"`,
+      `"${(r.pickup || "").replace(/"/g, '""')}"`,
+      r.booking,
+      r.off_adv,
+      r.due,
+    ]);
+    rows.push([
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Total Cash",
+      dailyTotals.booking,
+      dailyTotals.offAdv,
+      dailyTotals.due,
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Daily_Reports_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Daily Report Add / Edit Modal State
   const [dailyModalOpen, setDailyModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<DailyReportRecord | null>(null);
@@ -1516,6 +1558,17 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
                 <span>Search</span>
               </button>
 
+              {/* Excel Export Button */}
+              <button
+                type="button"
+                onClick={handleExportExcelCSV}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#107c41] hover:bg-[#0d6535] active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer shrink-0"
+                title="Download Excel Sheet (.csv)"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Export Excel</span>
+              </button>
+
               {/* Reset Button */}
               {hasActiveDailyFilters && (
                 <button
@@ -1554,150 +1607,165 @@ export function AccountsReportsHub({ initialReport = "reports", onSelectReport }
 
         <div className="overflow-x-auto">
           {activeReport === "daily" ? (
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="bg-slate-50 text-slate-600 font-black border-b border-slate-200 uppercase tracking-wider text-[10px]">
-                  <th className="py-3 px-3 text-center w-12">SL</th>
-                  <th className="py-3 px-3 whitespace-nowrap">DATE</th>
-                  <th className="py-3 px-3 whitespace-nowrap">TRAV ON</th>
-                  <th className="py-3 px-3 whitespace-nowrap">TRAV BY</th>
-                  <th className="py-3 px-3 whitespace-nowrap">PAX</th>
-                  <th className="py-3 px-3 whitespace-nowrap">PH NO</th>
-                  <th className="py-3 px-3 whitespace-nowrap">FROM</th>
-                  <th className="py-3 px-3 whitespace-nowrap">TO</th>
-                  <th className="py-3 px-3 whitespace-nowrap">PICK UP</th>
-                  <th className="py-3 px-3 text-right whitespace-nowrap">BOOKING</th>
-                  <th className="py-3 px-3 text-right whitespace-nowrap">OFF ADV</th>
-                  <th className="py-3 px-3 text-right whitespace-nowrap">DUE</th>
-                  <th className="py-3 px-3 text-center whitespace-nowrap w-24">ACTION</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
-                {filteredDailyRecords.length === 0 ? (
-                  <tr>
-                    <td colSpan={13} className="py-12 text-center text-slate-400">
-                      <AlertCircle className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                      <p className="font-bold text-sm">No daily report records match the selected date range and booking type.</p>
-                      <p className="text-xs text-slate-400 mt-1">Try selecting "All Booking Types" or adjusting your date range.</p>
-                    </td>
+            <div className="min-w-full inline-block align-middle">
+              <table className="w-full text-left text-xs border-collapse border border-slate-300 font-sans">
+                <thead>
+                  <tr className="bg-[#107c41] text-white font-black uppercase tracking-wider text-[11px]">
+                    <th className="py-2.5 px-3 text-center w-12 border border-[#0d6535] whitespace-nowrap">SL</th>
+                    <th className="py-2.5 px-3 text-center whitespace-nowrap border border-[#0d6535]">DATE</th>
+                    <th className="py-2.5 px-3 text-center whitespace-nowrap border border-[#0d6535]">TRAV ON</th>
+                    <th className="py-2.5 px-3 text-center whitespace-nowrap border border-[#0d6535]">TRAV BY</th>
+                    <th className="py-2.5 px-3 text-left whitespace-nowrap border border-[#0d6535]">PAX</th>
+                    <th className="py-2.5 px-3 text-left whitespace-nowrap border border-[#0d6535]">PH NO</th>
+                    <th className="py-2.5 px-3 text-left whitespace-nowrap border border-[#0d6535]">FROM</th>
+                    <th className="py-2.5 px-3 text-left whitespace-nowrap border border-[#0d6535]">TO</th>
+                    <th className="py-2.5 px-3 text-left whitespace-nowrap border border-[#0d6535]">PICK UP</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap border border-[#0d6535]">BOOKING</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap border border-[#0d6535]">OFF ADV</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap border border-[#0d6535]">DUE</th>
+                    <th className="py-2.5 px-3 text-center whitespace-nowrap w-24 border border-[#0d6535]">ACTION</th>
                   </tr>
-                ) : (
-                  filteredDailyRecords.map((r, idx) => (
-                    <tr key={r.id} className="hover:bg-slate-50/80 transition">
-                      {/* 1. SL */}
-                      <td className="py-3 px-3 text-center font-bold text-slate-500 whitespace-nowrap">
-                        {idx + 1}
-                      </td>
-
-                      {/* 2. DATE */}
-                      <td className="py-3 px-3 whitespace-nowrap font-bold text-slate-900">
-                        {r.date}
-                      </td>
-
-                      {/* 3. TRAV ON */}
-                      <td className="py-3 px-3 whitespace-nowrap text-slate-700 font-semibold">
-                        {r.trav_on}
-                      </td>
-
-                      {/* 4. TRAV BY */}
-                      <td className="py-3 px-3 whitespace-nowrap">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-700 border border-slate-200">
-                          {r.trav_by}
-                        </span>
-                      </td>
-
-                      {/* 5. PAX */}
-                      <td className="py-3 px-3 whitespace-nowrap">
-                        <span className="font-bold text-slate-900">{r.pax}</span>
-                      </td>
-
-                      {/* 6. PH NO */}
-                      <td className="py-3 px-3 whitespace-nowrap">
-                        <span className="font-mono text-slate-600">{r.ph_no}</span>
-                      </td>
-
-                      {/* 7. FROM */}
-                      <td className="py-3 px-3 whitespace-nowrap text-slate-800 font-semibold">
-                        {r.from}
-                      </td>
-
-                      {/* 8. TO */}
-                      <td className="py-3 px-3 whitespace-nowrap text-slate-800 font-semibold">
-                        {r.to}
-                      </td>
-
-                      {/* 9. PICK UP */}
-                      <td className="py-3 px-3 whitespace-nowrap text-slate-700">
-                        {r.pickup}
-                      </td>
-
-                      {/* 10. BOOKING */}
-                      <td className="py-3 px-3 text-right whitespace-nowrap font-bold text-slate-900">
-                        ₹{Number(r.booking).toLocaleString("en-IN")}
-                      </td>
-
-                      {/* 11. OFF ADV */}
-                      <td className="py-3 px-3 text-right whitespace-nowrap font-bold text-blue-600">
-                        ₹{Number(r.off_adv).toLocaleString("en-IN")}
-                      </td>
-
-                      {/* 12. DUE */}
-                      <td className="py-3 px-3 text-right whitespace-nowrap font-black">
-                        <span
-                          className={
-                            Number(r.due) > 0 ? "text-rose-600" : "text-emerald-700"
-                          }
-                        >
-                          ₹{Number(r.due).toLocaleString("en-IN")}
-                        </span>
-                      </td>
-
-                      {/* ACTIONS */}
-                      <td className="py-3 px-3 text-center whitespace-nowrap">
-                        <div className="flex items-center justify-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => openEditDailyModal(r)}
-                            className="p-1 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-md transition cursor-pointer"
-                            title="Edit Entry"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteDailyRecord(r.id)}
-                            className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition cursor-pointer"
-                            title="Delete Entry"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+                </thead>
+                <tbody className="divide-y divide-slate-300 font-medium">
+                  {filteredDailyRecords.length === 0 ? (
+                    <tr>
+                      <td colSpan={13} className="py-12 text-center text-slate-500 border border-slate-300 bg-white">
+                        <AlertCircle className="w-8 h-8 mx-auto mb-2 text-slate-400" />
+                        <p className="font-bold text-sm">No daily report records match the selected criteria.</p>
+                        <p className="text-xs text-slate-400 mt-1">Try resetting filters or adjusting your date range.</p>
                       </td>
                     </tr>
-                  ))
+                  ) : (
+                    filteredDailyRecords.map((r, idx) => (
+                      <tr key={r.id} className="bg-white even:bg-[#f7faf8] hover:bg-[#ebf5ec] transition-colors">
+                        {/* 1. SL */}
+                        <td className="py-2 px-3 text-center font-bold text-slate-700 whitespace-nowrap border border-slate-300 bg-slate-50/70">
+                          {idx + 1}
+                        </td>
+
+                        {/* 2. DATE */}
+                        <td className="py-2 px-3 text-center whitespace-nowrap font-medium text-slate-900 border border-slate-300">
+                          {r.date}
+                        </td>
+
+                        {/* 3. TRAV ON */}
+                        <td className="py-2 px-3 text-center whitespace-nowrap font-medium text-slate-800 border border-slate-300">
+                          {r.trav_on}
+                        </td>
+
+                        {/* 4. TRAV BY */}
+                        <td className="py-2 px-3 text-center whitespace-nowrap font-bold text-slate-800 border border-slate-300">
+                          {r.trav_by}
+                        </td>
+
+                        {/* 5. PAX */}
+                        <td className="py-2 px-3 whitespace-nowrap font-bold text-slate-900 border border-slate-300">
+                          {r.pax}
+                        </td>
+
+                        {/* 6. PH NO */}
+                        <td className="py-2 px-3 whitespace-nowrap font-medium text-slate-800 border border-slate-300">
+                          {r.ph_no}
+                        </td>
+
+                        {/* 7. FROM */}
+                        <td className="py-2 px-3 whitespace-nowrap text-slate-800 font-medium border border-slate-300">
+                          {r.from}
+                        </td>
+
+                        {/* 8. TO */}
+                        <td className="py-2 px-3 whitespace-nowrap text-slate-800 font-medium border border-slate-300">
+                          {r.to}
+                        </td>
+
+                        {/* 9. PICK UP */}
+                        <td className="py-2 px-3 whitespace-nowrap text-slate-700 border border-slate-300">
+                          {r.pickup}
+                        </td>
+
+                        {/* 10. BOOKING */}
+                        <td className="py-2 px-3 text-right whitespace-nowrap font-bold text-slate-900 border border-slate-300 bg-emerald-50/20">
+                          ₹{Number(r.booking).toLocaleString("en-IN")}
+                        </td>
+
+                        {/* 11. OFF ADV */}
+                        <td className="py-2 px-3 text-right whitespace-nowrap font-bold text-blue-700 border border-slate-300 bg-blue-50/20">
+                          ₹{Number(r.off_adv).toLocaleString("en-IN")}
+                        </td>
+
+                        {/* 12. DUE */}
+                        <td className="py-2 px-3 text-right whitespace-nowrap font-black border border-slate-300 bg-rose-50/20">
+                          <span
+                            className={
+                              Number(r.due) > 0 ? "text-rose-600" : "text-emerald-700"
+                            }
+                          >
+                            ₹{Number(r.due).toLocaleString("en-IN")}
+                          </span>
+                        </td>
+
+                        {/* ACTIONS */}
+                        <td className="py-2 px-3 text-center whitespace-nowrap border border-slate-300 bg-slate-50/40">
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => openEditDailyModal(r)}
+                              className="p-1 text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition cursor-pointer"
+                              title="Edit Entry"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteDailyRecord(r.id)}
+                              className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition cursor-pointer"
+                              title="Delete Entry"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+                {filteredDailyRecords.length > 0 && (
+                  <tfoot className="bg-[#eef7ee] text-slate-900 font-black border-t-2 border-slate-400 border-b-4 border-double border-slate-500">
+                    <tr>
+                      <td colSpan={8} className="py-2.5 px-3 border border-slate-300 bg-slate-100/70"></td>
+                      <td className="py-2.5 px-3 text-right font-black text-slate-900 whitespace-nowrap text-xs uppercase tracking-wider border border-slate-300 bg-[#d9ebd9]">
+                        Total Cash
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-black text-emerald-800 whitespace-nowrap text-sm border border-slate-300 bg-[#d9ebd9]/70">
+                        ₹{dailyTotals.booking.toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-black text-blue-800 whitespace-nowrap text-sm border border-slate-300 bg-[#d9ebd9]/70">
+                        ₹{dailyTotals.offAdv.toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-black text-rose-700 whitespace-nowrap text-sm border border-slate-300 bg-[#d9ebd9]/70">
+                        ₹{dailyTotals.due.toLocaleString("en-IN")}
+                      </td>
+                      <td className="py-2.5 px-3 border border-slate-300 bg-slate-100/70"></td>
+                    </tr>
+                  </tfoot>
                 )}
-              </tbody>
-              {filteredDailyRecords.length > 0 && (
-                <tfoot className="bg-slate-100 text-slate-900 font-black border-t-2 border-slate-300">
-                  <tr>
-                    <td colSpan={8} className="py-3 px-3 text-right"></td>
-                    <td className="py-3 px-3 font-black text-slate-900 whitespace-nowrap text-xs uppercase tracking-wider">
-                      Total Cash
-                    </td>
-                    <td className="py-3 px-3 text-right font-black text-emerald-700 whitespace-nowrap text-sm">
-                      ₹{dailyTotals.booking.toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3 px-3 text-right font-black text-blue-700 whitespace-nowrap text-sm">
-                      ₹{dailyTotals.offAdv.toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3 px-3 text-right font-black text-rose-700 whitespace-nowrap text-sm">
-                      ₹{dailyTotals.due.toLocaleString("en-IN")}
-                    </td>
-                    <td className="py-3 px-3"></td>
-                  </tr>
-                </tfoot>
-              )}
-            </table>
+              </table>
+
+              {/* Excel-style Sheet Tab Bar */}
+              <div className="bg-[#f3f4f6] border-t border-slate-300 px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 select-none">
+                <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2 px-3 py-1 bg-white border-t-2 border-t-[#107c41] border-x border-b border-slate-300 font-bold text-slate-800 shadow-2xs rounded-t-sm">
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-[#107c41]" />
+                    <span>Daily Reports Sheet</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 text-[11px] font-semibold text-slate-500">
+                  <span>Rows: <strong className="text-slate-800">{filteredDailyRecords.length}</strong></span>
+                  <span>Total Booking: <strong className="text-emerald-700">₹{dailyTotals.booking.toLocaleString("en-IN")}</strong></span>
+                  <span>Total Due: <strong className="text-rose-700">₹{dailyTotals.due.toLocaleString("en-IN")}</strong></span>
+                </div>
+              </div>
+            </div>
           ) : (
             <table className="w-full text-left text-xs border-collapse">
               <thead>
