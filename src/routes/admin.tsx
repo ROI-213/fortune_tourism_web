@@ -1380,7 +1380,7 @@ function AdminPage() {
               <div className="mb-2">
                 <div className="mb-4">
                   <h2 className="text-2xl sm:text-3xl font-black text-white font-heading drop-shadow-md tracking-tight">
-                    Booking Itinerary
+                    Select Your Category
                   </h2>
                 </div>
 
