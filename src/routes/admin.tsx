@@ -948,154 +948,181 @@ function AdminPage() {
   }
 
   if (!isAuthenticated) {
+    const tempoSlide = {
+      eyebrow: "GROUP TRAVEL",
+      title: "TEMPO TRAVELLER",
+      tagline: "SPACE. TOGETHERNESS. ADVENTURE.",
+      quote: "“Comfortable luxury group touring for family outings, pilgrimages and corporate events.”",
+      image: fleetTempoImg,
+      alt: "Force Tempo Traveller - Fortune Tourism Fleet",
+    };
+
     return (
-      <div className="h-screen h-[100dvh] w-full overflow-hidden flex flex-col bg-[#0b1329]">
-        {/* Top Header: Compact White Section with Official Integrated Fortune Tourism Logo */}
-        <header className="relative w-full shrink-0 bg-white border-b border-slate-200/90 text-slate-900 py-1.5 sm:py-2 flex items-center justify-center shadow-xs z-20">
-          <div className="w-full flex items-center justify-center text-center px-3 sm:px-4">
+      <div className="min-h-screen min-h-[100dvh] w-full flex flex-col bg-slate-50 text-slate-900">
+        {/* Top Header: Clean White Section with Official Integrated Fortune Tourism Logo */}
+        <header className="relative w-full shrink-0 bg-white border-b border-slate-200/90 py-2 sm:py-2.5 flex items-center justify-center shadow-xs z-20">
+          <div className="w-full max-w-7xl mx-auto flex items-center justify-center text-center px-4 sm:px-6">
             <h1 className="sr-only">Fortune Tourism - Meets all your travel needs</h1>
             <img
               src={fullLogoAsset}
               alt="Fortune Tourism - Meets all your travel needs"
-              className="h-7 sm:h-8 md:h-10 lg:h-11 w-auto max-w-[65vw] sm:max-w-[50vw] md:max-w-[40vw] object-contain block mx-auto"
+              className="h-8 sm:h-9 md:h-10 lg:h-11 w-auto max-w-[65vw] sm:max-w-[50vw] md:max-w-[40vw] object-contain block mx-auto"
             />
           </div>
         </header>
 
-        {/* Bottom Half: Destination Slider Background Section with Words Content & Login Card */}
-        <main className="relative flex-1 min-h-0 w-full overflow-hidden flex flex-col items-center justify-center px-3 sm:px-4 py-2">
-          {/* Automatic Moving Background Images with Cross-Fade */}
-          <div className="absolute inset-0 z-0">
-            {LOGIN_DESTINATION_SLIDES.map((slide, idx) => (
-              <div
-                key={slide.title}
-                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                  idx === activeSlide ? "opacity-100 z-1" : "opacity-0 z-0 pointer-events-none"
-                }`}
-              >
-                <img
-                  src={slide.image}
-                  alt={slide.alt}
-                  className="w-full h-full object-cover object-center"
-                />
-              </div>
-            ))}
-            {/* Cinematic Gradient Overlays for high contrast */}
-            <div className="absolute inset-0 z-2 bg-gradient-to-t from-[#0b1329]/95 via-[#0b1329]/75 to-[#0b1329]/85" />
-            <div className="absolute inset-0 z-2 bg-black/35 backdrop-blur-[0.5px]" />
-          </div>
+        {/* Two-Column Layout below Header */}
+        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex flex-col justify-center">
+          <div className="w-full flex flex-col lg:flex-row items-stretch justify-center gap-6 lg:gap-8">
+            {/* Left Side (~65% width): Tempo Traveller Promotional Showcase Panel */}
+            <div className="w-full lg:w-[65%] bg-white rounded-2xl border border-slate-200/90 shadow-md p-6 sm:p-8 flex flex-col justify-between overflow-hidden">
+              {/* Top Text Content */}
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-black uppercase tracking-[0.25em] bg-emerald-50 text-[#063f2d] border border-emerald-200/70 shadow-2xs">
+                    <Sparkles className="w-3 h-3 text-[#d79a17]" />
+                    {tempoSlide.eyebrow}
+                  </span>
+                  <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    Fortune Tourism Fleet
+                  </span>
+                </div>
 
-          <div className="relative z-10 w-full max-w-3xl mx-auto flex flex-col items-center justify-center text-center my-auto">
-            {/* Words Content matching the active slide */}
-            <div className="flex flex-col items-center justify-center mb-1 sm:mb-2">
-              <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.3em] text-amber-300/95 drop-shadow transition-all duration-500">
-                {LOGIN_DESTINATION_SLIDES[activeSlide].eyebrow}
-              </p>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 font-heading tracking-tight uppercase mt-1 leading-tight">
+                  {tempoSlide.title}
+                </h2>
 
-              <h2 className="font-heading text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-wider text-white uppercase drop-shadow-2xl leading-tight my-0.5 transition-all duration-500">
-                {LOGIN_DESTINATION_SLIDES[activeSlide].title}
-              </h2>
+                <div className="flex items-center gap-2 max-w-md my-1.5">
+                  <div className="h-px bg-gradient-to-r from-transparent via-amber-400 to-amber-500 w-8 sm:w-12 shrink-0" />
+                  <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-[#d79a17] whitespace-nowrap">
+                    {tempoSlide.tagline}
+                  </p>
+                  <div className="h-px bg-gradient-to-r from-amber-500 via-amber-400 to-transparent flex-1" />
+                </div>
 
-              <div className="flex items-center justify-center gap-2 w-full max-w-xs sm:max-w-sm my-0.5">
-                <div className="h-px bg-gradient-to-r from-transparent via-amber-400/80 to-amber-400 flex-1" />
-                <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300 whitespace-nowrap drop-shadow transition-all duration-500">
-                  {LOGIN_DESTINATION_SLIDES[activeSlide].tagline}
+                <p className="text-xs sm:text-sm text-slate-600 italic font-serif leading-relaxed max-w-xl">
+                  {tempoSlide.quote}
                 </p>
-                <div className="h-px bg-gradient-to-r from-amber-400 via-amber-400/80 to-transparent flex-1" />
               </div>
 
-              <p className="max-w-lg text-[10px] sm:text-xs text-slate-200 italic font-serif leading-snug px-3 drop-shadow-md transition-all duration-500 line-clamp-2 sm:line-clamp-none">
-                {LOGIN_DESTINATION_SLIDES[activeSlide].quote}
-              </p>
-            </div>
-
-            {/* Slide Navigation Indicator Dots */}
-            <div className="flex items-center justify-center gap-1.5 mb-2 sm:mb-2.5">
-              {LOGIN_DESTINATION_SLIDES.map((slide, idx) => (
-                <button
-                  key={slide.title}
-                  type="button"
-                  onClick={() => setActiveSlide(idx)}
-                  className={`h-1 rounded-full transition-all duration-500 cursor-pointer ${
-                    idx === activeSlide
-                      ? "w-5 bg-amber-400 shadow-xs"
-                      : "w-1 bg-white/40 hover:bg-white/70"
-                  }`}
-                  aria-label={`Go to ${slide.title} slide`}
+              {/* Center Image: Pristine Force Tempo Traveller with Original Brightness & Full Visibility */}
+              <div className="flex-1 min-h-[220px] sm:min-h-[260px] lg:min-h-[300px] flex items-center justify-center py-4 my-auto">
+                <img
+                  src={tempoSlide.image}
+                  alt={tempoSlide.alt}
+                  className="w-full h-auto max-h-[260px] sm:max-h-[300px] lg:max-h-[340px] object-contain mx-auto transition-transform duration-500 hover:scale-[1.02] drop-shadow-md"
                 />
-              ))}
+              </div>
+
+              {/* Bottom Feature Badges */}
+              <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-slate-500">
+                <span className="flex items-center gap-1.5 text-slate-700">
+                  <Shield className="w-3.5 h-3.5 text-emerald-600" />
+                  Verified Fleet &amp; Expert Chauffeurs
+                </span>
+                <span className="flex items-center gap-1.5 text-slate-700">
+                  <Users className="w-3.5 h-3.5 text-blue-600" />
+                  12 - 26 Seater Luxury Seating
+                </span>
+                <span className="flex items-center gap-1.5 text-[#063f2d] font-bold">
+                  <Car className="w-3.5 h-3.5 text-[#d79a17]" />
+                  All South India Outstation Tours
+                </span>
+              </div>
             </div>
 
-            {/* Login Credentials Card */}
-            <div className="w-full max-w-[92vw] sm:max-w-[340px] mx-auto bg-white/95 backdrop-blur-md border border-white/30 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-2.5 sm:space-y-3 text-left">
+            {/* Right Side (~35% width): Admin Login Credentials Form Card */}
+            <div className="w-full lg:w-[35%] bg-white rounded-2xl border border-slate-200/90 shadow-md p-6 sm:p-8 flex flex-col justify-center">
+              <div className="mb-5">
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-50 text-[#063f2d] text-xs font-black uppercase tracking-wider mb-2 border border-emerald-200/60">
+                  <Shield className="w-3.5 h-3.5 text-[#063f2d]" />
+                  Admin Portal
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 font-heading tracking-tight">
+                  Sign In to Dashboard
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Enter your administrator credentials to access fleet, bookings, and itinerary management.
+                </p>
+              </div>
+
               {loginError && (
-                <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-2.5 text-xs text-red-700">
-                  <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0 mt-0.5" />
+                <div className="mb-4 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700">
+                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
                   <div className="font-medium leading-tight">{loginError}</div>
                 </div>
               )}
 
-              <form onSubmit={handleAdminLogin} className="space-y-2 sm:space-y-2.5">
+              <form onSubmit={handleAdminLogin} className="space-y-4">
                 <div>
-                  <label className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-700 block mb-1">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
                     User ID / Email *
                   </label>
                   <div className="relative">
-                    <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
                       required
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       placeholder="adminfortunetourism@gmail.com"
-                      className="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
+                      className="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition shadow-2xs"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-700 block mb-1">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
                     Password *
                   </label>
                   <div className="relative">
-                    <KeyRound className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type={showPassword ? "text" : "password"}
                       required
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-9 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
+                      className="w-full bg-white border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition shadow-2xs"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer transition"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
-                      {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
 
-                <div className="pt-1">
+                <div className="pt-2">
                   <button
                     type="submit"
                     disabled={loginLoading}
-                    className="w-full py-2 sm:py-2.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-amber-500/20 hover:shadow-lg transition-all flex items-center justify-center gap-1.5 disabled:opacity-60 cursor-pointer"
+                    className="w-full py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-sm shadow-md shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
                   >
                     {loginLoading ? (
                       <>
-                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Authenticating...
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Authenticating...</span>
                       </>
                     ) : (
                       <>
-                        <Shield className="w-3.5 h-3.5" /> Sign In
+                        <Shield className="w-4 h-4" />
+                        <span>Sign In</span>
                       </>
                     )}
                   </button>
                 </div>
               </form>
+
+              <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-center gap-1.5 text-slate-400 text-xs text-center">
+                <Lock className="w-3.5 h-3.5 text-emerald-700" />
+                <span className="text-[11px] font-medium text-slate-500">
+                  Authorized Fortune Tourism Personnel Only
+                </span>
+              </div>
             </div>
           </div>
         </main>
